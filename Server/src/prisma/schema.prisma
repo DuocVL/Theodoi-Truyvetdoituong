@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+    id String @id @unique @default(uuid())
+    full_name String 
+    username String @unique
+    password String 
+    email String?
+    status Boolean @default(false)
+    created_at DateTime @default(now())
+    update_at DateTime @updatedAt
+
+    userRole UserRole[] @relation("UserToUserRole")
+    subject Subject[] @relation("UserToSubject")
+    zone Zone[] @relation("UserToZone")
+}
+
+model Role {
+    id Int @id @unique @default(autoincrement())
+    name String @unique 
+    description String?
+
+    userRole UserRole[] @relation("RoleToUserRole")
+}
+
+model UserRole {
+  user_id String 
+  role_id Int 
+
+  user User @relation("UserToUserRole", fields: [user_id], references: [id], onDelete: Cascade)
+  role Role @relation("RoleToUserRole", fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, role_id])
+  @@map("user_roles")
+}
+
+
+model Subject {
+  id String @id @unique @default(uuid()) 
+  code String @unique @default(uuid()) //Mã hồ sơ
+  full_name String 
+  username String @unique
+  password String 
+  device_token String @default(uuid())
+  dob DateTime? //Ngày sinh
+  gender String? // Giới tính
+  id_number String? // CCCD
+
+  status String
+  created_by String 
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  subjectZone SubjectZone[] @relation("SubjectToSubjectZone")
+  locationLog LocationLog[] @relation("SubjectToLocationLog") 
+  checkin Checkin[] @relation("SubjectToCheckin")
+  faceData FaceData[] @relation("SubjectToFaceData")
+  alert Alert[] @relation("SubjectToAlert")
+
+  user User @relation("UserToSubject", fields: [created_by], references: [id], onDelete: Cascade)
+}
+
+model FaceData {
+  id String @id @unique @default(uuid())
+  subject_id String
+  embedding Unsupported("vector(128)")
+  image_url String
+  status Boolean @default(false)
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  subject Subject @relation("SubjectToFaceData", fields: [subject_id], references: [id], onDelete: Cascade)
+}
+
+
+model Zone {
+  id String @id @unique @default(uuid())
+  zone_name String 
+  geom Unsupported("GEOGRAPHY")
+  description String?
+  created_by String
+  status Boolean @default(true)
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  checkinRule CheckInRule[] @relation("ZoneToCheckInRule")
+  subjectZone SubjectZone[] @relation("ZoneToSubjectZone")
+
+  user User @relation("UserToZone", fields: [created_by], references: [id], onDelete: Cascade)
+}
+
+model SubjectZone {
+  subject_id String 
+  zone_id String
+  
+  subject Subject @relation("SubjectToSubjectZone", fields: [subject_id], references: [id], onDelete: Cascade)
+  zone Zone @relation("ZoneToSubjectZone", fields: [zone_id], references: [id], onDelete: Cascade)
+
+  @@id([subject_id, zone_id])
+
+}
+
+model LocationLog {
+    id BigInt @id @unique @default(autoincrement())
+    subject_id String 
+    location Unsupported("GEOGRAPHY") 
+    latitude Decimal @db.Decimal(9,6)
+    longitude Decimal @db.Decimal(9,6)
+    accuracy Float @default(0.0)
+    source String?
+    recorded_at DateTime @default(now())
+
+    subject Subject @relation("SubjectToLocationLog", fields: [subject_id], references: [id], onDelete: Cascade)
+}
+
+model Checkin {
+  id BigInt @id @unique @default(autoincrement())
+  subject_id String 
+  location Unsupported("GEOGRAPHY")
+  image_url String?
+  face_verified Boolean @default(false)
+  confidence Float 
+  checkin_time DateTime @default(now())
+
+  subject Subject @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
+}
+
+model CheckInRule {
+  id String @id @unique @default(uuid())
+  zone_id String
+  interval_minutes Int @default(15)
+  created_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  zone Zone @relation("ZoneToCheckInRule", fields: [zone_id], references: [id], onDelete: Cascade)
+}
+
+model Alert {
+  id String @id @unique @default(uuid())
+  subject_id String
+  type String
+  severity Int
+  message String
+  created_at DateTime @default(now())
+  status String 
+
+  subject Subject @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
+}
+
+
+
