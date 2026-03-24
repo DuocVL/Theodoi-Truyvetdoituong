@@ -7,33 +7,35 @@ datasource db {
   provider = "postgresql"
 }
 
-
 model User {
-    id String @id @unique @default(uuid())
-    full_name String 
-    username String @unique
-    password String 
-    email String?
-    status Boolean @default(false)
-    created_at DateTime @default(now())
-    update_at DateTime @updatedAt
+  id                   String   @id @default(uuid())
+  full_name            String
+  username             String   @unique
+  password             String
+  email                String?
+  status               Boolean  @default(true)
+  authentication_email Boolean  @default(false)
+  created_at           DateTime @default(now())
+  update_at            DateTime @updatedAt
 
-    userRole UserRole[] @relation("UserToUserRole")
-    subject Subject[] @relation("UserToSubject")
-    zone Zone[] @relation("UserToZone")
+  userRole  UserRole[]  @relation("UserToUserRole")
+  subject   Subject[]   @relation("UserToSubject")
+  zone      Zone[]      @relation("UserToZone")
+  alerts    Alert[]     @relation("ResolvedAlerts")
+  auditLogs SystemLog[] @relation("UserToSystemLog")
 }
 
 model Role {
-    id Int @id @unique @default(autoincrement())
-    name String @unique 
-    description String?
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
 
-    userRole UserRole[] @relation("RoleToUserRole")
+  userRole UserRole[] @relation("RoleToUserRole")
 }
 
 model UserRole {
-  user_id String 
-  role_id Int 
+  user_id String
+  role_id Int
 
   user User @relation("UserToUserRole", fields: [user_id], references: [id], onDelete: Cascade)
   role Role @relation("RoleToUserRole", fields: [role_id], references: [id], onDelete: Cascade)
@@ -42,118 +44,156 @@ model UserRole {
   @@map("user_roles")
 }
 
-
 model Subject {
-  id String @id @unique @default(uuid()) 
-  code String @unique @default(uuid()) //Mã hồ sơ
-  full_name String 
-  username String @unique
-  password String 
-  device_token String @default(uuid())
-  dob DateTime? //Ngày sinh
-  gender String? // Giới tính
+  id        String    @id @default(uuid())
+  code      String    @unique @default(uuid()) //Mã hồ sơ
+  full_name String
+  dob       DateTime? //Ngày sinh
+  gender    String? // Giới tính
   id_number String? // CCCD
+  address   String?
+  phone     String?
+  username  String    @unique
+  password  String
 
-  status String
-  created_by String 
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  status           String    @default("ACTIVE") // ACTIVE, INACTIVE, VIOLATED
+  monitoring_start DateTime?
+  monitoring_end   DateTime?
+  created_by       String
+  created_at       DateTime  @default(now())
+  update_at        DateTime  @updatedAt
+  deleted_at       DateTime?
 
+  creator     User          @relation("UserToSubject", fields: [created_by], references: [id])
   subjectZone SubjectZone[] @relation("SubjectToSubjectZone")
-  locationLog LocationLog[] @relation("SubjectToLocationLog") 
-  checkin Checkin[] @relation("SubjectToCheckin")
-  faceData FaceData[] @relation("SubjectToFaceData")
-  alert Alert[] @relation("SubjectToAlert")
+  locationLog LocationLog[] @relation("SubjectToLocationLog")
+  checkin     Checkin[]     @relation("SubjectToCheckin")
+  faceData    FaceData[]    @relation("SubjectToFaceData")
+  alert       Alert[]       @relation("SubjectToAlert")
+  events      EventLog[]    @relation("SubjectToEventLog")
+  device      Device[]      @relation("SubjectTodevice")
+}
 
-  user User @relation("UserToSubject", fields: [created_by], references: [id], onDelete: Cascade)
+model Device {
+  id         String @id @default(uuid())
+  subject_id String
+
+  device_token String? // FCM token
+  device_uuid  String // ID thiết bị (unique từ app)
+  platform     String // ANDROID / IOS
+  app_version  String?
+
+  is_active  Boolean @default(true)
+  is_trusted Boolean @default(true)
+
+  last_seen_at DateTime?
+  created_at   DateTime  @default(now())
+
+  subject Subject @relation("SubjectTodevice", fields: [subject_id], references: [id], onDelete: Cascade)
+
+  @@unique([subject_id, device_uuid])
 }
 
 model FaceData {
-  id String @id @unique @default(uuid())
+  id         String                     @id @default(uuid())
   subject_id String
-  embedding Unsupported("vector(128)")
-  image_url String
-  status Boolean @default(false)
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  embedding  Unsupported("vector(128)")
+  image_url  String
+  is_active  Boolean                    @default(false)
+  created_at DateTime                   @default(now())
+  update_at  DateTime                   @updatedAt
 
   subject Subject @relation("SubjectToFaceData", fields: [subject_id], references: [id], onDelete: Cascade)
 }
 
-
 model Zone {
-  id String @id @unique @default(uuid())
-  zone_name String 
-  geom Unsupported("GEOGRAPHY")
+  id          String                                  @id @default(uuid())
+  zone_name   String
+  geom        Unsupported("GEOGRAPHY(Polygon, 4326)")
   description String?
-  created_by String
-  status Boolean @default(true)
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
+  created_by  String
+  is_active   Boolean                                 @default(true)
+  created_at  DateTime                                @default(now())
+  update_at   DateTime                                @updatedAt
 
-  checkinRule CheckInRule[] @relation("ZoneToCheckInRule")
+  creator     User          @relation("UserToZone", fields: [created_by], references: [id])
   subjectZone SubjectZone[] @relation("ZoneToSubjectZone")
-
-  user User @relation("UserToZone", fields: [created_by], references: [id], onDelete: Cascade)
 }
 
 model SubjectZone {
-  subject_id String 
-  zone_id String
-  
+  subject_id String
+  zone_id    String
+
+  interval_minutes Int      @default(15)
+  created_at       DateTime @default(now())
+
   subject Subject @relation("SubjectToSubjectZone", fields: [subject_id], references: [id], onDelete: Cascade)
-  zone Zone @relation("ZoneToSubjectZone", fields: [zone_id], references: [id], onDelete: Cascade)
+  zone    Zone    @relation("ZoneToSubjectZone", fields: [zone_id], references: [id], onDelete: Cascade)
 
   @@id([subject_id, zone_id])
-
 }
 
 model LocationLog {
-    id BigInt @id @unique @default(autoincrement())
-    subject_id String 
-    location Unsupported("GEOGRAPHY") 
-    latitude Decimal @db.Decimal(9,6)
-    longitude Decimal @db.Decimal(9,6)
-    accuracy Float @default(0.0)
-    source String?
-    recorded_at DateTime @default(now())
+  id          BigInt                                @id @default(autoincrement())
+  subject_id  String
+  location    Unsupported("GEOGRAPHY(Point, 4326)")
+  accuracy    Float                                 @default(0.0)
+  source      String?
+  recorded_at DateTime                              @default(now())
+  is_mock     Boolean                               @default(false)
+  speed       Float?
+  device_id   String?
 
-    subject Subject @relation("SubjectToLocationLog", fields: [subject_id], references: [id], onDelete: Cascade)
+  subject Subject @relation("SubjectToLocationLog", fields: [subject_id], references: [id], onDelete: Cascade)
 }
 
 model Checkin {
-  id BigInt @id @unique @default(autoincrement())
-  subject_id String 
-  location Unsupported("GEOGRAPHY")
-  image_url String?
-  face_verified Boolean @default(false)
-  confidence Float 
-  checkin_time DateTime @default(now())
+  id            BigInt                                @id @default(autoincrement())
+  subject_id    String
+  location      Unsupported("GEOGRAPHY(Point, 4326)")
+  image_url     String?
+  face_verified Boolean                               @default(false)
+  confidence    Float // Độ chính xác khi đối chiếu khuôn mặt
+  status        String                                @default("ON_TIME") // ON_TIME, LATE, MISS
+  checkin_time  DateTime                              @default(now())
 
   subject Subject @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
 }
 
-model CheckInRule {
-  id String @id @unique @default(uuid())
-  zone_id String
-  interval_minutes Int @default(15)
-  created_at DateTime @default(now())
-  update_at DateTime @updatedAt
-
-  zone Zone @relation("ZoneToCheckInRule", fields: [zone_id], references: [id], onDelete: Cascade)
-}
-
 model Alert {
-  id String @id @unique @default(uuid())
+  id         String                                 @id @default(uuid())
   subject_id String
-  type String
-  severity Int
-  message String
-  created_at DateTime @default(now())
-  status String 
+  type       String
+  severity   Int
+  message    String
+  location   Unsupported("GEOGRAPHY(Point, 4326)")?
 
-  subject Subject @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
+  status      String    @default("PENDING") // PENDING, RESOLVED, IGNORED
+  resolved_by String?
+  resolved_at DateTime?
+  created_at  DateTime  @default(now())
+
+  subject  Subject @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
+  resolver User?   @relation("ResolvedAlerts", fields: [resolved_by], references: [id])
 }
 
+model EventLog {
+  id          BigInt   @id @default(autoincrement())
+  subject_id  String
+  event_type  String // ZONE_ENTRY, ZONE_EXIT, PROFILE_UPDATED
+  description String
+  created_at  DateTime @default(now())
 
+  subject Subject @relation("SubjectToEventLog", fields: [subject_id], references: [id], onDelete: Cascade)
+}
 
+model SystemLog {
+  id         BigInt   @id @default(autoincrement())
+  user_id    String
+  action     String // CREATE_SUBJECT, UPDATE_ZONE, RESOLVE_ALERT
+  ip_address String?
+  details    String?
+  created_at DateTime @default(now())
+
+  user User @relation("UserToSystemLog", fields: [user_id], references: [id])
+}
