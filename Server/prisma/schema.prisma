@@ -1,26 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"  
+  provider = "postgresql"
+  extensions = [postgis, vector]
+}
+
+enum AccountType {
+  USER
+  SUBJECT
+}
+
+model Account {
+  id         String      @id @default(uuid())
+  type       AccountType
+  username   String      @unique
+  password   String
+  status     String      @default("ACTIVE")
+  created_at DateTime    @default(now())
+
+  user    User?
+  subject Subject?
+
+  refreshToken RefreshToken[]
+  devices      Device[]
+
+  @@map("accounts")
 }
 
 model User {
-  id                   String      @id @default(uuid())
-  full_name            String
-  username             String      @unique
-  password             String
-  email                String?
-  status               Boolean     @default(true)
-  authentication_email Boolean     @default(false)
-  created_at           DateTime    @default(now())
-  update_at            DateTime    @updatedAt
-  alerts               Alert[]     @relation("ResolvedAlerts")
-  subject              Subject[]   @relation("UserToSubject")
-  auditLogs            SystemLog[] @relation("UserToSystemLog")
-  zone                 Zone[]      @relation("UserToZone")
-  userRole             UserRole[]  @relation("UserToUserRole")
+  id         String  @id @default(uuid())
+  account_id String  @unique
+  full_name  String
+  email      String?
+  status     Boolean @default(true)
+
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+
+  account Account @relation(fields: [account_id], references: [id])
+
+  alerts    Alert[]     @relation("ResolvedAlerts")
+  subject   Subject[]   @relation("UserToSubject")
+  auditLogs SystemLog[] @relation("UserToSystemLog")
+  zone      Zone[]      @relation("UserToZone")
+  userRole  UserRole[]  @relation("UserToUserRole")
+
+  @@map("users")
 }
 
 model Role {
@@ -28,6 +63,8 @@ model Role {
   name        String     @unique
   description String?
   userRole    UserRole[] @relation("RoleToUserRole")
+
+  @@map("roles")
 }
 
 model UserRole {
@@ -41,40 +78,59 @@ model UserRole {
 }
 
 model Subject {
-  id               String        @id @default(uuid())
-  code             String        @unique @default(uuid())
-  full_name        String
-  dob              DateTime?
-  gender           String?
-  id_number        String?
-  address          String?
-  phone            String?
-  username         String        @unique
-  password         String
-  status           String        @default("ACTIVE")
+  id         String @id @default(uuid())
+  account_id String @unique
+
+  code      String    @unique @default(uuid())
+  full_name String
+  dob       DateTime?
+  gender    String?
+  id_number String?
+  address   String?
+  phone     String?
+
+  status           String    @default("ACTIVE")
   monitoring_start DateTime?
   monitoring_end   DateTime?
-  created_by       String
-  created_at       DateTime      @default(now())
-  update_at        DateTime      @updatedAt
-  deleted_at       DateTime?
-  alert            Alert[]       @relation("SubjectToAlert")
-  checkin          Checkin[]     @relation("SubjectToCheckin")
-  device           Device[]      @relation("SubjectTodevice")
-  events           EventLog[]    @relation("SubjectToEventLog")
-  faceData         FaceData[]    @relation("SubjectToFaceData")
-  locationLog      LocationLog[] @relation("SubjectToLocationLog")
-  creator          User          @relation("UserToSubject", fields: [created_by], references: [id])
-  subjectZone      SubjectZone[] @relation("SubjectToSubjectZone")
+
+  created_by String
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+  deleted_at DateTime
+
+  creator User    @relation("UserToSubject", fields: [created_by], references: [id])
+  account Account @relation(fields: [account_id], references: [id])
+
+  alert       Alert[]       @relation("SubjectToAlert")
+  checkin     Checkin[]     @relation("SubjectToCheckin")
+  events      EventLog[]    @relation("SubjectToEventLog")
+  faceData    FaceData[]    @relation("SubjectToFaceData")
+
+  subjectZone SubjectZone[] @relation("SubjectToSubjectZone")
 
   @@index([full_name])
   @@index([status])
   @@index([created_by])
+  @@map("subjects")
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  token_hash      String   @unique
+  account_id String
+  device_id String
+  revoked    Boolean  @default(false)
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  @@map("refreshtokens")
 }
 
 model Device {
   id           String    @id @default(uuid())
-  subject_id   String
+  account_id   String
   device_token String?
   device_uuid  String
   platform     String
@@ -83,9 +139,11 @@ model Device {
   is_trusted   Boolean   @default(true)
   last_seen_at DateTime?
   created_at   DateTime  @default(now())
-  subject      Subject   @relation("SubjectTodevice", fields: [subject_id], references: [id], onDelete: Cascade)
+  account      Account?  @relation(fields: [accountId], references: [id])
+  accountId    String?
 
-  @@unique([subject_id, device_uuid])
+  @@unique([account_id, device_uuid])
+  @@map("devices")
 }
 
 model FaceData {
@@ -97,6 +155,8 @@ model FaceData {
   created_at DateTime              @default(now())
   update_at  DateTime              @updatedAt
   subject    Subject               @relation("SubjectToFaceData", fields: [subject_id], references: [id], onDelete: Cascade)
+
+  @@map("face_data")
 }
 
 model Zone {
@@ -112,6 +172,7 @@ model Zone {
   creator     User                     @relation("UserToZone", fields: [created_by], references: [id])
 
   @@index([geom], type: Gist)
+  @@map("zones")
 }
 
 model SubjectZone {
@@ -123,22 +184,7 @@ model SubjectZone {
   zone             Zone     @relation("ZoneToSubjectZone", fields: [zone_id], references: [id], onDelete: Cascade)
 
   @@id([subject_id, zone_id])
-}
-
-model LocationLog {
-  id          BigInt                   @id @default(autoincrement())
-  subject_id  String
-  location    Unsupported("geography")
-  accuracy    Float                    @default(0.0)
-  source      String?
-  recorded_at DateTime                 @default(now())
-  is_mock     Boolean                  @default(false)
-  speed       Float?
-  device_id   String?
-  subject     Subject                  @relation("SubjectToLocationLog", fields: [subject_id], references: [id], onDelete: Cascade)
-
-  @@index([subject_id, recorded_at])
-  @@index([location], type: Gist)
+  @@map("subject_zones")
 }
 
 model Checkin {
@@ -153,6 +199,7 @@ model Checkin {
   subject       Subject                  @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
 
   @@index([subject_id, checkin_time])
+  @@map("checkins")
 }
 
 model Alert {
@@ -171,6 +218,7 @@ model Alert {
 
   @@index([subject_id, status])
   @@index([created_at(sort: Desc)])
+  @@map("alerts")
 }
 
 model EventLog {
@@ -182,23 +230,71 @@ model EventLog {
   subject     Subject  @relation("SubjectToEventLog", fields: [subject_id], references: [id], onDelete: Cascade)
 
   @@index([subject_id, created_at])
+  @@map("event_logs")
 }
 
 model SystemLog {
-  id         BigInt   @id @default(autoincrement())
-  user_id    String
-  action     String
-  ip_address String?
-  details    String?
-  created_at DateTime @default(now())
-  user       User     @relation("UserToSystemLog", fields: [user_id], references: [id])
+  id           BigInt   @id @default(autoincrement())
+  user_id      String?
+  action       String
+  entity       String?      // bảng bị tác động (Subject, Account,...)
+  entity_id    String?
+  
+  old_data     Json?        // dữ liệu trước
+  new_data     Json?        // dữ liệu sau
+
+  ip_address   String?
+  user_agent   String?
+  device_id    String?
+
+  request_id   String?      // trace request
+  status       String?      // SUCCESS / FAIL
+  error        String?
+
+  created_at   DateTime @default(now())
+
+  user User? @relation("UserToSystemLog", fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([entity, entity_id])
+  @@index([created_at])
+  @@map("system_log")
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
-model spatial_ref_sys {
-  srid      Int     @id
-  auth_name String? @db.VarChar(256)
-  auth_srid Int?
-  srtext    String? @db.VarChar(2048)
-  proj4text String? @db.VarChar(2048)
+model RequestLog {
+  id            String   @id @default(uuid())
+  user_id       String?
+  method        String
+  path          String
+  status_code   Int
+  duration_ms   Int
+
+  ip_address    String?
+  user_agent    String?
+  device_id     String?
+
+  request_body  Json?
+  response_body Json?
+
+  created_at    DateTime @default(now())
+
+  @@index([user_id])
+  @@index([created_at])
+  @@map("request_log")
+}
+
+model AuthLog {
+  id           String   @id @default(uuid())
+  account_id   String
+  action       String   // LOGIN, LOGOUT, REFRESH
+  status       String   // SUCCESS / FAIL
+
+  ip_address   String?
+  user_agent   String?
+  device_id    String?
+
+  created_at   DateTime @default(now())
+
+  @@index([account_id])
+  @@map("auth_log")
 }

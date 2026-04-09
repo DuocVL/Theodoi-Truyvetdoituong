@@ -165,7 +165,7 @@ export type FaceDataGroupByOutputType = {
   _max: FaceDataMaxAggregateOutputType | null
 }
 
-type GetFaceDataGroupByPayload<T extends FaceDataGroupByArgs> = Prisma.PrismaPromise<
+export type GetFaceDataGroupByPayload<T extends FaceDataGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<FaceDataGroupByOutputType, T['by']> &
       {

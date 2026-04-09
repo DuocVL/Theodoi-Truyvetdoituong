@@ -18,6 +18,11 @@ export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
 /**
+ * Model Account
+ * 
+ */
+export type Account = Prisma.AccountModel
+/**
  * Model User
  * 
  */
@@ -37,6 +42,11 @@ export type UserRole = Prisma.UserRoleModel
  * 
  */
 export type Subject = Prisma.SubjectModel
+/**
+ * Model RefreshToken
+ * 
+ */
+export type RefreshToken = Prisma.RefreshTokenModel
 /**
  * Model Device
  * 
@@ -58,11 +68,6 @@ export type Zone = Prisma.ZoneModel
  */
 export type SubjectZone = Prisma.SubjectZoneModel
 /**
- * Model LocationLog
- * 
- */
-export type LocationLog = Prisma.LocationLogModel
-/**
  * Model Checkin
  * 
  */
@@ -82,3 +87,13 @@ export type EventLog = Prisma.EventLogModel
  * 
  */
 export type SystemLog = Prisma.SystemLogModel
+/**
+ * Model RequestLog
+ * 
+ */
+export type RequestLog = Prisma.RequestLogModel
+/**
+ * Model AuthLog
+ * 
+ */
+export type AuthLog = Prisma.AuthLogModel

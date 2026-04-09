@@ -26,7 +26,7 @@ export type AggregateDevice = {
 
 export type DeviceMinAggregateOutputType = {
   id: string | null
-  subject_id: string | null
+  account_id: string | null
   device_token: string | null
   device_uuid: string | null
   platform: string | null
@@ -35,11 +35,12 @@ export type DeviceMinAggregateOutputType = {
   is_trusted: boolean | null
   last_seen_at: Date | null
   created_at: Date | null
+  accountId: string | null
 }
 
 export type DeviceMaxAggregateOutputType = {
   id: string | null
-  subject_id: string | null
+  account_id: string | null
   device_token: string | null
   device_uuid: string | null
   platform: string | null
@@ -48,11 +49,12 @@ export type DeviceMaxAggregateOutputType = {
   is_trusted: boolean | null
   last_seen_at: Date | null
   created_at: Date | null
+  accountId: string | null
 }
 
 export type DeviceCountAggregateOutputType = {
   id: number
-  subject_id: number
+  account_id: number
   device_token: number
   device_uuid: number
   platform: number
@@ -61,13 +63,14 @@ export type DeviceCountAggregateOutputType = {
   is_trusted: number
   last_seen_at: number
   created_at: number
+  accountId: number
   _all: number
 }
 
 
 export type DeviceMinAggregateInputType = {
   id?: true
-  subject_id?: true
+  account_id?: true
   device_token?: true
   device_uuid?: true
   platform?: true
@@ -76,11 +79,12 @@ export type DeviceMinAggregateInputType = {
   is_trusted?: true
   last_seen_at?: true
   created_at?: true
+  accountId?: true
 }
 
 export type DeviceMaxAggregateInputType = {
   id?: true
-  subject_id?: true
+  account_id?: true
   device_token?: true
   device_uuid?: true
   platform?: true
@@ -89,11 +93,12 @@ export type DeviceMaxAggregateInputType = {
   is_trusted?: true
   last_seen_at?: true
   created_at?: true
+  accountId?: true
 }
 
 export type DeviceCountAggregateInputType = {
   id?: true
-  subject_id?: true
+  account_id?: true
   device_token?: true
   device_uuid?: true
   platform?: true
@@ -102,6 +107,7 @@ export type DeviceCountAggregateInputType = {
   is_trusted?: true
   last_seen_at?: true
   created_at?: true
+  accountId?: true
   _all?: true
 }
 
@@ -179,7 +185,7 @@ export type DeviceGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type DeviceGroupByOutputType = {
   id: string
-  subject_id: string
+  account_id: string
   device_token: string | null
   device_uuid: string
   platform: string
@@ -188,12 +194,13 @@ export type DeviceGroupByOutputType = {
   is_trusted: boolean
   last_seen_at: Date | null
   created_at: Date
+  accountId: string | null
   _count: DeviceCountAggregateOutputType | null
   _min: DeviceMinAggregateOutputType | null
   _max: DeviceMaxAggregateOutputType | null
 }
 
-type GetDeviceGroupByPayload<T extends DeviceGroupByArgs> = Prisma.PrismaPromise<
+export type GetDeviceGroupByPayload<T extends DeviceGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<DeviceGroupByOutputType, T['by']> &
       {
@@ -213,7 +220,7 @@ export type DeviceWhereInput = {
   OR?: Prisma.DeviceWhereInput[]
   NOT?: Prisma.DeviceWhereInput | Prisma.DeviceWhereInput[]
   id?: Prisma.StringFilter<"Device"> | string
-  subject_id?: Prisma.StringFilter<"Device"> | string
+  account_id?: Prisma.StringFilter<"Device"> | string
   device_token?: Prisma.StringNullableFilter<"Device"> | string | null
   device_uuid?: Prisma.StringFilter<"Device"> | string
   platform?: Prisma.StringFilter<"Device"> | string
@@ -222,12 +229,13 @@ export type DeviceWhereInput = {
   is_trusted?: Prisma.BoolFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Device"> | Date | string
-  subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
+  accountId?: Prisma.StringNullableFilter<"Device"> | string | null
+  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
 }
 
 export type DeviceOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  subject_id?: Prisma.SortOrder
+  account_id?: Prisma.SortOrder
   device_token?: Prisma.SortOrderInput | Prisma.SortOrder
   device_uuid?: Prisma.SortOrder
   platform?: Prisma.SortOrder
@@ -236,16 +244,17 @@ export type DeviceOrderByWithRelationInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  subject?: Prisma.SubjectOrderByWithRelationInput
+  accountId?: Prisma.SortOrderInput | Prisma.SortOrder
+  account?: Prisma.AccountOrderByWithRelationInput
 }
 
 export type DeviceWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  subject_id_device_uuid?: Prisma.DeviceSubject_idDevice_uuidCompoundUniqueInput
+  account_id_device_uuid?: Prisma.DeviceAccount_idDevice_uuidCompoundUniqueInput
   AND?: Prisma.DeviceWhereInput | Prisma.DeviceWhereInput[]
   OR?: Prisma.DeviceWhereInput[]
   NOT?: Prisma.DeviceWhereInput | Prisma.DeviceWhereInput[]
-  subject_id?: Prisma.StringFilter<"Device"> | string
+  account_id?: Prisma.StringFilter<"Device"> | string
   device_token?: Prisma.StringNullableFilter<"Device"> | string | null
   device_uuid?: Prisma.StringFilter<"Device"> | string
   platform?: Prisma.StringFilter<"Device"> | string
@@ -254,12 +263,13 @@ export type DeviceWhereUniqueInput = Prisma.AtLeast<{
   is_trusted?: Prisma.BoolFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Device"> | Date | string
-  subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
-}, "id" | "subject_id_device_uuid">
+  accountId?: Prisma.StringNullableFilter<"Device"> | string | null
+  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+}, "id" | "account_id_device_uuid">
 
 export type DeviceOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  subject_id?: Prisma.SortOrder
+  account_id?: Prisma.SortOrder
   device_token?: Prisma.SortOrderInput | Prisma.SortOrder
   device_uuid?: Prisma.SortOrder
   platform?: Prisma.SortOrder
@@ -268,6 +278,7 @@ export type DeviceOrderByWithAggregationInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DeviceCountOrderByAggregateInput
   _max?: Prisma.DeviceMaxOrderByAggregateInput
   _min?: Prisma.DeviceMinOrderByAggregateInput
@@ -278,7 +289,7 @@ export type DeviceScalarWhereWithAggregatesInput = {
   OR?: Prisma.DeviceScalarWhereWithAggregatesInput[]
   NOT?: Prisma.DeviceScalarWhereWithAggregatesInput | Prisma.DeviceScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Device"> | string
-  subject_id?: Prisma.StringWithAggregatesFilter<"Device"> | string
+  account_id?: Prisma.StringWithAggregatesFilter<"Device"> | string
   device_token?: Prisma.StringNullableWithAggregatesFilter<"Device"> | string | null
   device_uuid?: Prisma.StringWithAggregatesFilter<"Device"> | string
   platform?: Prisma.StringWithAggregatesFilter<"Device"> | string
@@ -287,10 +298,12 @@ export type DeviceScalarWhereWithAggregatesInput = {
   is_trusted?: Prisma.BoolWithAggregatesFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Device"> | Date | string
+  accountId?: Prisma.StringNullableWithAggregatesFilter<"Device"> | string | null
 }
 
 export type DeviceCreateInput = {
   id?: string
+  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -299,12 +312,12 @@ export type DeviceCreateInput = {
   is_trusted?: boolean
   last_seen_at?: Date | string | null
   created_at?: Date | string
-  subject: Prisma.SubjectCreateNestedOneWithoutDeviceInput
+  account?: Prisma.AccountCreateNestedOneWithoutDevicesInput
 }
 
 export type DeviceUncheckedCreateInput = {
   id?: string
-  subject_id: string
+  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -313,10 +326,12 @@ export type DeviceUncheckedCreateInput = {
   is_trusted?: boolean
   last_seen_at?: Date | string | null
   created_at?: Date | string
+  accountId?: string | null
 }
 
 export type DeviceUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -325,12 +340,12 @@ export type DeviceUpdateInput = {
   is_trusted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   last_seen_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subject?: Prisma.SubjectUpdateOneRequiredWithoutDeviceNestedInput
+  account?: Prisma.AccountUpdateOneWithoutDevicesNestedInput
 }
 
 export type DeviceUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  subject_id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -339,11 +354,12 @@ export type DeviceUncheckedUpdateInput = {
   is_trusted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   last_seen_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeviceCreateManyInput = {
   id?: string
-  subject_id: string
+  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -352,10 +368,12 @@ export type DeviceCreateManyInput = {
   is_trusted?: boolean
   last_seen_at?: Date | string | null
   created_at?: Date | string
+  accountId?: string | null
 }
 
 export type DeviceUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -368,7 +386,7 @@ export type DeviceUpdateManyMutationInput = {
 
 export type DeviceUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  subject_id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -377,6 +395,7 @@ export type DeviceUncheckedUpdateManyInput = {
   is_trusted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   last_seen_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeviceListRelationFilter = {
@@ -389,14 +408,14 @@ export type DeviceOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type DeviceSubject_idDevice_uuidCompoundUniqueInput = {
-  subject_id: string
+export type DeviceAccount_idDevice_uuidCompoundUniqueInput = {
+  account_id: string
   device_uuid: string
 }
 
 export type DeviceCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  subject_id?: Prisma.SortOrder
+  account_id?: Prisma.SortOrder
   device_token?: Prisma.SortOrder
   device_uuid?: Prisma.SortOrder
   platform?: Prisma.SortOrder
@@ -405,11 +424,12 @@ export type DeviceCountOrderByAggregateInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
 }
 
 export type DeviceMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  subject_id?: Prisma.SortOrder
+  account_id?: Prisma.SortOrder
   device_token?: Prisma.SortOrder
   device_uuid?: Prisma.SortOrder
   platform?: Prisma.SortOrder
@@ -418,11 +438,12 @@ export type DeviceMaxOrderByAggregateInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
 }
 
 export type DeviceMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  subject_id?: Prisma.SortOrder
+  account_id?: Prisma.SortOrder
   device_token?: Prisma.SortOrder
   device_uuid?: Prisma.SortOrder
   platform?: Prisma.SortOrder
@@ -431,52 +452,54 @@ export type DeviceMinOrderByAggregateInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
 }
 
-export type DeviceCreateNestedManyWithoutSubjectInput = {
-  create?: Prisma.XOR<Prisma.DeviceCreateWithoutSubjectInput, Prisma.DeviceUncheckedCreateWithoutSubjectInput> | Prisma.DeviceCreateWithoutSubjectInput[] | Prisma.DeviceUncheckedCreateWithoutSubjectInput[]
-  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutSubjectInput | Prisma.DeviceCreateOrConnectWithoutSubjectInput[]
-  createMany?: Prisma.DeviceCreateManySubjectInputEnvelope
+export type DeviceCreateNestedManyWithoutAccountInput = {
+  create?: Prisma.XOR<Prisma.DeviceCreateWithoutAccountInput, Prisma.DeviceUncheckedCreateWithoutAccountInput> | Prisma.DeviceCreateWithoutAccountInput[] | Prisma.DeviceUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutAccountInput | Prisma.DeviceCreateOrConnectWithoutAccountInput[]
+  createMany?: Prisma.DeviceCreateManyAccountInputEnvelope
   connect?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
 }
 
-export type DeviceUncheckedCreateNestedManyWithoutSubjectInput = {
-  create?: Prisma.XOR<Prisma.DeviceCreateWithoutSubjectInput, Prisma.DeviceUncheckedCreateWithoutSubjectInput> | Prisma.DeviceCreateWithoutSubjectInput[] | Prisma.DeviceUncheckedCreateWithoutSubjectInput[]
-  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutSubjectInput | Prisma.DeviceCreateOrConnectWithoutSubjectInput[]
-  createMany?: Prisma.DeviceCreateManySubjectInputEnvelope
+export type DeviceUncheckedCreateNestedManyWithoutAccountInput = {
+  create?: Prisma.XOR<Prisma.DeviceCreateWithoutAccountInput, Prisma.DeviceUncheckedCreateWithoutAccountInput> | Prisma.DeviceCreateWithoutAccountInput[] | Prisma.DeviceUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutAccountInput | Prisma.DeviceCreateOrConnectWithoutAccountInput[]
+  createMany?: Prisma.DeviceCreateManyAccountInputEnvelope
   connect?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
 }
 
-export type DeviceUpdateManyWithoutSubjectNestedInput = {
-  create?: Prisma.XOR<Prisma.DeviceCreateWithoutSubjectInput, Prisma.DeviceUncheckedCreateWithoutSubjectInput> | Prisma.DeviceCreateWithoutSubjectInput[] | Prisma.DeviceUncheckedCreateWithoutSubjectInput[]
-  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutSubjectInput | Prisma.DeviceCreateOrConnectWithoutSubjectInput[]
-  upsert?: Prisma.DeviceUpsertWithWhereUniqueWithoutSubjectInput | Prisma.DeviceUpsertWithWhereUniqueWithoutSubjectInput[]
-  createMany?: Prisma.DeviceCreateManySubjectInputEnvelope
+export type DeviceUpdateManyWithoutAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.DeviceCreateWithoutAccountInput, Prisma.DeviceUncheckedCreateWithoutAccountInput> | Prisma.DeviceCreateWithoutAccountInput[] | Prisma.DeviceUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutAccountInput | Prisma.DeviceCreateOrConnectWithoutAccountInput[]
+  upsert?: Prisma.DeviceUpsertWithWhereUniqueWithoutAccountInput | Prisma.DeviceUpsertWithWhereUniqueWithoutAccountInput[]
+  createMany?: Prisma.DeviceCreateManyAccountInputEnvelope
   set?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
   disconnect?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
   delete?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
   connect?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
-  update?: Prisma.DeviceUpdateWithWhereUniqueWithoutSubjectInput | Prisma.DeviceUpdateWithWhereUniqueWithoutSubjectInput[]
-  updateMany?: Prisma.DeviceUpdateManyWithWhereWithoutSubjectInput | Prisma.DeviceUpdateManyWithWhereWithoutSubjectInput[]
+  update?: Prisma.DeviceUpdateWithWhereUniqueWithoutAccountInput | Prisma.DeviceUpdateWithWhereUniqueWithoutAccountInput[]
+  updateMany?: Prisma.DeviceUpdateManyWithWhereWithoutAccountInput | Prisma.DeviceUpdateManyWithWhereWithoutAccountInput[]
   deleteMany?: Prisma.DeviceScalarWhereInput | Prisma.DeviceScalarWhereInput[]
 }
 
-export type DeviceUncheckedUpdateManyWithoutSubjectNestedInput = {
-  create?: Prisma.XOR<Prisma.DeviceCreateWithoutSubjectInput, Prisma.DeviceUncheckedCreateWithoutSubjectInput> | Prisma.DeviceCreateWithoutSubjectInput[] | Prisma.DeviceUncheckedCreateWithoutSubjectInput[]
-  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutSubjectInput | Prisma.DeviceCreateOrConnectWithoutSubjectInput[]
-  upsert?: Prisma.DeviceUpsertWithWhereUniqueWithoutSubjectInput | Prisma.DeviceUpsertWithWhereUniqueWithoutSubjectInput[]
-  createMany?: Prisma.DeviceCreateManySubjectInputEnvelope
+export type DeviceUncheckedUpdateManyWithoutAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.DeviceCreateWithoutAccountInput, Prisma.DeviceUncheckedCreateWithoutAccountInput> | Prisma.DeviceCreateWithoutAccountInput[] | Prisma.DeviceUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.DeviceCreateOrConnectWithoutAccountInput | Prisma.DeviceCreateOrConnectWithoutAccountInput[]
+  upsert?: Prisma.DeviceUpsertWithWhereUniqueWithoutAccountInput | Prisma.DeviceUpsertWithWhereUniqueWithoutAccountInput[]
+  createMany?: Prisma.DeviceCreateManyAccountInputEnvelope
   set?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
   disconnect?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
   delete?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
   connect?: Prisma.DeviceWhereUniqueInput | Prisma.DeviceWhereUniqueInput[]
-  update?: Prisma.DeviceUpdateWithWhereUniqueWithoutSubjectInput | Prisma.DeviceUpdateWithWhereUniqueWithoutSubjectInput[]
-  updateMany?: Prisma.DeviceUpdateManyWithWhereWithoutSubjectInput | Prisma.DeviceUpdateManyWithWhereWithoutSubjectInput[]
+  update?: Prisma.DeviceUpdateWithWhereUniqueWithoutAccountInput | Prisma.DeviceUpdateWithWhereUniqueWithoutAccountInput[]
+  updateMany?: Prisma.DeviceUpdateManyWithWhereWithoutAccountInput | Prisma.DeviceUpdateManyWithWhereWithoutAccountInput[]
   deleteMany?: Prisma.DeviceScalarWhereInput | Prisma.DeviceScalarWhereInput[]
 }
 
-export type DeviceCreateWithoutSubjectInput = {
+export type DeviceCreateWithoutAccountInput = {
   id?: string
+  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -487,8 +510,9 @@ export type DeviceCreateWithoutSubjectInput = {
   created_at?: Date | string
 }
 
-export type DeviceUncheckedCreateWithoutSubjectInput = {
+export type DeviceUncheckedCreateWithoutAccountInput = {
   id?: string
+  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -499,30 +523,30 @@ export type DeviceUncheckedCreateWithoutSubjectInput = {
   created_at?: Date | string
 }
 
-export type DeviceCreateOrConnectWithoutSubjectInput = {
+export type DeviceCreateOrConnectWithoutAccountInput = {
   where: Prisma.DeviceWhereUniqueInput
-  create: Prisma.XOR<Prisma.DeviceCreateWithoutSubjectInput, Prisma.DeviceUncheckedCreateWithoutSubjectInput>
+  create: Prisma.XOR<Prisma.DeviceCreateWithoutAccountInput, Prisma.DeviceUncheckedCreateWithoutAccountInput>
 }
 
-export type DeviceCreateManySubjectInputEnvelope = {
-  data: Prisma.DeviceCreateManySubjectInput | Prisma.DeviceCreateManySubjectInput[]
+export type DeviceCreateManyAccountInputEnvelope = {
+  data: Prisma.DeviceCreateManyAccountInput | Prisma.DeviceCreateManyAccountInput[]
   skipDuplicates?: boolean
 }
 
-export type DeviceUpsertWithWhereUniqueWithoutSubjectInput = {
+export type DeviceUpsertWithWhereUniqueWithoutAccountInput = {
   where: Prisma.DeviceWhereUniqueInput
-  update: Prisma.XOR<Prisma.DeviceUpdateWithoutSubjectInput, Prisma.DeviceUncheckedUpdateWithoutSubjectInput>
-  create: Prisma.XOR<Prisma.DeviceCreateWithoutSubjectInput, Prisma.DeviceUncheckedCreateWithoutSubjectInput>
+  update: Prisma.XOR<Prisma.DeviceUpdateWithoutAccountInput, Prisma.DeviceUncheckedUpdateWithoutAccountInput>
+  create: Prisma.XOR<Prisma.DeviceCreateWithoutAccountInput, Prisma.DeviceUncheckedCreateWithoutAccountInput>
 }
 
-export type DeviceUpdateWithWhereUniqueWithoutSubjectInput = {
+export type DeviceUpdateWithWhereUniqueWithoutAccountInput = {
   where: Prisma.DeviceWhereUniqueInput
-  data: Prisma.XOR<Prisma.DeviceUpdateWithoutSubjectInput, Prisma.DeviceUncheckedUpdateWithoutSubjectInput>
+  data: Prisma.XOR<Prisma.DeviceUpdateWithoutAccountInput, Prisma.DeviceUncheckedUpdateWithoutAccountInput>
 }
 
-export type DeviceUpdateManyWithWhereWithoutSubjectInput = {
+export type DeviceUpdateManyWithWhereWithoutAccountInput = {
   where: Prisma.DeviceScalarWhereInput
-  data: Prisma.XOR<Prisma.DeviceUpdateManyMutationInput, Prisma.DeviceUncheckedUpdateManyWithoutSubjectInput>
+  data: Prisma.XOR<Prisma.DeviceUpdateManyMutationInput, Prisma.DeviceUncheckedUpdateManyWithoutAccountInput>
 }
 
 export type DeviceScalarWhereInput = {
@@ -530,7 +554,7 @@ export type DeviceScalarWhereInput = {
   OR?: Prisma.DeviceScalarWhereInput[]
   NOT?: Prisma.DeviceScalarWhereInput | Prisma.DeviceScalarWhereInput[]
   id?: Prisma.StringFilter<"Device"> | string
-  subject_id?: Prisma.StringFilter<"Device"> | string
+  account_id?: Prisma.StringFilter<"Device"> | string
   device_token?: Prisma.StringNullableFilter<"Device"> | string | null
   device_uuid?: Prisma.StringFilter<"Device"> | string
   platform?: Prisma.StringFilter<"Device"> | string
@@ -539,10 +563,12 @@ export type DeviceScalarWhereInput = {
   is_trusted?: Prisma.BoolFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Device"> | Date | string
+  accountId?: Prisma.StringNullableFilter<"Device"> | string | null
 }
 
-export type DeviceCreateManySubjectInput = {
+export type DeviceCreateManyAccountInput = {
   id?: string
+  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -553,8 +579,9 @@ export type DeviceCreateManySubjectInput = {
   created_at?: Date | string
 }
 
-export type DeviceUpdateWithoutSubjectInput = {
+export type DeviceUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -565,8 +592,9 @@ export type DeviceUpdateWithoutSubjectInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type DeviceUncheckedUpdateWithoutSubjectInput = {
+export type DeviceUncheckedUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -577,8 +605,9 @@ export type DeviceUncheckedUpdateWithoutSubjectInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type DeviceUncheckedUpdateManyWithoutSubjectInput = {
+export type DeviceUncheckedUpdateManyWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -593,7 +622,7 @@ export type DeviceUncheckedUpdateManyWithoutSubjectInput = {
 
 export type DeviceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  subject_id?: boolean
+  account_id?: boolean
   device_token?: boolean
   device_uuid?: boolean
   platform?: boolean
@@ -602,12 +631,13 @@ export type DeviceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
+  accountId?: boolean
+  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
 export type DeviceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  subject_id?: boolean
+  account_id?: boolean
   device_token?: boolean
   device_uuid?: boolean
   platform?: boolean
@@ -616,12 +646,13 @@ export type DeviceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
+  accountId?: boolean
+  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
 export type DeviceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  subject_id?: boolean
+  account_id?: boolean
   device_token?: boolean
   device_uuid?: boolean
   platform?: boolean
@@ -630,12 +661,13 @@ export type DeviceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
+  accountId?: boolean
+  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
 export type DeviceSelectScalar = {
   id?: boolean
-  subject_id?: boolean
+  account_id?: boolean
   device_token?: boolean
   device_uuid?: boolean
   platform?: boolean
@@ -644,27 +676,28 @@ export type DeviceSelectScalar = {
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
+  accountId?: boolean
 }
 
-export type DeviceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "device_token" | "device_uuid" | "platform" | "app_version" | "is_active" | "is_trusted" | "last_seen_at" | "created_at", ExtArgs["result"]["device"]>
+export type DeviceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "device_token" | "device_uuid" | "platform" | "app_version" | "is_active" | "is_trusted" | "last_seen_at" | "created_at" | "accountId", ExtArgs["result"]["device"]>
 export type DeviceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }
 export type DeviceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }
 export type DeviceIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }
 
 export type $DevicePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Device"
   objects: {
-    subject: Prisma.$SubjectPayload<ExtArgs>
+    account: Prisma.$AccountPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    subject_id: string
+    account_id: string
     device_token: string | null
     device_uuid: string
     platform: string
@@ -673,6 +706,7 @@ export type $DevicePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     is_trusted: boolean
     last_seen_at: Date | null
     created_at: Date
+    accountId: string | null
   }, ExtArgs["result"]["device"]>
   composites: {}
 }
@@ -1067,7 +1101,7 @@ readonly fields: DeviceFieldRefs;
  */
 export interface Prisma__DeviceClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  subject<T extends Prisma.SubjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubjectDefaultArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  account<T extends Prisma.Device$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Device$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1098,7 +1132,7 @@ export interface Prisma__DeviceClient<T, Null = never, ExtArgs extends runtime.T
  */
 export interface DeviceFieldRefs {
   readonly id: Prisma.FieldRef<"Device", 'String'>
-  readonly subject_id: Prisma.FieldRef<"Device", 'String'>
+  readonly account_id: Prisma.FieldRef<"Device", 'String'>
   readonly device_token: Prisma.FieldRef<"Device", 'String'>
   readonly device_uuid: Prisma.FieldRef<"Device", 'String'>
   readonly platform: Prisma.FieldRef<"Device", 'String'>
@@ -1107,6 +1141,7 @@ export interface DeviceFieldRefs {
   readonly is_trusted: Prisma.FieldRef<"Device", 'Boolean'>
   readonly last_seen_at: Prisma.FieldRef<"Device", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"Device", 'DateTime'>
+  readonly accountId: Prisma.FieldRef<"Device", 'String'>
 }
     
 
@@ -1505,6 +1540,25 @@ export type DeviceDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Devices to delete.
    */
   limit?: number
+}
+
+/**
+ * Device.account
+ */
+export type Device$accountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Account
+   */
+  select?: Prisma.AccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Account
+   */
+  omit?: Prisma.AccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountInclude<ExtArgs> | null
+  where?: Prisma.AccountWhereInput
 }
 
 /**

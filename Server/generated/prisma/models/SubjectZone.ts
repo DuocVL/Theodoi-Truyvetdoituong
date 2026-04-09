@@ -185,7 +185,7 @@ export type SubjectZoneGroupByOutputType = {
   _max: SubjectZoneMaxAggregateOutputType | null
 }
 
-type GetSubjectZoneGroupByPayload<T extends SubjectZoneGroupByArgs> = Prisma.PrismaPromise<
+export type GetSubjectZoneGroupByPayload<T extends SubjectZoneGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<SubjectZoneGroupByOutputType, T['by']> &
       {

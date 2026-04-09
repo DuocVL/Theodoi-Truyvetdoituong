@@ -220,7 +220,7 @@ export type AlertGroupByOutputType = {
   _max: AlertMaxAggregateOutputType | null
 }
 
-type GetAlertGroupByPayload<T extends AlertGroupByArgs> = Prisma.PrismaPromise<
+export type GetAlertGroupByPayload<T extends AlertGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<AlertGroupByOutputType, T['by']> &
       {
@@ -248,8 +248,8 @@ export type AlertWhereInput = {
   resolved_by?: Prisma.StringNullableFilter<"Alert"> | string | null
   resolved_at?: Prisma.DateTimeNullableFilter<"Alert"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Alert"> | Date | string
-  subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
   resolver?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
 }
 
 export type AlertOrderByWithRelationInput = {
@@ -262,8 +262,8 @@ export type AlertOrderByWithRelationInput = {
   resolved_by?: Prisma.SortOrderInput | Prisma.SortOrder
   resolved_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  subject?: Prisma.SubjectOrderByWithRelationInput
   resolver?: Prisma.UserOrderByWithRelationInput
+  subject?: Prisma.SubjectOrderByWithRelationInput
 }
 
 export type AlertWhereUniqueInput = Prisma.AtLeast<{
@@ -279,8 +279,8 @@ export type AlertWhereUniqueInput = Prisma.AtLeast<{
   resolved_by?: Prisma.StringNullableFilter<"Alert"> | string | null
   resolved_at?: Prisma.DateTimeNullableFilter<"Alert"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Alert"> | Date | string
-  subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
   resolver?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
 }, "id">
 
 export type AlertOrderByWithAggregationInput = {
@@ -323,8 +323,8 @@ export type AlertCreateInput = {
   status?: string
   resolved_at?: Date | string | null
   created_at?: Date | string
-  subject: Prisma.SubjectCreateNestedOneWithoutAlertInput
   resolver?: Prisma.UserCreateNestedOneWithoutAlertsInput
+  subject: Prisma.SubjectCreateNestedOneWithoutAlertInput
 }
 
 export type AlertUncheckedCreateInput = {
@@ -347,8 +347,8 @@ export type AlertUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   resolved_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subject?: Prisma.SubjectUpdateOneRequiredWithoutAlertNestedInput
   resolver?: Prisma.UserUpdateOneWithoutAlertsNestedInput
+  subject?: Prisma.SubjectUpdateOneRequiredWithoutAlertNestedInput
 }
 
 export type AlertUncheckedUpdateInput = {
@@ -746,8 +746,8 @@ export type AlertSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   resolved_by?: boolean
   resolved_at?: boolean
   created_at?: boolean
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   resolver?: boolean | Prisma.Alert$resolverArgs<ExtArgs>
+  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["alert"]>
 
 export type AlertSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -760,8 +760,8 @@ export type AlertSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   resolved_by?: boolean
   resolved_at?: boolean
   created_at?: boolean
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   resolver?: boolean | Prisma.Alert$resolverArgs<ExtArgs>
+  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["alert"]>
 
 export type AlertSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -774,8 +774,8 @@ export type AlertSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   resolved_by?: boolean
   resolved_at?: boolean
   created_at?: boolean
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   resolver?: boolean | Prisma.Alert$resolverArgs<ExtArgs>
+  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["alert"]>
 
 export type AlertSelectScalar = {
@@ -792,23 +792,23 @@ export type AlertSelectScalar = {
 
 export type AlertOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "type" | "severity" | "message" | "status" | "resolved_by" | "resolved_at" | "created_at", ExtArgs["result"]["alert"]>
 export type AlertInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   resolver?: boolean | Prisma.Alert$resolverArgs<ExtArgs>
+  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }
 export type AlertIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   resolver?: boolean | Prisma.Alert$resolverArgs<ExtArgs>
+  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }
 export type AlertIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   resolver?: boolean | Prisma.Alert$resolverArgs<ExtArgs>
+  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }
 
 export type $AlertPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Alert"
   objects: {
-    subject: Prisma.$SubjectPayload<ExtArgs>
     resolver: Prisma.$UserPayload<ExtArgs> | null
+    subject: Prisma.$SubjectPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1214,8 +1214,8 @@ readonly fields: AlertFieldRefs;
  */
 export interface Prisma__AlertClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  subject<T extends Prisma.SubjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubjectDefaultArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   resolver<T extends Prisma.Alert$resolverArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Alert$resolverArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  subject<T extends Prisma.SubjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubjectDefaultArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

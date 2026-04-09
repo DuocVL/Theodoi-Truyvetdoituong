@@ -172,7 +172,7 @@ export type ZoneGroupByOutputType = {
   _max: ZoneMaxAggregateOutputType | null
 }
 
-type GetZoneGroupByPayload<T extends ZoneGroupByArgs> = Prisma.PrismaPromise<
+export type GetZoneGroupByPayload<T extends ZoneGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<ZoneGroupByOutputType, T['by']> &
       {
@@ -198,8 +198,8 @@ export type ZoneWhereInput = {
   is_active?: Prisma.BoolFilter<"Zone"> | boolean
   created_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
-  creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   subjectZone?: Prisma.SubjectZoneListRelationFilter
+  creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type ZoneOrderByWithRelationInput = {
@@ -210,8 +210,8 @@ export type ZoneOrderByWithRelationInput = {
   is_active?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
-  creator?: Prisma.UserOrderByWithRelationInput
   subjectZone?: Prisma.SubjectZoneOrderByRelationAggregateInput
+  creator?: Prisma.UserOrderByWithRelationInput
 }
 
 export type ZoneWhereUniqueInput = Prisma.AtLeast<{
@@ -225,8 +225,8 @@ export type ZoneWhereUniqueInput = Prisma.AtLeast<{
   is_active?: Prisma.BoolFilter<"Zone"> | boolean
   created_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
-  creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   subjectZone?: Prisma.SubjectZoneListRelationFilter
+  creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type ZoneOrderByWithAggregationInput = {
@@ -262,8 +262,8 @@ export type ZoneUpdateInput = {
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  creator?: Prisma.UserUpdateOneRequiredWithoutZoneNestedInput
   subjectZone?: Prisma.SubjectZoneUpdateManyWithoutZoneNestedInput
+  creator?: Prisma.UserUpdateOneRequiredWithoutZoneNestedInput
 }
 
 export type ZoneUncheckedUpdateInput = {
@@ -494,8 +494,8 @@ export type ZoneSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   is_active?: boolean
   created_at?: boolean
   update_at?: boolean
-  creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   subjectZone?: boolean | Prisma.Zone$subjectZoneArgs<ExtArgs>
+  creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ZoneCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["zone"]>
 
@@ -523,8 +523,8 @@ export type ZoneSelectScalar = {
 
 export type ZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "zone_name" | "description" | "created_by" | "is_active" | "created_at" | "update_at", ExtArgs["result"]["zone"]>
 export type ZoneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   subjectZone?: boolean | Prisma.Zone$subjectZoneArgs<ExtArgs>
+  creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.ZoneCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ZoneIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -534,8 +534,8 @@ export type ZoneIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $ZonePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Zone"
   objects: {
-    creator: Prisma.$UserPayload<ExtArgs>
     subjectZone: Prisma.$SubjectZonePayload<ExtArgs>[]
+    creator: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -868,8 +868,8 @@ readonly fields: ZoneFieldRefs;
  */
 export interface Prisma__ZoneClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   subjectZone<T extends Prisma.Zone$subjectZoneArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Zone$subjectZoneArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubjectZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

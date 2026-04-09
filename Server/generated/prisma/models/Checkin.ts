@@ -210,7 +210,7 @@ export type CheckinGroupByOutputType = {
   _max: CheckinMaxAggregateOutputType | null
 }
 
-type GetCheckinGroupByPayload<T extends CheckinGroupByArgs> = Prisma.PrismaPromise<
+export type GetCheckinGroupByPayload<T extends CheckinGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<CheckinGroupByOutputType, T['by']> &
       {
@@ -407,6 +407,22 @@ export type CheckinUncheckedUpdateManyWithoutSubjectNestedInput = {
   update?: Prisma.CheckinUpdateWithWhereUniqueWithoutSubjectInput | Prisma.CheckinUpdateWithWhereUniqueWithoutSubjectInput[]
   updateMany?: Prisma.CheckinUpdateManyWithWhereWithoutSubjectInput | Prisma.CheckinUpdateManyWithWhereWithoutSubjectInput[]
   deleteMany?: Prisma.CheckinScalarWhereInput | Prisma.CheckinScalarWhereInput[]
+}
+
+export type BigIntFieldUpdateOperationsInput = {
+  set?: bigint | number
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
+}
+
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type CheckinUpdateWithWhereUniqueWithoutSubjectInput = {

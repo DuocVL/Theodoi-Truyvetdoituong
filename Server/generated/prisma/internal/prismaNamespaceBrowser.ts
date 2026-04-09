@@ -51,19 +51,22 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Account: 'Account',
   User: 'User',
   Role: 'Role',
   UserRole: 'UserRole',
   Subject: 'Subject',
+  RefreshToken: 'RefreshToken',
   Device: 'Device',
   FaceData: 'FaceData',
   Zone: 'Zone',
   SubjectZone: 'SubjectZone',
-  LocationLog: 'LocationLog',
   Checkin: 'Checkin',
   Alert: 'Alert',
   EventLog: 'EventLog',
-  SystemLog: 'SystemLog'
+  SystemLog: 'SystemLog',
+  RequestLog: 'RequestLog',
+  AuthLog: 'AuthLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -82,14 +85,24 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-export const UserScalarFieldEnum = {
+export const AccountScalarFieldEnum = {
   id: 'id',
-  full_name: 'full_name',
+  type: 'type',
   username: 'username',
   password: 'password',
+  status: 'status',
+  created_at: 'created_at'
+} as const
+
+export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
+
+
+export const UserScalarFieldEnum = {
+  id: 'id',
+  account_id: 'account_id',
+  full_name: 'full_name',
   email: 'email',
   status: 'status',
-  authentication_email: 'authentication_email',
   created_at: 'created_at',
   update_at: 'update_at'
 } as const
@@ -116,6 +129,7 @@ export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typ
 
 export const SubjectScalarFieldEnum = {
   id: 'id',
+  account_id: 'account_id',
   code: 'code',
   full_name: 'full_name',
   dob: 'dob',
@@ -123,8 +137,6 @@ export const SubjectScalarFieldEnum = {
   id_number: 'id_number',
   address: 'address',
   phone: 'phone',
-  username: 'username',
-  password: 'password',
   status: 'status',
   monitoring_start: 'monitoring_start',
   monitoring_end: 'monitoring_end',
@@ -137,9 +149,22 @@ export const SubjectScalarFieldEnum = {
 export type SubjectScalarFieldEnum = (typeof SubjectScalarFieldEnum)[keyof typeof SubjectScalarFieldEnum]
 
 
+export const RefreshTokenScalarFieldEnum = {
+  id: 'id',
+  token_hash: 'token_hash',
+  account_id: 'account_id',
+  device_id: 'device_id',
+  revoked: 'revoked',
+  expires_at: 'expires_at',
+  created_at: 'created_at'
+} as const
+
+export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
+
+
 export const DeviceScalarFieldEnum = {
   id: 'id',
-  subject_id: 'subject_id',
+  account_id: 'account_id',
   device_token: 'device_token',
   device_uuid: 'device_uuid',
   platform: 'platform',
@@ -147,7 +172,8 @@ export const DeviceScalarFieldEnum = {
   is_active: 'is_active',
   is_trusted: 'is_trusted',
   last_seen_at: 'last_seen_at',
-  created_at: 'created_at'
+  created_at: 'created_at',
+  accountId: 'accountId'
 } as const
 
 export type DeviceScalarFieldEnum = (typeof DeviceScalarFieldEnum)[keyof typeof DeviceScalarFieldEnum]
@@ -186,20 +212,6 @@ export const SubjectZoneScalarFieldEnum = {
 } as const
 
 export type SubjectZoneScalarFieldEnum = (typeof SubjectZoneScalarFieldEnum)[keyof typeof SubjectZoneScalarFieldEnum]
-
-
-export const LocationLogScalarFieldEnum = {
-  id: 'id',
-  subject_id: 'subject_id',
-  accuracy: 'accuracy',
-  source: 'source',
-  recorded_at: 'recorded_at',
-  is_mock: 'is_mock',
-  speed: 'speed',
-  device_id: 'device_id'
-} as const
-
-export type LocationLogScalarFieldEnum = (typeof LocationLogScalarFieldEnum)[keyof typeof LocationLogScalarFieldEnum]
 
 
 export const CheckinScalarFieldEnum = {
@@ -245,12 +257,52 @@ export const SystemLogScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
   action: 'action',
+  entity: 'entity',
+  entity_id: 'entity_id',
+  old_data: 'old_data',
+  new_data: 'new_data',
   ip_address: 'ip_address',
-  details: 'details',
+  user_agent: 'user_agent',
+  device_id: 'device_id',
+  request_id: 'request_id',
+  status: 'status',
+  error: 'error',
   created_at: 'created_at'
 } as const
 
 export type SystemLogScalarFieldEnum = (typeof SystemLogScalarFieldEnum)[keyof typeof SystemLogScalarFieldEnum]
+
+
+export const RequestLogScalarFieldEnum = {
+  id: 'id',
+  user_id: 'user_id',
+  method: 'method',
+  path: 'path',
+  status_code: 'status_code',
+  duration_ms: 'duration_ms',
+  ip_address: 'ip_address',
+  user_agent: 'user_agent',
+  device_id: 'device_id',
+  request_body: 'request_body',
+  response_body: 'response_body',
+  created_at: 'created_at'
+} as const
+
+export type RequestLogScalarFieldEnum = (typeof RequestLogScalarFieldEnum)[keyof typeof RequestLogScalarFieldEnum]
+
+
+export const AuthLogScalarFieldEnum = {
+  id: 'id',
+  account_id: 'account_id',
+  action: 'action',
+  status: 'status',
+  ip_address: 'ip_address',
+  user_agent: 'user_agent',
+  device_id: 'device_id',
+  created_at: 'created_at'
+} as const
+
+export type AuthLogScalarFieldEnum = (typeof AuthLogScalarFieldEnum)[keyof typeof AuthLogScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -259,6 +311,14 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -275,4 +335,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
