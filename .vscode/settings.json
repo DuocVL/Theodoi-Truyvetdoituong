@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./Service/face_service/Silent-Face-Anti-Spoofing"
+    ]
+}

@@ -172,8 +172,7 @@ export const DeviceScalarFieldEnum = {
   is_active: 'is_active',
   is_trusted: 'is_trusted',
   last_seen_at: 'last_seen_at',
-  created_at: 'created_at',
-  accountId: 'accountId'
+  created_at: 'created_at'
 } as const
 
 export type DeviceScalarFieldEnum = (typeof DeviceScalarFieldEnum)[keyof typeof DeviceScalarFieldEnum]

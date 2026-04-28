@@ -1,17 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider        = "prisma-client"
+  output          = "../generated/prisma"
   previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
   extensions = [postgis, vector]
 }
 
@@ -101,10 +95,10 @@ model Subject {
   creator User    @relation("UserToSubject", fields: [created_by], references: [id])
   account Account @relation(fields: [account_id], references: [id])
 
-  alert       Alert[]       @relation("SubjectToAlert")
-  checkin     Checkin[]     @relation("SubjectToCheckin")
-  events      EventLog[]    @relation("SubjectToEventLog")
-  faceData    FaceData[]    @relation("SubjectToFaceData")
+  alert    Alert[]    @relation("SubjectToAlert")
+  checkin  Checkin[]  @relation("SubjectToCheckin")
+  events   EventLog[] @relation("SubjectToEventLog")
+  faceData FaceData[] @relation("SubjectToFaceData")
 
   subjectZone SubjectZone[] @relation("SubjectToSubjectZone")
 
@@ -116,9 +110,9 @@ model Subject {
 
 model RefreshToken {
   id         String   @id @default(uuid())
-  token_hash      String   @unique
+  token_hash String   @unique
   account_id String
-  device_id String
+  device_id  String
   revoked    Boolean  @default(false)
   expires_at DateTime
   created_at DateTime @default(now())
@@ -139,8 +133,7 @@ model Device {
   is_trusted   Boolean   @default(true)
   last_seen_at DateTime?
   created_at   DateTime  @default(now())
-  account      Account?  @relation(fields: [accountId], references: [id])
-  accountId    String?
+  account      Account?  @relation(fields: [account_id], references: [id])
 
   @@unique([account_id, device_uuid])
   @@map("devices")
@@ -151,7 +144,7 @@ model FaceData {
   subject_id String
   embedding  Unsupported("vector")
   image_url  String
-  is_active  Boolean               @default(false)
+  status  String 
   created_at DateTime              @default(now())
   update_at  DateTime              @updatedAt
   subject    Subject               @relation("SubjectToFaceData", fields: [subject_id], references: [id], onDelete: Cascade)
@@ -234,24 +227,24 @@ model EventLog {
 }
 
 model SystemLog {
-  id           BigInt   @id @default(autoincrement())
-  user_id      String?
-  action       String
-  entity       String?      // bảng bị tác động (Subject, Account,...)
-  entity_id    String?
-  
-  old_data     Json?        // dữ liệu trước
-  new_data     Json?        // dữ liệu sau
+  id        BigInt  @id @default(autoincrement())
+  user_id   String?
+  action    String
+  entity    String? // bảng bị tác động (Subject, Account,...)
+  entity_id String?
 
-  ip_address   String?
-  user_agent   String?
-  device_id    String?
+  old_data Json? // dữ liệu trước
+  new_data Json? // dữ liệu sau
 
-  request_id   String?      // trace request
-  status       String?      // SUCCESS / FAIL
-  error        String?
+  ip_address String?
+  user_agent String?
+  device_id  String?
 
-  created_at   DateTime @default(now())
+  request_id String? // trace request
+  status     String? // SUCCESS / FAIL
+  error      String?
+
+  created_at DateTime @default(now())
 
   user User? @relation("UserToSystemLog", fields: [user_id], references: [id])
 
@@ -262,21 +255,21 @@ model SystemLog {
 }
 
 model RequestLog {
-  id            String   @id @default(uuid())
-  user_id       String?
-  method        String
-  path          String
-  status_code   Int
-  duration_ms   Int
+  id          String  @id @default(uuid())
+  user_id     String?
+  method      String
+  path        String
+  status_code Int
+  duration_ms Int
 
-  ip_address    String?
-  user_agent    String?
-  device_id     String?
+  ip_address String?
+  user_agent String?
+  device_id  String?
 
   request_body  Json?
   response_body Json?
 
-  created_at    DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@index([user_id])
   @@index([created_at])
@@ -284,16 +277,16 @@ model RequestLog {
 }
 
 model AuthLog {
-  id           String   @id @default(uuid())
-  account_id   String
-  action       String   // LOGIN, LOGOUT, REFRESH
-  status       String   // SUCCESS / FAIL
+  id         String @id @default(uuid())
+  account_id String
+  action     String // LOGIN, LOGOUT, REFRESH
+  status     String // SUCCESS / FAIL
 
-  ip_address   String?
-  user_agent   String?
-  device_id    String?
+  ip_address String?
+  user_agent String?
+  device_id  String?
 
-  created_at   DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@index([account_id])
   @@map("auth_log")

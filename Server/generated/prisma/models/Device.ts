@@ -35,7 +35,6 @@ export type DeviceMinAggregateOutputType = {
   is_trusted: boolean | null
   last_seen_at: Date | null
   created_at: Date | null
-  accountId: string | null
 }
 
 export type DeviceMaxAggregateOutputType = {
@@ -49,7 +48,6 @@ export type DeviceMaxAggregateOutputType = {
   is_trusted: boolean | null
   last_seen_at: Date | null
   created_at: Date | null
-  accountId: string | null
 }
 
 export type DeviceCountAggregateOutputType = {
@@ -63,7 +61,6 @@ export type DeviceCountAggregateOutputType = {
   is_trusted: number
   last_seen_at: number
   created_at: number
-  accountId: number
   _all: number
 }
 
@@ -79,7 +76,6 @@ export type DeviceMinAggregateInputType = {
   is_trusted?: true
   last_seen_at?: true
   created_at?: true
-  accountId?: true
 }
 
 export type DeviceMaxAggregateInputType = {
@@ -93,7 +89,6 @@ export type DeviceMaxAggregateInputType = {
   is_trusted?: true
   last_seen_at?: true
   created_at?: true
-  accountId?: true
 }
 
 export type DeviceCountAggregateInputType = {
@@ -107,7 +102,6 @@ export type DeviceCountAggregateInputType = {
   is_trusted?: true
   last_seen_at?: true
   created_at?: true
-  accountId?: true
   _all?: true
 }
 
@@ -194,7 +188,6 @@ export type DeviceGroupByOutputType = {
   is_trusted: boolean
   last_seen_at: Date | null
   created_at: Date
-  accountId: string | null
   _count: DeviceCountAggregateOutputType | null
   _min: DeviceMinAggregateOutputType | null
   _max: DeviceMaxAggregateOutputType | null
@@ -229,7 +222,6 @@ export type DeviceWhereInput = {
   is_trusted?: Prisma.BoolFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Device"> | Date | string
-  accountId?: Prisma.StringNullableFilter<"Device"> | string | null
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
 }
 
@@ -244,7 +236,6 @@ export type DeviceOrderByWithRelationInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   account?: Prisma.AccountOrderByWithRelationInput
 }
 
@@ -263,7 +254,6 @@ export type DeviceWhereUniqueInput = Prisma.AtLeast<{
   is_trusted?: Prisma.BoolFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Device"> | Date | string
-  accountId?: Prisma.StringNullableFilter<"Device"> | string | null
   account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
 }, "id" | "account_id_device_uuid">
 
@@ -278,7 +268,6 @@ export type DeviceOrderByWithAggregationInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DeviceCountOrderByAggregateInput
   _max?: Prisma.DeviceMaxOrderByAggregateInput
   _min?: Prisma.DeviceMinOrderByAggregateInput
@@ -298,12 +287,10 @@ export type DeviceScalarWhereWithAggregatesInput = {
   is_trusted?: Prisma.BoolWithAggregatesFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Device"> | Date | string
-  accountId?: Prisma.StringNullableWithAggregatesFilter<"Device"> | string | null
 }
 
 export type DeviceCreateInput = {
   id?: string
-  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -326,12 +313,10 @@ export type DeviceUncheckedCreateInput = {
   is_trusted?: boolean
   last_seen_at?: Date | string | null
   created_at?: Date | string
-  accountId?: string | null
 }
 
 export type DeviceUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -354,7 +339,6 @@ export type DeviceUncheckedUpdateInput = {
   is_trusted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   last_seen_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeviceCreateManyInput = {
@@ -368,12 +352,10 @@ export type DeviceCreateManyInput = {
   is_trusted?: boolean
   last_seen_at?: Date | string | null
   created_at?: Date | string
-  accountId?: string | null
 }
 
 export type DeviceUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -395,7 +377,6 @@ export type DeviceUncheckedUpdateManyInput = {
   is_trusted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   last_seen_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type DeviceListRelationFilter = {
@@ -424,7 +405,6 @@ export type DeviceCountOrderByAggregateInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  accountId?: Prisma.SortOrder
 }
 
 export type DeviceMaxOrderByAggregateInput = {
@@ -438,7 +418,6 @@ export type DeviceMaxOrderByAggregateInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  accountId?: Prisma.SortOrder
 }
 
 export type DeviceMinOrderByAggregateInput = {
@@ -452,7 +431,6 @@ export type DeviceMinOrderByAggregateInput = {
   is_trusted?: Prisma.SortOrder
   last_seen_at?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  accountId?: Prisma.SortOrder
 }
 
 export type DeviceCreateNestedManyWithoutAccountInput = {
@@ -499,7 +477,6 @@ export type DeviceUncheckedUpdateManyWithoutAccountNestedInput = {
 
 export type DeviceCreateWithoutAccountInput = {
   id?: string
-  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -512,7 +489,6 @@ export type DeviceCreateWithoutAccountInput = {
 
 export type DeviceUncheckedCreateWithoutAccountInput = {
   id?: string
-  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -563,12 +539,10 @@ export type DeviceScalarWhereInput = {
   is_trusted?: Prisma.BoolFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Device"> | Date | string
-  accountId?: Prisma.StringNullableFilter<"Device"> | string | null
 }
 
 export type DeviceCreateManyAccountInput = {
   id?: string
-  account_id: string
   device_token?: string | null
   device_uuid: string
   platform: string
@@ -581,7 +555,6 @@ export type DeviceCreateManyAccountInput = {
 
 export type DeviceUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -594,7 +567,6 @@ export type DeviceUpdateWithoutAccountInput = {
 
 export type DeviceUncheckedUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -607,7 +579,6 @@ export type DeviceUncheckedUpdateWithoutAccountInput = {
 
 export type DeviceUncheckedUpdateManyWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  account_id?: Prisma.StringFieldUpdateOperationsInput | string
   device_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   device_uuid?: Prisma.StringFieldUpdateOperationsInput | string
   platform?: Prisma.StringFieldUpdateOperationsInput | string
@@ -631,7 +602,6 @@ export type DeviceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  accountId?: boolean
   account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
@@ -646,7 +616,6 @@ export type DeviceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  accountId?: boolean
   account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
@@ -661,7 +630,6 @@ export type DeviceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  accountId?: boolean
   account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
@@ -676,10 +644,9 @@ export type DeviceSelectScalar = {
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  accountId?: boolean
 }
 
-export type DeviceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "device_token" | "device_uuid" | "platform" | "app_version" | "is_active" | "is_trusted" | "last_seen_at" | "created_at" | "accountId", ExtArgs["result"]["device"]>
+export type DeviceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "device_token" | "device_uuid" | "platform" | "app_version" | "is_active" | "is_trusted" | "last_seen_at" | "created_at", ExtArgs["result"]["device"]>
 export type DeviceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   account?: boolean | Prisma.Device$accountArgs<ExtArgs>
 }
@@ -706,7 +673,6 @@ export type $DevicePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     is_trusted: boolean
     last_seen_at: Date | null
     created_at: Date
-    accountId: string | null
   }, ExtArgs["result"]["device"]>
   composites: {}
 }
@@ -1141,7 +1107,6 @@ export interface DeviceFieldRefs {
   readonly is_trusted: Prisma.FieldRef<"Device", 'Boolean'>
   readonly last_seen_at: Prisma.FieldRef<"Device", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"Device", 'DateTime'>
-  readonly accountId: Prisma.FieldRef<"Device", 'String'>
 }
     
 

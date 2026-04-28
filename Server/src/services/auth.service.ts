@@ -1,8 +1,10 @@
 import { LoginDto } from "../dtos/auth.dto";
-import * as accountReposity from '../repositories/account.reposity'
+import * as accountReposity from '../repositories/account.reposity';
+import * as refreshTokenReposity from '../repositories/refreshtoken.reposity';
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
 import { compareData } from '../utils/hash'
 import { AccountPayload } from "../types/data";
+import { RefreshTokenCreateInput } from "../../generated/prisma/models";
 
 export const login = async (data: LoginDto) => {
   //Kiểm tra tồn tại
@@ -35,5 +37,11 @@ export const login = async (data: LoginDto) => {
   const accessToken = generateAccessToken(payload);
   const refreshToken = generateRefreshToken();
 
-
+  //Ghi token mới
+  const token: RefreshTokenCreateInput = {
+    token_hash: refreshToken.hashedToken,
+    device_id: "11111",
+    account
+  };
+  const newToken = refreshTokenReposity.create();
 }

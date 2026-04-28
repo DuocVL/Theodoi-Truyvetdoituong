@@ -7,15 +7,15 @@ export async function create(data: Prisma.RefreshTokenCreateInput) {
     });
 }
 
-export async function findByToken(token: string) {
+export async function findByToken(token_hash: string) {
     return prisma.refreshToken.findUnique({
-        where: { token }
+        where: { token_hash }
     });
 }
 
-export async function validateRefreshToken(token: string) {
+export async function validateRefreshToken(token_hash: string) {
     const rt = await prisma.refreshToken.findUnique({
-        where: { token },
+        where: { token_hash },
     })
 
     if (!rt) return null
@@ -27,9 +27,9 @@ export async function validateRefreshToken(token: string) {
     return rt
 }
 
-export async function revokeToken(token: string) {
+export async function revokeToken(token_hash: string) {
     return prisma.refreshToken.update({
-        where: { token },
+        where: { token_hash },
         data: {
             revoked: true
         }
