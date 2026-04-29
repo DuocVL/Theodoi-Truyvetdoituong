@@ -1,24 +1,9 @@
-import { prisma } from "./configs/prisma.js";
+import app from './app';
+import { env } from './configs/env';
+import { logger } from './utils/logger';
 
-async function main() {
-  // Create a new user with a post
-  const role = await prisma.role.create({
-    data: {
-      name: "Alice3",
-      
-    },
-  });
-  console.log("Created role:", role);
+const PORT = env.PORT || 3000;
 
-
-}
-
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+app.listen(PORT, () => {
+    logger.info(`Server is running on port ${PORT}`);
+});

@@ -19,14 +19,16 @@ model Account {
   type       AccountType
   username   String      @unique
   password   String
+  email      String?     @unique
   status     String      @default("ACTIVE")
   created_at DateTime    @default(now())
 
   user    User?
   subject Subject?
 
-  refreshToken RefreshToken[]
-  devices      Device[]
+  refreshToken         RefreshToken[]
+  devices              Device[]
+  passwordResetTokens  PasswordResetToken[]
 
   @@map("accounts")
 }
@@ -35,7 +37,6 @@ model User {
   id         String  @id @default(uuid())
   account_id String  @unique
   full_name  String
-  email      String?
   status     Boolean @default(true)
 
   created_at DateTime @default(now())
@@ -120,6 +121,18 @@ model RefreshToken {
   account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
 
   @@map("refreshtokens")
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  token      String   @unique
+  account_id String
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
 }
 
 model Device {

@@ -23,4 +23,4 @@ Sản phẩm đầu ra
 • Module bản đồ số phục vụ hiển thị và truy vết theo không gian, thời gian.
 • Module tìm kiếm, tra cứu, thống kê và cảnh báo.
 • Bộ tài liệu thiết kế hệ thống, tài liệu hướng dẫn sử dụng và quản trị.
-• Bộ dữ liệu thử nghiệm, báo cáo đánh giá kết quả triển khai thử nghiệm.
+• Bộ dữ liệu thử nghiệm, báo cáo đánh giá kết quả triển khai thử nghiệm."
