@@ -1,3 +1,4 @@
+
 generator client {
   provider        = "prisma-client"
   output          = "../generated/prisma"
@@ -7,6 +8,7 @@ generator client {
 datasource db {
   provider   = "postgresql"
   extensions = [postgis, vector]
+  url        = env("DATABASE_URL")
 }
 
 enum AccountType {
@@ -14,13 +16,20 @@ enum AccountType {
   SUBJECT
 }
 
+// New enum for account status
+enum AccountStatus {
+  PENDING_ACTIVATION
+  ACTIVE
+  SUSPENDED
+}
+
 model Account {
   id         String      @id @default(uuid())
   type       AccountType
   username   String      @unique
-  password   String
+  password   String?     // Changed to optional
   email      String?     @unique
-  status     String      @default("ACTIVE")
+  status     AccountStatus @default(PENDING_ACTIVATION) // Use enum and change default
   created_at DateTime    @default(now())
 
   user    User?
@@ -29,8 +38,22 @@ model Account {
   refreshToken         RefreshToken[]
   devices              Device[]
   passwordResetTokens  PasswordResetToken[]
+  activationTokens     ActivationToken[] // Add relation
 
   @@map("accounts")
+}
+
+// New model for activation tokens
+model ActivationToken {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  account_id  String
+  expires_at  DateTime
+  created_at  DateTime @default(now())
+
+  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  @@map("activation_tokens")
 }
 
 model User {
@@ -91,7 +114,7 @@ model Subject {
   created_by String
   created_at DateTime @default(now())
   update_at  DateTime @updatedAt
-  deleted_at DateTime
+  deleted_at DateTime?
 
   creator User    @relation("UserToSubject", fields: [created_by], references: [id])
   account Account @relation(fields: [account_id], references: [id])
