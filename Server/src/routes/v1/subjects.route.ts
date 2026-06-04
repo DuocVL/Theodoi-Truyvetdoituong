@@ -1,10 +1,9 @@
-
 import { Router } from 'express';
 import SubjectController from '../../controllers/subjects.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware'; // Assuming you have this
-import { Route } from '../types/route.interface';
+import { roleMiddleware } from '../../middlewares/role.middleware';
 
-class SubjectRoute implements Route {
+class SubjectRoute {
   public path = '/subjects';
   public router = Router();
   public subjectController = new SubjectController();
@@ -14,8 +13,8 @@ class SubjectRoute implements Route {
   }
 
   private initializeRoutes() {
-    // Protect all routes with auth middleware
     this.router.use(authMiddleware);
+    this.router.use(roleMiddleware);
 
     // GET /api/v1/subjects - Get all subjects
     this.router.get(`${this.path}`, this.subjectController.getAll);

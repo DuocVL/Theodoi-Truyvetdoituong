@@ -327,3 +327,14 @@ model AuthLog {
   @@index([account_id])
   @@map("auth_log")
 }
+model AuthImage {
+  id         String   @id @default(uuid())
+  account_id String
+  image_url  String
+  created_at DateTime @default(now())
+
+  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  @@map("auth_images")
+}
+

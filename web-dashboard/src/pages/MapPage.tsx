@@ -1,20 +1,21 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import styled from 'styled-components';
-import { fetchTrackingData } from '../services/api'; // Import the API function
+import { fetchTrackingData, getSubjects, getZones } from '../services/api'; // Import API functions
+
+import 'leaflet-draw/dist/leaflet.draw.css';
 
 // Interface for our tracking data received from the backend
-interface TrackingEvent {
+interface TrackingEvent { 
     id: number;
     subject_id: string;
     subject_name: string;
     timestamp: string;
     coordinates: [number, number];
-    // Add other properties like photoUrl, address, type if they come from the API
-    // For now, we will use hardcoded or derived values for some fields.
+    type?: string;
+    image_url?: string; // optional photo from check‑in
 }
 
 // --- Dữ liệu tĩnh còn lại (sẽ được thay thế dần) ---
@@ -92,7 +93,12 @@ const LoadingOverlay = styled.div`
 // --- Component Chính ---
 const MapPage: React.FC = () => {
     // State for data, loading, and errors
+    const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
+    const [customPolygon, setCustomPolygon] = useState<L.Polygon | null>(null);
     const [allEvents, setAllEvents] = useState<TrackingEvent[]>([]);
+    const [subjects, setSubjects] = useState<any[]>([]);
+    const [zones, setZones] = useState<any[]>([]);
+    const [zoneFilter, setZoneFilter] = useState<string>('all');
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -100,14 +106,21 @@ const MapPage: React.FC = () => {
     const [startDate, setStartDate] = useState('2023-10-27');
     const [endDate, setEndDate] = useState('2023-10-30');
     const [subjectFilter, setSubjectFilter] = useState<string>('all');
+    const [showSubjects, setShowSubjects] = useState<boolean>(false);
 
     // Fetch data from server when component mounts
     useEffect(() => {
         const loadData = async () => {
             try {
                 setIsLoading(true);
-                const data = await fetchTrackingData();
-                setAllEvents(data);
+                const [tracking, subj, zn] = await Promise.all([
+                    fetchTrackingData(),
+                    getSubjects(),
+                    getZones()
+                ]);
+                setAllEvents(tracking);
+                setSubjects(subj);
+                setZones(zn);
                 setError(null);
             } catch (err: any) {
                 setError(err.message || "An unknown error occurred.");
@@ -119,17 +132,6 @@ const MapPage: React.FC = () => {
         loadData();
     }, []); // Empty dependency array means this runs once on mount
 
-
-    const subjects = useMemo(() => {
-        const uniqueSubjects = new Map<string, string>();
-        allEvents.forEach(event => {
-            if (!uniqueSubjects.has(event.subject_id)) {
-                uniqueSubjects.set(event.subject_id, event.subject_name);
-            }
-        });
-        return Array.from(uniqueSubjects.entries()).map(([id, name]) => ({ id, name }));
-    }, [allEvents]);
-
     const filteredHistory = useMemo(() => {
         return allEvents.filter(event => {
             const eventDate = new Date(event.timestamp);
@@ -139,10 +141,13 @@ const MapPage: React.FC = () => {
 
             const dateFilter = eventDate >= start && eventDate <= end;
             const subjectFilterMatch = subjectFilter === 'all' || event.subject_id === subjectFilter;
+            const typeMatch = selectedEventTypes.length === 0 || selectedEventTypes.includes(event.type || '');
+            const zoneMatch = zoneFilter === 'all' || (event as any).zone_id === zoneFilter;
+                const insideCustom = !customPolygon || customPolygon.getBounds().contains(event.coordinates as unknown as L.LatLng);
 
-            return dateFilter && subjectFilterMatch;
+            return dateFilter && subjectFilterMatch && typeMatch && insideCustom && zoneMatch;
         });
-    }, [allEvents, startDate, endDate, subjectFilter]);
+    }, [allEvents, startDate, endDate, subjectFilter, selectedEventTypes, customPolygon]);
 
     const polylineCoords = filteredHistory.map(event => event.coordinates as L.LatLngExpression);
 
@@ -155,11 +160,29 @@ const MapPage: React.FC = () => {
             {isLoading && <LoadingOverlay>Đang tải dữ liệu...</LoadingOverlay>}
             <ControlPanel>
                 <h3>Bộ lọc truy vết</h3>
-                 <div className="filter-group">
+                <div className="filter-group">
+                    <label>Loại sự kiện</label>
+                    {eventTypes.map(type => (
+                        <div key={type}>
+                            <input type="checkbox" checked={selectedEventTypes.includes(type)} onChange={e => {
+                                const checked = e.target.checked;
+                                setSelectedEventTypes(prev => checked ? [...prev, type] : prev.filter(t => t !== type));
+                            }} /> {type}
+                        </div>
+                    ))}
+                </div>
+                <div className="filter-group">
                     <label htmlFor="subject-filter">Đối tượng</label>
                     <select id="subject-filter" value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)}>
                         <option value="all">Tất cả đối tượng</option>
                         {subjects.map(subject => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
+                    </select>
+                </div>
+                <div className="filter-group">
+                    <label htmlFor="zone-filter">Khu vực</label>
+                    <select id="zone-filter" value={zoneFilter} onChange={e => setZoneFilter(e.target.value)}>
+                        <option value="all">Tất cả khu vực</option>
+                        {zones.map(zone => <option key={zone.id} value={zone.id}>{zone.name}</option>)}
                     </select>
                 </div>
                 <div className="filter-group">
@@ -170,32 +193,35 @@ const MapPage: React.FC = () => {
                     <label htmlFor="end-date">Đến ngày</label>
                     <input type="date" id="end-date" value={endDate} onChange={e => setEndDate(e.target.value)} />
                 </div>
-                 {/* Filters for type and address search are removed for now, can be re-added later */}
+                <div className="filter-group">
+                    <label>
+                        <input type="checkbox" checked={showSubjects} onChange={e => setShowSubjects(e.target.checked)} /> Hiển thị danh sách đối tượng
+                    </label>
+                </div>
             </ControlPanel>
-
-            <MapContainer center={permittedArea.center} zoom={12} style={{ height: '100%', width: '100%' }}>
-                <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-
-                <Circle
-                    center={permittedArea.center}
-                    radius={permittedArea.radius}
-                    pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: 0.1 }}
-                >
-                    <Popup><b>{permittedArea.name}</b></Popup>
-                </Circle>
-                
+            <MapContainer center={permittedArea.center} zoom={13} style={{ height: "100%", width: "100%" }}>
+                <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {polylineCoords.length > 1 && <Polyline pathOptions={{ color: 'navy', weight: 3 }} positions={polylineCoords} />}
-
                 {filteredHistory.map(event => (
-                    <Marker key={event.id} position={event.coordinates as L.LatLngExpression} icon={createColoredIcon('blue')}>
+                    <Marker key={event.id} position={event.coordinates as L.LatLngExpression} icon={createColoredIcon(event.type ? event.type.toLowerCase() : 'blue')}>
                         <Popup>
                             <PopupContent>
                                 <h4>{event.subject_name}</h4>
-                                <p><strong>Thời gian:</strong> {new Date(event.timestamp).toLocaleString('vi-VN')}</p>
-                                {/* Add more info here if available from API */}
+                                <p>Thời gian: {new Date(event.timestamp).toLocaleString('vi-VN')}</p>
+                                {event.image_url && <img src={event.image_url} alt="Check-in" style={{ maxWidth: '150px', borderRadius: '4px' }} />}
+                            </PopupContent>
+                        </Popup>
+                    </Marker>
+                ))}
+                <Circle center={permittedArea.center} radius={permittedArea.radius} pathOptions={{ color: 'green', fillColor: 'green', fillOpacity: 0.1 }}>
+                    <Popup><b>{permittedArea.name}</b></Popup>
+                </Circle>
+                {showSubjects && subjects.map(sub => (
+                    <Marker key={sub.id} position={[sub.lat, sub.lng] as L.LatLngExpression} icon={createColoredIcon('red')}>
+                        <Popup>
+                            <PopupContent>
+                                <h4>{sub.name}</h4>
+                                <p>ID: {sub.id}</p>
                             </PopupContent>
                         </Popup>
                     </Marker>

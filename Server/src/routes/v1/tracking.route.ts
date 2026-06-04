@@ -1,10 +1,9 @@
 
 import { Router } from 'express';
-import TrackingController from '../../controllers/tracking.controller';
+import trackingController from '../../controllers/tracking.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 
 const router = Router();
-const trackingController = new TrackingController();
 
 // Middleware to protect all tracking routes
 router.use(authMiddleware);

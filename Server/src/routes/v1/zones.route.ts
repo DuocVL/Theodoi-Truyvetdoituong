@@ -2,9 +2,9 @@
 import { Router } from 'express';
 import ZoneController from '../../controllers/zones.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { Route } from '../types/route.interface';
 
-class ZoneRoute implements Route {
+
+class ZoneRoute {
   public path = '/zones';
   public router = Router();
   public zoneController = new ZoneController();

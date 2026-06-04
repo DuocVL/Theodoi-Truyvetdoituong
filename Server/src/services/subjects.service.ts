@@ -139,9 +139,9 @@ class SubjectService {
           where: { id: subjectId },
           include: {
               account: true, // include all account details
-              check_ins: { // include recent checkin history
+              checkin: { // include recent checkin history
                   orderBy: {
-                      timestamp: 'desc'
+                      checkin_time: 'desc'
                   },
                   take: 10
               },

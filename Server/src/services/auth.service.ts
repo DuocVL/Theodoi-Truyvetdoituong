@@ -131,3 +131,35 @@ export const resetPassword = async (data: ResetPasswordDto) => {
 
     await passwordResetTokenRepository.deleteByToken(token);
 };
+
+export const getMe = async (accountId: string) => {
+    const account = await accountRepository.findByIdWithRelations(accountId);
+    if (!account) {
+        throw new HttpException(404, "Account not found");
+    }
+
+    if (account.type === 'SUBJECT' && account.subject) {
+        // format response to match SubjectData in client
+        return {
+            id: account.subject.id,
+            full_name: account.subject.full_name,
+            dob: account.subject.dob,
+            gender: account.subject.gender,
+            id_number: account.subject.id_number,
+            address: account.subject.address,
+            phone: account.subject.phone,
+            monitoring_start: account.subject.monitoring_start,
+            monitoring_end: account.subject.monitoring_end,
+            account: {
+                username: account.username,
+                email: account.email,
+                status: account.status
+            },
+            check_ins: account.subject.checkin
+        };
+    } else if (account.type === 'USER' && account.user) {
+        return account.user;
+    }
+
+    return account;
+};

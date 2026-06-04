@@ -2,7 +2,7 @@
 import { NextFunction, Response } from 'express';
 import multer from 'multer';
 import FaceService from '../services/face.service';
-import { PrismaClient } from '../../generated/prisma';
+import { PrismaClient, Prisma } from '../../generated/prisma';
 import { RequestWithUser } from '../types/data';
 import { faceVerificationQueue } from '../queues/face-verification.queue';
 
@@ -78,15 +78,15 @@ class FaceController {
       }
 
       // 1. Create a placeholder check-in record
-      const checkinRecord = await this.prisma.checkin.create({
-        data: {
-          subject_id: subject.id,
-          location: { type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] }, // Assuming GeoJSON point
-          status: 'PROCESSING', // New status
-          face_verified: false,
-          confidence: 0,
-        }
-      });
+      const geoJsonString = JSON.stringify({ type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] });
+      const rawQuery = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
+
+      const checkinRecords = await this.prisma.$queryRaw<any[]>`
+        INSERT INTO "checkins" (subject_id, location, status, face_verified, confidence, checkin_time)
+        VALUES (${subject.id}, ${rawQuery}, 'PROCESSING', false, 0, NOW())
+        RETURNING id;
+      `;
+      const checkinRecord = checkinRecords[0];
 
       // 2. Add job to the queue
       const jobData = {

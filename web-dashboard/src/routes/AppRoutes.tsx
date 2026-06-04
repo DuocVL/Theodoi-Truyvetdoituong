@@ -7,6 +7,7 @@ import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
+import SubjectListPage from '../pages/SubjectListPage';
 
 const AppRoutes: React.FC = () => {
     const { isAuthenticated } = useAuth();
@@ -18,8 +19,11 @@ const AppRoutes: React.FC = () => {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="/dashboard" element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<ProtectedRoute />}> 
                     <Route path="/dashboard" element={<DashboardPage />} />
+                </Route>
+                <Route path="/subjects" element={<ProtectedRoute />}> 
+                    <Route path="/subjects" element={<SubjectListPage />} />
                 </Route>
                 <Route 
                     path="/"

@@ -1,17 +1,17 @@
-
 // A simple wrapper around the fetch API to handle API calls.
 
 const API_BASE_URL = 'http://localhost:3000/api/v1'; // Adjust if your backend URL is different
 
 // A helper to get the auth token from localStorage
 const getAuthToken = () => {
-    // The token is stored as a JSON string with quotes, so we need to parse it.
-    const tokenString = localStorage.getItem('authToken');
+    // Token is stored under the key 'token' by AuthContext
+    const tokenString = localStorage.getItem('token');
     if (tokenString) {
         try {
-            return JSON.parse(tokenString);
+            // tokenString is a plain string, not JSON-wrapped
+            return tokenString;
         } catch (e) {
-            console.error("Failed to parse auth token:", e);
+            console.error("Failed to retrieve auth token:", e);
             return null;
         }
     }
@@ -40,3 +40,37 @@ export const fetchTrackingData = async () => {
     const result = await response.json();
     return result.data; // The API returns data inside a `data` property
 };
+
+// New helper to fetch the list of subjects
+export const getSubjects = async () => {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/subjects`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error(`Error fetching subjects: ${response.statusText}`);
+    }
+    const result = await response.json();
+    // Expect API to return an array of subjects directly or inside a data field
+    return result.data || result;
+}
+
+export const getZones = async () => {
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/zones`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    if (!response.ok) {
+        throw new Error(`Error fetching zones: ${response.statusText}`);
+    }
+    const result = await response.json();
+    return result.data || result;
+};;

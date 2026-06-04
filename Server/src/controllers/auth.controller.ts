@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/auth.service';
 import { LoginDto, RegisterDto, RefreshTokenDto, ForgotPasswordDto, ResetPasswordDto } from '../dtos/auth.dto';
+import { RequestWithUser } from '../types/data';
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -57,6 +58,16 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
         const resetPasswordData: ResetPasswordDto = req.body;
         await authService.resetPassword(resetPasswordData);
         res.status(204).send();
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getMe = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    try {
+        const accountId = req.user.id;
+        const result = await authService.getMe(accountId);
+        res.json({ data: result });
     } catch (error) {
         next(error);
     }

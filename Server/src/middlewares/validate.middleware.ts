@@ -1,8 +1,8 @@
 //Kiểm tra , chuẩn hóa đầu vào từ request
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema } from 'zod/v3';
+import { ZodSchema } from 'zod';
 
-export const validate = (schema: ZodSchema) => {
+export const validate = (schema: any) => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
     

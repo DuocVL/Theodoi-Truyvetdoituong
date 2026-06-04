@@ -1,4 +1,3 @@
-
 import { NextFunction, Request, Response } from 'express';
 import SubjectService from '../services/subjects.service';
 import { RequestWithUser } from '../types/data';
@@ -10,15 +9,14 @@ class SubjectController {
 
   public create = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const role = (req as any).role;
+      if (role !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
       const subjectData = createSubjectSchema.parse(req.body);
       const createdByUserId = req.user.id;
-
       const result = await this.subjectService.createSubjectAndInvite(subjectData, createdByUserId);
-
-      res.status(201).json({ 
-        message: 'Subject created and invitation sent successfully.',
-        data: result.subject
-      });
+      res.status(201).json({ message: 'Subject created and invitation sent successfully.', data: result.subject });
     } catch (error) {
       next(error);
     }
@@ -28,7 +26,6 @@ class SubjectController {
     try {
       const activationData = activateAccountSchema.parse(req.body);
       await this.subjectService.activateAccount(activationData);
-
       res.status(200).json({ message: 'Account activated successfully. You can now log in.' });
     } catch (error) {
       next(error);
@@ -56,6 +53,10 @@ class SubjectController {
 
   public update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const role = (req as any).role;
+      if (role !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
       const subjectId = z.string().parse(req.params.id);
       const subjectData = updateSubjectSchema.parse(req.body);
       const updatedSubject = await this.subjectService.updateSubject(subjectId, subjectData);
@@ -67,6 +68,10 @@ class SubjectController {
 
   public delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const role = (req as any).role;
+      if (role !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden' });
+      }
       const subjectId = z.string().parse(req.params.id);
       await this.subjectService.deleteSubject(subjectId);
       res.status(200).json({ message: 'deleted' });

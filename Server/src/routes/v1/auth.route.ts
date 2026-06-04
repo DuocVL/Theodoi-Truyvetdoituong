@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import * as authController from '../../../controllers/auth.controller';
-import { validate } from '../../../middlewares/validation.middleware';
-import { loginSchema, registerSchema, refreshTokenSchema, logoutSchema, forgotPasswordSchema, resetPasswordSchema } from '../../../dtos/auth.dto';
+import * as authController from '../../controllers/auth.controller';
+import { validate } from '../../middlewares/validate.middleware';
+import { authMiddleware } from '../../middlewares/auth.middleware';
+import { loginSchema, registerSchema, refreshTokenSchema, logoutSchema, forgotPasswordSchema, resetPasswordSchema } from '../../dtos/auth.dto';
 
 const router = Router();
 
@@ -11,5 +12,6 @@ router.post('/refresh-token', validate(refreshTokenSchema), authController.refre
 router.post('/logout', validate(logoutSchema), authController.logout);
 router.post('/forgot-password', validate(forgotPasswordSchema), authController.forgotPassword);
 router.post('/reset-password', validate(resetPasswordSchema), authController.resetPassword);
+router.get('/me', authMiddleware, authController.getMe as any);
 
 export default router;

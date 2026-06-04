@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import * as logController from '../../controllers/log.controller';
-import { auth } from '../../middlewares/auth.middleware';
+import { authMiddleware } from '../../middlewares/auth.middleware';
 import { authorize } from '../../middlewares/role.middleware';
 
 const router = Router();
 
 // All log routes are protected and require admin privileges
-router.use(auth, authorize(['ADMIN']));
+router.use(authMiddleware, authorize(['ADMIN']));
 
 router.get('/request', logController.getRequestLogs);
 router.get('/auth', logController.getAuthLogs);

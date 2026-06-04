@@ -1,7 +1,7 @@
 
 import { NextFunction, Request, Response } from 'express';
-import UserService from '../../services/users.service';
-import { updateUserSchema } from '../../dtos/users.dto';
+import UserService from '../services/users.service';
+import { updateUserSchema } from '../dtos/users.dto';
 import { z } from 'zod';
 
 class UserController {

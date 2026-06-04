@@ -3,9 +3,9 @@ import { Router } from 'express';
 import UserController from '../../controllers/users.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { authorize } from '../../middlewares/role.middleware';
-import { Route } from '../types/route.interface';
 
-class UserRoute implements Route {
+
+class UserRoute {
   public path = '/users';
   public router = Router();
   public userController = new UserController();

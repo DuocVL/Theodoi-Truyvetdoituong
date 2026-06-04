@@ -23,20 +23,20 @@ interface ApiService {
     suspend fun getMyProfile(): Response<SubjectProfileResponse> // Assuming the /me route returns subject details
 
     @Multipart
-    @POST("/api/v1/tracking/register-face") // Assuming this is the endpoint
+    @POST("/api/v1/face/register") // Assuming this is the endpoint
     suspend fun registerFace(
-        @Part image: MultipartBody.Part
+        @Part files: List<MultipartBody.Part>
     ): Response<GenericResponse>
 
 
     // --- CHECK-IN --- //
 
     @Multipart
-    @POST("/api/v1/tracking/check-in")
+    @POST("/api/v1/face/check-in")
     suspend fun checkIn(
         @Part("latitude") latitude: RequestBody,
         @Part("longitude") longitude: RequestBody,
-        @Part image: MultipartBody.Part
+        @Part files: MultipartBody.Part
     ): Response<CheckInResponse>
 
 

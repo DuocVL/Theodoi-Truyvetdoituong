@@ -2,10 +2,10 @@
 import { Router } from 'express';
 import FaceController from '../../controllers/face.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { Routes } from '../types/routes';
+// No Routes interface – removed
 
-class FaceRoute implements Routes {
-  public path = '/api/v1/face';
+class FaceRoute {
+  public path = '/face';
   public router = Router();
   public faceController = new FaceController();
 
