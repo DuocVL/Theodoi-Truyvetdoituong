@@ -45,21 +45,6 @@ class FaceController {
     }
   };
 
-  /**
-   * @swagger
-   * /api/v1/face/check-in:
-   *   post:
-   *     summary: Accepts a check-in request and queues it for processing.
-   *     description: Uploads images and location, then immediately responds while processing happens in the background.
-   *     tags: [Face]
-   *     security:
-   *       - bearerAuth: []
-   *     responses:
-   *       202:
-   *         description: Check-in request accepted and is being processed.
-   *       400:
-   *         description: Bad request (e.g., missing images or location).
-   */
   public checkIn = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const files = req.files as Express.Multer.File[];
@@ -77,7 +62,6 @@ class FaceController {
         return;
       }
 
-      // 1. Create a placeholder check-in record
       const geoJsonString = JSON.stringify({ type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] });
       const rawQuery = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
 
@@ -88,12 +72,11 @@ class FaceController {
       `;
       const checkinRecord = checkinRecords[0];
 
-      // 2. Add job to the queue
       const jobData = {
         checkinId: checkinRecord.id,
         subjectId: subject.id,
         files: files.map(f => ({ 
-            buffer: f.buffer.toString('base64'), // Pass buffer as base64 string
+            buffer: f.buffer.toString('base64'),
             originalname: f.originalname,
             mimetype: f.mimetype
         }))
@@ -101,7 +84,6 @@ class FaceController {
 
       await faceVerificationQueue.add('verify-face', jobData);
 
-      // 3. Respond immediately
       res.status(202).json({ 
         message: 'Check-in accepted and is being processed.',
         checkinId: checkinRecord.id

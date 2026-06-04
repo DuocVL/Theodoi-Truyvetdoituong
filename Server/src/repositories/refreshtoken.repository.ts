@@ -1,19 +1,14 @@
 import { prisma } from '../configs/prisma';
-import { RefreshToken } from '@prisma/client';
-import { CreateRefreshTokenInput } from '../types/data';
+import { RefreshToken, Prisma } from '../../generated/prisma/client';
 
 /**
  * Creates a new refresh token in the database.
  * @param data - The data for the new refresh token, including token hash, device ID, and account ID.
  * @returns The newly created refresh token.
  */
-export const create = async (data: CreateRefreshTokenInput): Promise<RefreshToken> => {
+export const create = async (data: Prisma.RefreshTokenCreateInput): Promise<RefreshToken> => {
     return await prisma.refreshToken.create({ 
-        data: {
-            token_hash: data.token_hash,
-            device_id: data.device_id,
-            account_id: data.account_id
-        }
+        data: data
     });
 };
 

@@ -1,5 +1,4 @@
 
-import { PrismaClient, Role } from '@prisma/client';
 import { prisma } from '../configs/prisma';
 import { HttpException } from '../exceptions/HttpException';
 import { updateUserSchema } from '../dtos/users.dto';
