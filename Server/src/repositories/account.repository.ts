@@ -1,5 +1,5 @@
 import { prisma } from '../configs/prisma';
-import { Account , Prisma } from '../../generated/prisma/client';
+import { Account , Prisma, AccountStatus } from '../../generated/prisma/client';
 
 
 export const create = async (data: Prisma.AccountCreateInput): Promise<Account> => {
@@ -18,6 +18,13 @@ export const updatePassword = async (id: string, password: string): Promise<Acco
     return await prisma.account.update({
         where: { id },
         data: { password },
+    });
+};
+
+export const updateStatus = async (id: string, status: AccountStatus): Promise<Account> => {
+    return await prisma.account.update({
+        where: { id },
+        data: { status },
     });
 };
 
