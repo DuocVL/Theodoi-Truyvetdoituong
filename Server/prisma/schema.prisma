@@ -61,6 +61,9 @@ model User {
   full_name  String
   status     Boolean @default(true)
 
+  avatar_id  String? @unique
+  avatar     Image?  @relation("UserToAvatar", fields: [avatar_id], references: [id], onDelete: SetNull)
+
   created_at DateTime @default(now())
   update_at  DateTime @updatedAt
 
@@ -109,6 +112,9 @@ model Subject {
   status           String    @default("ACTIVE")
   monitoring_start DateTime?
   monitoring_end   DateTime?
+
+  avatar_id  String? @unique
+  avatar     Image?  @relation("SubjectToAvatar", fields: [avatar_id], references: [id], onDelete: SetNull)
 
   created_by String
   created_at DateTime  @default(now())
@@ -219,7 +225,8 @@ model Checkin {
   id            BigInt                   @id @default(autoincrement())
   subject_id    String
   location      Unsupported("geography")
-  image_url     String?
+  image_id      String?                  @unique
+  image         Image?                   @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
   face_verified Boolean                  @default(false)
   confidence    Float
   status        String                   @default("ON_TIME")
@@ -336,4 +343,18 @@ model AuthImage {
   account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
 
   @@map("auth_images")
+}
+
+model Image {
+  id         String   @id @default(uuid())
+  url        String
+  alt_text   String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  userAvatar    User?    @relation("UserToAvatar")
+  subjectAvatar Subject? @relation("SubjectToAvatar")
+  checkinImage  Checkin? @relation("CheckinToImage")
+
+  @@map("images")
 }
