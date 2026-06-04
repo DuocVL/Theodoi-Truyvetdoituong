@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AccountStatus } from '../../generated/prisma';
+import { AccountStatus } from '../../generated/prisma/client';
 
 export const UpdateAccountDto = z.object({
     status: z.nativeEnum(AccountStatus).optional(),

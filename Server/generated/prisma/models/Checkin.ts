@@ -39,7 +39,7 @@ export type CheckinSumAggregateOutputType = {
 export type CheckinMinAggregateOutputType = {
   id: bigint | null
   subject_id: string | null
-  image_url: string | null
+  image_id: string | null
   face_verified: boolean | null
   confidence: number | null
   status: string | null
@@ -49,7 +49,7 @@ export type CheckinMinAggregateOutputType = {
 export type CheckinMaxAggregateOutputType = {
   id: bigint | null
   subject_id: string | null
-  image_url: string | null
+  image_id: string | null
   face_verified: boolean | null
   confidence: number | null
   status: string | null
@@ -59,7 +59,7 @@ export type CheckinMaxAggregateOutputType = {
 export type CheckinCountAggregateOutputType = {
   id: number
   subject_id: number
-  image_url: number
+  image_id: number
   face_verified: number
   confidence: number
   status: number
@@ -81,7 +81,7 @@ export type CheckinSumAggregateInputType = {
 export type CheckinMinAggregateInputType = {
   id?: true
   subject_id?: true
-  image_url?: true
+  image_id?: true
   face_verified?: true
   confidence?: true
   status?: true
@@ -91,7 +91,7 @@ export type CheckinMinAggregateInputType = {
 export type CheckinMaxAggregateInputType = {
   id?: true
   subject_id?: true
-  image_url?: true
+  image_id?: true
   face_verified?: true
   confidence?: true
   status?: true
@@ -101,7 +101,7 @@ export type CheckinMaxAggregateInputType = {
 export type CheckinCountAggregateInputType = {
   id?: true
   subject_id?: true
-  image_url?: true
+  image_id?: true
   face_verified?: true
   confidence?: true
   status?: true
@@ -198,7 +198,7 @@ export type CheckinGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type CheckinGroupByOutputType = {
   id: bigint
   subject_id: string
-  image_url: string | null
+  image_id: string | null
   face_verified: boolean
   confidence: number
   status: string
@@ -231,43 +231,46 @@ export type CheckinWhereInput = {
   NOT?: Prisma.CheckinWhereInput | Prisma.CheckinWhereInput[]
   id?: Prisma.BigIntFilter<"Checkin"> | bigint | number
   subject_id?: Prisma.StringFilter<"Checkin"> | string
-  image_url?: Prisma.StringNullableFilter<"Checkin"> | string | null
+  image_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   confidence?: Prisma.FloatFilter<"Checkin"> | number
   status?: Prisma.StringFilter<"Checkin"> | string
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
+  image?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
 }
 
 export type CheckinOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
-  image_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  image_id?: Prisma.SortOrderInput | Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   status?: Prisma.SortOrder
   checkin_time?: Prisma.SortOrder
+  image?: Prisma.ImageOrderByWithRelationInput
   subject?: Prisma.SubjectOrderByWithRelationInput
 }
 
 export type CheckinWhereUniqueInput = Prisma.AtLeast<{
   id?: bigint | number
+  image_id?: string
   AND?: Prisma.CheckinWhereInput | Prisma.CheckinWhereInput[]
   OR?: Prisma.CheckinWhereInput[]
   NOT?: Prisma.CheckinWhereInput | Prisma.CheckinWhereInput[]
   subject_id?: Prisma.StringFilter<"Checkin"> | string
-  image_url?: Prisma.StringNullableFilter<"Checkin"> | string | null
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   confidence?: Prisma.FloatFilter<"Checkin"> | number
   status?: Prisma.StringFilter<"Checkin"> | string
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
+  image?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
-}, "id">
+}, "id" | "image_id">
 
 export type CheckinOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
-  image_url?: Prisma.SortOrderInput | Prisma.SortOrder
+  image_id?: Prisma.SortOrderInput | Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -285,7 +288,7 @@ export type CheckinScalarWhereWithAggregatesInput = {
   NOT?: Prisma.CheckinScalarWhereWithAggregatesInput | Prisma.CheckinScalarWhereWithAggregatesInput[]
   id?: Prisma.BigIntWithAggregatesFilter<"Checkin"> | bigint | number
   subject_id?: Prisma.StringWithAggregatesFilter<"Checkin"> | string
-  image_url?: Prisma.StringNullableWithAggregatesFilter<"Checkin"> | string | null
+  image_id?: Prisma.StringNullableWithAggregatesFilter<"Checkin"> | string | null
   face_verified?: Prisma.BoolWithAggregatesFilter<"Checkin"> | boolean
   confidence?: Prisma.FloatWithAggregatesFilter<"Checkin"> | number
   status?: Prisma.StringWithAggregatesFilter<"Checkin"> | string
@@ -294,18 +297,18 @@ export type CheckinScalarWhereWithAggregatesInput = {
 
 export type CheckinUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  image?: Prisma.ImageUpdateOneWithoutCheckinImageNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutCheckinNestedInput
 }
 
 export type CheckinUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
-  image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -314,7 +317,6 @@ export type CheckinUncheckedUpdateInput = {
 
 export type CheckinUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -324,7 +326,7 @@ export type CheckinUpdateManyMutationInput = {
 export type CheckinUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
-  image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -344,7 +346,7 @@ export type CheckinOrderByRelationAggregateInput = {
 export type CheckinCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
-  image_url?: Prisma.SortOrder
+  image_id?: Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -359,7 +361,7 @@ export type CheckinAvgOrderByAggregateInput = {
 export type CheckinMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
-  image_url?: Prisma.SortOrder
+  image_id?: Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -369,7 +371,7 @@ export type CheckinMaxOrderByAggregateInput = {
 export type CheckinMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
-  image_url?: Prisma.SortOrder
+  image_id?: Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -379,6 +381,11 @@ export type CheckinMinOrderByAggregateInput = {
 export type CheckinSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
+}
+
+export type CheckinNullableScalarRelationFilter = {
+  is?: Prisma.CheckinWhereInput | null
+  isNot?: Prisma.CheckinWhereInput | null
 }
 
 export type CheckinCreateNestedManyWithoutSubjectInput = {
@@ -425,6 +432,28 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type CheckinCreateNestedOneWithoutImageInput = {
+  connect?: Prisma.CheckinWhereUniqueInput
+}
+
+export type CheckinUncheckedCreateNestedOneWithoutImageInput = {
+  connect?: Prisma.CheckinWhereUniqueInput
+}
+
+export type CheckinUpdateOneWithoutImageNestedInput = {
+  disconnect?: Prisma.CheckinWhereInput | boolean
+  delete?: Prisma.CheckinWhereInput | boolean
+  connect?: Prisma.CheckinWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CheckinUpdateToOneWithWhereWithoutImageInput, Prisma.CheckinUpdateWithoutImageInput>, Prisma.CheckinUncheckedUpdateWithoutImageInput>
+}
+
+export type CheckinUncheckedUpdateOneWithoutImageNestedInput = {
+  disconnect?: Prisma.CheckinWhereInput | boolean
+  delete?: Prisma.CheckinWhereInput | boolean
+  connect?: Prisma.CheckinWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CheckinUpdateToOneWithWhereWithoutImageInput, Prisma.CheckinUpdateWithoutImageInput>, Prisma.CheckinUncheckedUpdateWithoutImageInput>
+}
+
 export type CheckinUpdateWithWhereUniqueWithoutSubjectInput = {
   where: Prisma.CheckinWhereUniqueInput
   data: Prisma.XOR<Prisma.CheckinUpdateWithoutSubjectInput, Prisma.CheckinUncheckedUpdateWithoutSubjectInput>
@@ -441,25 +470,48 @@ export type CheckinScalarWhereInput = {
   NOT?: Prisma.CheckinScalarWhereInput | Prisma.CheckinScalarWhereInput[]
   id?: Prisma.BigIntFilter<"Checkin"> | bigint | number
   subject_id?: Prisma.StringFilter<"Checkin"> | string
-  image_url?: Prisma.StringNullableFilter<"Checkin"> | string | null
+  image_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   confidence?: Prisma.FloatFilter<"Checkin"> | number
   status?: Prisma.StringFilter<"Checkin"> | string
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
 }
 
-export type CheckinUpdateWithoutSubjectInput = {
+export type CheckinUpdateToOneWithWhereWithoutImageInput = {
+  where?: Prisma.CheckinWhereInput
+  data: Prisma.XOR<Prisma.CheckinUpdateWithoutImageInput, Prisma.CheckinUncheckedUpdateWithoutImageInput>
+}
+
+export type CheckinUpdateWithoutImageInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confidence?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subject?: Prisma.SubjectUpdateOneRequiredWithoutCheckinNestedInput
+}
+
+export type CheckinUncheckedUpdateWithoutImageInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  subject_id?: Prisma.StringFieldUpdateOperationsInput | string
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type CheckinUpdateWithoutSubjectInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confidence?: Prisma.FloatFieldUpdateOperationsInput | number
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  image?: Prisma.ImageUpdateOneWithoutCheckinImageNestedInput
+}
+
 export type CheckinUncheckedUpdateWithoutSubjectInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -468,7 +520,7 @@ export type CheckinUncheckedUpdateWithoutSubjectInput = {
 
 export type CheckinUncheckedUpdateManyWithoutSubjectInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  image_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.FloatFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -480,11 +532,12 @@ export type CheckinUncheckedUpdateManyWithoutSubjectInput = {
 export type CheckinSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   subject_id?: boolean
-  image_url?: boolean
+  image_id?: boolean
   face_verified?: boolean
   confidence?: boolean
   status?: boolean
   checkin_time?: boolean
+  image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["checkin"]>
 
@@ -492,41 +545,45 @@ export type CheckinSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type CheckinSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   subject_id?: boolean
-  image_url?: boolean
+  image_id?: boolean
   face_verified?: boolean
   confidence?: boolean
   status?: boolean
   checkin_time?: boolean
+  image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["checkin"]>
 
 export type CheckinSelectScalar = {
   id?: boolean
   subject_id?: boolean
-  image_url?: boolean
+  image_id?: boolean
   face_verified?: boolean
   confidence?: boolean
   status?: boolean
   checkin_time?: boolean
 }
 
-export type CheckinOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "image_url" | "face_verified" | "confidence" | "status" | "checkin_time", ExtArgs["result"]["checkin"]>
+export type CheckinOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "image_id" | "face_verified" | "confidence" | "status" | "checkin_time", ExtArgs["result"]["checkin"]>
 export type CheckinInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }
 export type CheckinIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }
 
 export type $CheckinPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Checkin"
   objects: {
+    image: Prisma.$ImagePayload<ExtArgs> | null
     subject: Prisma.$SubjectPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
     subject_id: string
-    image_url: string | null
+    image_id: string | null
     face_verified: boolean
     confidence: number
     status: string
@@ -854,6 +911,7 @@ readonly fields: CheckinFieldRefs;
  */
 export interface Prisma__CheckinClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  image<T extends Prisma.Checkin$imageArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Checkin$imageArgs<ExtArgs>>): Prisma.Prisma__ImageClient<runtime.Types.Result.GetResult<Prisma.$ImagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   subject<T extends Prisma.SubjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubjectDefaultArgs<ExtArgs>>): Prisma.Prisma__SubjectClient<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -886,7 +944,7 @@ export interface Prisma__CheckinClient<T, Null = never, ExtArgs extends runtime.
 export interface CheckinFieldRefs {
   readonly id: Prisma.FieldRef<"Checkin", 'BigInt'>
   readonly subject_id: Prisma.FieldRef<"Checkin", 'String'>
-  readonly image_url: Prisma.FieldRef<"Checkin", 'String'>
+  readonly image_id: Prisma.FieldRef<"Checkin", 'String'>
   readonly face_verified: Prisma.FieldRef<"Checkin", 'Boolean'>
   readonly confidence: Prisma.FieldRef<"Checkin", 'Float'>
   readonly status: Prisma.FieldRef<"Checkin", 'String'>
@@ -1203,6 +1261,25 @@ export type CheckinDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Checkins to delete.
    */
   limit?: number
+}
+
+/**
+ * Checkin.image
+ */
+export type Checkin$imageArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Image
+   */
+  select?: Prisma.ImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Image
+   */
+  omit?: Prisma.ImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImageInclude<ExtArgs> | null
+  where?: Prisma.ImageWhereInput
 }
 
 /**

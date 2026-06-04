@@ -37,6 +37,7 @@ export type SubjectMinAggregateOutputType = {
   status: string | null
   monitoring_start: Date | null
   monitoring_end: Date | null
+  avatar_id: string | null
   created_by: string | null
   created_at: Date | null
   update_at: Date | null
@@ -56,6 +57,7 @@ export type SubjectMaxAggregateOutputType = {
   status: string | null
   monitoring_start: Date | null
   monitoring_end: Date | null
+  avatar_id: string | null
   created_by: string | null
   created_at: Date | null
   update_at: Date | null
@@ -75,6 +77,7 @@ export type SubjectCountAggregateOutputType = {
   status: number
   monitoring_start: number
   monitoring_end: number
+  avatar_id: number
   created_by: number
   created_at: number
   update_at: number
@@ -96,6 +99,7 @@ export type SubjectMinAggregateInputType = {
   status?: true
   monitoring_start?: true
   monitoring_end?: true
+  avatar_id?: true
   created_by?: true
   created_at?: true
   update_at?: true
@@ -115,6 +119,7 @@ export type SubjectMaxAggregateInputType = {
   status?: true
   monitoring_start?: true
   monitoring_end?: true
+  avatar_id?: true
   created_by?: true
   created_at?: true
   update_at?: true
@@ -134,6 +139,7 @@ export type SubjectCountAggregateInputType = {
   status?: true
   monitoring_start?: true
   monitoring_end?: true
+  avatar_id?: true
   created_by?: true
   created_at?: true
   update_at?: true
@@ -226,6 +232,7 @@ export type SubjectGroupByOutputType = {
   status: string
   monitoring_start: Date | null
   monitoring_end: Date | null
+  avatar_id: string | null
   created_by: string
   created_at: Date
   update_at: Date
@@ -266,10 +273,12 @@ export type SubjectWhereInput = {
   status?: Prisma.StringFilter<"Subject"> | string
   monitoring_start?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   monitoring_end?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
+  avatar_id?: Prisma.StringNullableFilter<"Subject"> | string | null
   created_by?: Prisma.StringFilter<"Subject"> | string
   created_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   deleted_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
+  avatar?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   alert?: Prisma.AlertListRelationFilter
@@ -292,10 +301,12 @@ export type SubjectOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   monitoring_start?: Prisma.SortOrderInput | Prisma.SortOrder
   monitoring_end?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar?: Prisma.ImageOrderByWithRelationInput
   creator?: Prisma.UserOrderByWithRelationInput
   account?: Prisma.AccountOrderByWithRelationInput
   alert?: Prisma.AlertOrderByRelationAggregateInput
@@ -309,6 +320,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   account_id?: string
   code?: string
+  avatar_id?: string
   AND?: Prisma.SubjectWhereInput | Prisma.SubjectWhereInput[]
   OR?: Prisma.SubjectWhereInput[]
   NOT?: Prisma.SubjectWhereInput | Prisma.SubjectWhereInput[]
@@ -325,6 +337,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   created_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   deleted_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
+  avatar?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   alert?: Prisma.AlertListRelationFilter
@@ -332,7 +345,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   events?: Prisma.EventLogListRelationFilter
   faceData?: Prisma.FaceDataListRelationFilter
   subjectZone?: Prisma.SubjectZoneListRelationFilter
-}, "id" | "account_id" | "code">
+}, "id" | "account_id" | "code" | "avatar_id">
 
 export type SubjectOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -347,6 +360,7 @@ export type SubjectOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   monitoring_start?: Prisma.SortOrderInput | Prisma.SortOrder
   monitoring_end?: Prisma.SortOrderInput | Prisma.SortOrder
+  avatar_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
@@ -372,6 +386,7 @@ export type SubjectScalarWhereWithAggregatesInput = {
   status?: Prisma.StringWithAggregatesFilter<"Subject"> | string
   monitoring_start?: Prisma.DateTimeNullableWithAggregatesFilter<"Subject"> | Date | string | null
   monitoring_end?: Prisma.DateTimeNullableWithAggregatesFilter<"Subject"> | Date | string | null
+  avatar_id?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
   created_by?: Prisma.StringWithAggregatesFilter<"Subject"> | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Subject"> | Date | string
   update_at?: Prisma.DateTimeWithAggregatesFilter<"Subject"> | Date | string
@@ -393,6 +408,7 @@ export type SubjectCreateInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -415,6 +431,7 @@ export type SubjectUncheckedCreateInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
@@ -441,6 +458,7 @@ export type SubjectUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -463,6 +481,7 @@ export type SubjectUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -487,6 +506,7 @@ export type SubjectCreateManyInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
@@ -523,6 +543,7 @@ export type SubjectUncheckedUpdateManyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -557,6 +578,7 @@ export type SubjectCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   monitoring_start?: Prisma.SortOrder
   monitoring_end?: Prisma.SortOrder
+  avatar_id?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
@@ -576,6 +598,7 @@ export type SubjectMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   monitoring_start?: Prisma.SortOrder
   monitoring_end?: Prisma.SortOrder
+  avatar_id?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
@@ -595,6 +618,7 @@ export type SubjectMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   monitoring_start?: Prisma.SortOrder
   monitoring_end?: Prisma.SortOrder
+  avatar_id?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
@@ -742,6 +766,38 @@ export type SubjectUpdateOneRequiredWithoutEventsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutEventsInput, Prisma.SubjectUpdateWithoutEventsInput>, Prisma.SubjectUncheckedUpdateWithoutEventsInput>
 }
 
+export type SubjectCreateNestedOneWithoutAvatarInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutAvatarInput, Prisma.SubjectUncheckedCreateWithoutAvatarInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutAvatarInput
+  connect?: Prisma.SubjectWhereUniqueInput
+}
+
+export type SubjectUncheckedCreateNestedOneWithoutAvatarInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutAvatarInput, Prisma.SubjectUncheckedCreateWithoutAvatarInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutAvatarInput
+  connect?: Prisma.SubjectWhereUniqueInput
+}
+
+export type SubjectUpdateOneWithoutAvatarNestedInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutAvatarInput, Prisma.SubjectUncheckedCreateWithoutAvatarInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutAvatarInput
+  upsert?: Prisma.SubjectUpsertWithoutAvatarInput
+  disconnect?: Prisma.SubjectWhereInput | boolean
+  delete?: Prisma.SubjectWhereInput | boolean
+  connect?: Prisma.SubjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutAvatarInput, Prisma.SubjectUpdateWithoutAvatarInput>, Prisma.SubjectUncheckedUpdateWithoutAvatarInput>
+}
+
+export type SubjectUncheckedUpdateOneWithoutAvatarNestedInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutAvatarInput, Prisma.SubjectUncheckedCreateWithoutAvatarInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutAvatarInput
+  upsert?: Prisma.SubjectUpsertWithoutAvatarInput
+  disconnect?: Prisma.SubjectWhereInput | boolean
+  delete?: Prisma.SubjectWhereInput | boolean
+  connect?: Prisma.SubjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutAvatarInput, Prisma.SubjectUpdateWithoutAvatarInput>, Prisma.SubjectUncheckedUpdateWithoutAvatarInput>
+}
+
 export type SubjectCreateWithoutAccountInput = {
   id?: string
   code?: string
@@ -757,6 +813,7 @@ export type SubjectCreateWithoutAccountInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
@@ -777,6 +834,7 @@ export type SubjectUncheckedCreateWithoutAccountInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
@@ -819,6 +877,7 @@ export type SubjectUpdateWithoutAccountInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
@@ -839,6 +898,7 @@ export type SubjectUncheckedUpdateWithoutAccountInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -865,6 +925,7 @@ export type SubjectCreateWithoutCreatorInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
@@ -886,6 +947,7 @@ export type SubjectUncheckedCreateWithoutCreatorInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
@@ -938,6 +1000,7 @@ export type SubjectScalarWhereInput = {
   status?: Prisma.StringFilter<"Subject"> | string
   monitoring_start?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   monitoring_end?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
+  avatar_id?: Prisma.StringNullableFilter<"Subject"> | string | null
   created_by?: Prisma.StringFilter<"Subject"> | string
   created_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
@@ -959,6 +1022,7 @@ export type SubjectCreateWithoutFaceDataInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -980,6 +1044,7 @@ export type SubjectUncheckedCreateWithoutFaceDataInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
@@ -1021,6 +1086,7 @@ export type SubjectUpdateWithoutFaceDataInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -1042,6 +1108,7 @@ export type SubjectUncheckedUpdateWithoutFaceDataInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1067,6 +1134,7 @@ export type SubjectCreateWithoutSubjectZoneInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -1088,6 +1156,7 @@ export type SubjectUncheckedCreateWithoutSubjectZoneInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
@@ -1129,6 +1198,7 @@ export type SubjectUpdateWithoutSubjectZoneInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -1150,6 +1220,7 @@ export type SubjectUncheckedUpdateWithoutSubjectZoneInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1175,6 +1246,7 @@ export type SubjectCreateWithoutCheckinInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -1196,6 +1268,7 @@ export type SubjectUncheckedCreateWithoutCheckinInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
@@ -1237,6 +1310,7 @@ export type SubjectUpdateWithoutCheckinInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -1258,6 +1332,7 @@ export type SubjectUncheckedUpdateWithoutCheckinInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1283,6 +1358,7 @@ export type SubjectCreateWithoutAlertInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
@@ -1304,6 +1380,7 @@ export type SubjectUncheckedCreateWithoutAlertInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
@@ -1345,6 +1422,7 @@ export type SubjectUpdateWithoutAlertInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
@@ -1366,6 +1444,7 @@ export type SubjectUncheckedUpdateWithoutAlertInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1391,6 +1470,7 @@ export type SubjectCreateWithoutEventsInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -1412,6 +1492,7 @@ export type SubjectUncheckedCreateWithoutEventsInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
@@ -1453,6 +1534,7 @@ export type SubjectUpdateWithoutEventsInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -1474,12 +1556,125 @@ export type SubjectUncheckedUpdateWithoutEventsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
+  subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
+}
+
+export type SubjectCreateWithoutAvatarInput = {
+  id?: string
+  code?: string
+  full_name: string
+  dob?: Date | string | null
+  gender?: string | null
+  id_number?: string | null
+  address?: string | null
+  phone?: string | null
+  status?: string
+  monitoring_start?: Date | string | null
+  monitoring_end?: Date | string | null
+  created_at?: Date | string
+  update_at?: Date | string
+  deleted_at?: Date | string | null
+  creator: Prisma.UserCreateNestedOneWithoutSubjectInput
+  account: Prisma.AccountCreateNestedOneWithoutSubjectInput
+  alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
+  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  events?: Prisma.EventLogCreateNestedManyWithoutSubjectInput
+  faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
+  subjectZone?: Prisma.SubjectZoneCreateNestedManyWithoutSubjectInput
+}
+
+export type SubjectUncheckedCreateWithoutAvatarInput = {
+  id?: string
+  account_id: string
+  code?: string
+  full_name: string
+  dob?: Date | string | null
+  gender?: string | null
+  id_number?: string | null
+  address?: string | null
+  phone?: string | null
+  status?: string
+  monitoring_start?: Date | string | null
+  monitoring_end?: Date | string | null
+  created_by: string
+  created_at?: Date | string
+  update_at?: Date | string
+  deleted_at?: Date | string | null
+  alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
+  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
+  faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
+  subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
+}
+
+export type SubjectCreateOrConnectWithoutAvatarInput = {
+  where: Prisma.SubjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutAvatarInput, Prisma.SubjectUncheckedCreateWithoutAvatarInput>
+}
+
+export type SubjectUpsertWithoutAvatarInput = {
+  update: Prisma.XOR<Prisma.SubjectUpdateWithoutAvatarInput, Prisma.SubjectUncheckedUpdateWithoutAvatarInput>
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutAvatarInput, Prisma.SubjectUncheckedCreateWithoutAvatarInput>
+  where?: Prisma.SubjectWhereInput
+}
+
+export type SubjectUpdateToOneWithWhereWithoutAvatarInput = {
+  where?: Prisma.SubjectWhereInput
+  data: Prisma.XOR<Prisma.SubjectUpdateWithoutAvatarInput, Prisma.SubjectUncheckedUpdateWithoutAvatarInput>
+}
+
+export type SubjectUpdateWithoutAvatarInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
+  dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
+  alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
+  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  events?: Prisma.EventLogUpdateManyWithoutSubjectNestedInput
+  faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
+  subjectZone?: Prisma.SubjectZoneUpdateManyWithoutSubjectNestedInput
+}
+
+export type SubjectUncheckedUpdateWithoutAvatarInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
+  dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
+  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
 }
@@ -1497,6 +1692,7 @@ export type SubjectCreateManyCreatorInput = {
   status?: string
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
+  avatar_id?: string | null
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
@@ -1517,6 +1713,7 @@ export type SubjectUpdateWithoutCreatorInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
@@ -1538,6 +1735,7 @@ export type SubjectUncheckedUpdateWithoutCreatorInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1561,6 +1759,7 @@ export type SubjectUncheckedUpdateManyWithoutCreatorInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1646,10 +1845,12 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   status?: boolean
   monitoring_start?: boolean
   monitoring_end?: boolean
+  avatar_id?: boolean
   created_by?: boolean
   created_at?: boolean
   update_at?: boolean
   deleted_at?: boolean
+  avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   alert?: boolean | Prisma.Subject$alertArgs<ExtArgs>
@@ -1673,10 +1874,12 @@ export type SubjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   monitoring_start?: boolean
   monitoring_end?: boolean
+  avatar_id?: boolean
   created_by?: boolean
   created_at?: boolean
   update_at?: boolean
   deleted_at?: boolean
+  avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subject"]>
@@ -1694,10 +1897,12 @@ export type SubjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   status?: boolean
   monitoring_start?: boolean
   monitoring_end?: boolean
+  avatar_id?: boolean
   created_by?: boolean
   created_at?: boolean
   update_at?: boolean
   deleted_at?: boolean
+  avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subject"]>
@@ -1715,14 +1920,16 @@ export type SubjectSelectScalar = {
   status?: boolean
   monitoring_start?: boolean
   monitoring_end?: boolean
+  avatar_id?: boolean
   created_by?: boolean
   created_at?: boolean
   update_at?: boolean
   deleted_at?: boolean
 }
 
-export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "code" | "full_name" | "dob" | "gender" | "id_number" | "address" | "phone" | "status" | "monitoring_start" | "monitoring_end" | "created_by" | "created_at" | "update_at" | "deleted_at", ExtArgs["result"]["subject"]>
+export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "code" | "full_name" | "dob" | "gender" | "id_number" | "address" | "phone" | "status" | "monitoring_start" | "monitoring_end" | "avatar_id" | "created_by" | "created_at" | "update_at" | "deleted_at", ExtArgs["result"]["subject"]>
 export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   alert?: boolean | Prisma.Subject$alertArgs<ExtArgs>
@@ -1733,10 +1940,12 @@ export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   _count?: boolean | Prisma.SubjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SubjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }
 export type SubjectIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }
@@ -1744,6 +1953,7 @@ export type SubjectIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Subject"
   objects: {
+    avatar: Prisma.$ImagePayload<ExtArgs> | null
     creator: Prisma.$UserPayload<ExtArgs>
     account: Prisma.$AccountPayload<ExtArgs>
     alert: Prisma.$AlertPayload<ExtArgs>[]
@@ -1765,6 +1975,7 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     status: string
     monitoring_start: Date | null
     monitoring_end: Date | null
+    avatar_id: string | null
     created_by: string
     created_at: Date
     update_at: Date
@@ -2163,6 +2374,7 @@ readonly fields: SubjectFieldRefs;
  */
 export interface Prisma__SubjectClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  avatar<T extends Prisma.Subject$avatarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$avatarArgs<ExtArgs>>): Prisma.Prisma__ImageClient<runtime.Types.Result.GetResult<Prisma.$ImagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   account<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   alert<T extends Prisma.Subject$alertArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$alertArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2211,6 +2423,7 @@ export interface SubjectFieldRefs {
   readonly status: Prisma.FieldRef<"Subject", 'String'>
   readonly monitoring_start: Prisma.FieldRef<"Subject", 'DateTime'>
   readonly monitoring_end: Prisma.FieldRef<"Subject", 'DateTime'>
+  readonly avatar_id: Prisma.FieldRef<"Subject", 'String'>
   readonly created_by: Prisma.FieldRef<"Subject", 'String'>
   readonly created_at: Prisma.FieldRef<"Subject", 'DateTime'>
   readonly update_at: Prisma.FieldRef<"Subject", 'DateTime'>
@@ -2613,6 +2826,25 @@ export type SubjectDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Subjects to delete.
    */
   limit?: number
+}
+
+/**
+ * Subject.avatar
+ */
+export type Subject$avatarArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Image
+   */
+  select?: Prisma.ImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Image
+   */
+  omit?: Prisma.ImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImageInclude<ExtArgs> | null
+  where?: Prisma.ImageWhereInput
 }
 
 /**

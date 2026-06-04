@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AccountStatus } from '../../generated/prisma';
+import { AccountStatus } from '../../generated/prisma/client';
 
 // Schema for updating an existing user (by an Admin)
 export const updateUserSchema = z.object({

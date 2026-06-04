@@ -65,7 +65,8 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 
 export const getMe = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
-        const accountId = req.user.id;
+        const accountId = req.account?.id;
+        if (!accountId) return res.status(401).json({ message: 'Unauthorized' });
         const result = await authService.getMe(accountId);
         res.json({ data: result });
     } catch (error) {

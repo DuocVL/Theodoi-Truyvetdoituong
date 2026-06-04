@@ -134,3 +134,8 @@ export type AuthLog = Prisma.AuthLogModel
  * 
  */
 export type AuthImage = Prisma.AuthImageModel
+/**
+ * Model Image
+ * 
+ */
+export type Image = Prisma.ImageModel

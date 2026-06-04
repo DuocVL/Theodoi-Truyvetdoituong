@@ -69,7 +69,8 @@ export const ModelName = {
   SystemLog: 'SystemLog',
   RequestLog: 'RequestLog',
   AuthLog: 'AuthLog',
-  AuthImage: 'AuthImage'
+  AuthImage: 'AuthImage',
+  Image: 'Image'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -117,6 +118,7 @@ export const UserScalarFieldEnum = {
   account_id: 'account_id',
   full_name: 'full_name',
   status: 'status',
+  avatar_id: 'avatar_id',
   created_at: 'created_at',
   update_at: 'update_at'
 } as const
@@ -154,6 +156,7 @@ export const SubjectScalarFieldEnum = {
   status: 'status',
   monitoring_start: 'monitoring_start',
   monitoring_end: 'monitoring_end',
+  avatar_id: 'avatar_id',
   created_by: 'created_by',
   created_at: 'created_at',
   update_at: 'update_at',
@@ -241,7 +244,7 @@ export type SubjectZoneScalarFieldEnum = (typeof SubjectZoneScalarFieldEnum)[key
 export const CheckinScalarFieldEnum = {
   id: 'id',
   subject_id: 'subject_id',
-  image_url: 'image_url',
+  image_id: 'image_id',
   face_verified: 'face_verified',
   confidence: 'confidence',
   status: 'status',
@@ -337,6 +340,17 @@ export const AuthImageScalarFieldEnum = {
 } as const
 
 export type AuthImageScalarFieldEnum = (typeof AuthImageScalarFieldEnum)[keyof typeof AuthImageScalarFieldEnum]
+
+
+export const ImageScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  alt_text: 'alt_text',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type ImageScalarFieldEnum = (typeof ImageScalarFieldEnum)[keyof typeof ImageScalarFieldEnum]
 
 
 export const SortOrder = {

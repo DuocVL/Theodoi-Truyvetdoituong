@@ -1,5 +1,4 @@
-import { Request, Response, NextFunction } from "express";
-import { HttpException } from "./error.middleware"; // Self-import for the class
+import { Request, Response, NextFunction } from "express";// Self-import for the class
 import { logger } from "../utils/logger";
 import { env } from "../configs/env";
 
