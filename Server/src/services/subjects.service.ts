@@ -1,10 +1,11 @@
-
 import { prisma } from '../configs/prisma';
-import { HttpException } from '../exceptions/HttpException';
+import { HttpException } from '../exceptions/http-exception';
 import { createSubjectSchema, activateAccountSchema, updateSubjectSchema } from '../dtos/subjects.dto';
 import crypto from 'crypto';
 import { hashData } from '../utils/hash';
 import EmailService from './email.service';
+import Zod from 'zod';
+
 
 type CreateSubjectData = Zod.infer<typeof createSubjectSchema>;
 type UpdateSubjectData = Zod.infer<typeof updateSubjectSchema>;

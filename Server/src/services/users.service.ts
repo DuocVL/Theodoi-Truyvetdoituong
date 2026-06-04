@@ -1,7 +1,8 @@
 
 import { prisma } from '../configs/prisma';
-import { HttpException } from '../exceptions/HttpException';
+import { HttpException } from '../exceptions/http-exception';
 import { updateUserSchema } from '../dtos/users.dto';
+import Zod from 'zod';
 
 type UpdateUserData = Zod.infer<typeof updateUserSchema>;
 
@@ -106,7 +107,7 @@ class UserService {
 
     const deletedUser = await prisma.account.update({
         where: { id: userId },
-        data: { status: 'INACTIVE' } // Soft delete
+        data: { } // Soft delete
     });
 
     // For a hard delete, you would use:
