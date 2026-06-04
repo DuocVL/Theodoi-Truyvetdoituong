@@ -45,6 +45,11 @@ export { Prisma }
  */
 export type Account = Prisma.AccountModel
 /**
+ * Model ActivationToken
+ * 
+ */
+export type ActivationToken = Prisma.ActivationTokenModel
+/**
  * Model User
  * 
  */
@@ -69,6 +74,11 @@ export type Subject = Prisma.SubjectModel
  * 
  */
 export type RefreshToken = Prisma.RefreshTokenModel
+/**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel
 /**
  * Model Device
  * 
@@ -119,3 +129,8 @@ export type RequestLog = Prisma.RequestLogModel
  * 
  */
 export type AuthLog = Prisma.AuthLogModel
+/**
+ * Model AuthImage
+ * 
+ */
+export type AuthImage = Prisma.AuthImageModel

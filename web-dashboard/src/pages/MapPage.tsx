@@ -16,6 +16,7 @@ interface TrackingEvent {
     coordinates: [number, number];
     type?: string;
     image_url?: string; // optional photo from check‑in
+    zone_id?: string;
 }
 
 // --- Dữ liệu tĩnh còn lại (sẽ được thay thế dần) ---
@@ -142,8 +143,11 @@ const MapPage: React.FC = () => {
             const dateFilter = eventDate >= start && eventDate <= end;
             const subjectFilterMatch = subjectFilter === 'all' || event.subject_id === subjectFilter;
             const typeMatch = selectedEventTypes.length === 0 || selectedEventTypes.includes(event.type || '');
-            const zoneMatch = zoneFilter === 'all' || (event as any).zone_id === zoneFilter;
-                const insideCustom = !customPolygon || customPolygon.getBounds().contains(event.coordinates as unknown as L.LatLng);
+            const zoneMatch = zoneFilter === 'all' || event.zone_id === zoneFilter;
+            
+            // Chuyển đổi coordinates thành LatLng object trước khi kiểm tra bounds
+            const eventLatLng = L.latLng(event.coordinates[0], event.coordinates[1]);
+            const insideCustom = !customPolygon || customPolygon.getBounds().contains(eventLatLng);
 
             return dateFilter && subjectFilterMatch && typeMatch && insideCustom && zoneMatch;
         });

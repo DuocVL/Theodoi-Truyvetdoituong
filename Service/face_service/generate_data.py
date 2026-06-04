@@ -27,7 +27,7 @@ for f in folders:
 # =========================
 # CAPTURE IMAGES FROM WEBCAM
 # =========================
-def capture_images(save_dir, count=10, label="Capture"):
+def capture_images(save_dir, count=10, label="Capture", show_gui=True):
     cap = cv2.VideoCapture(0)
     saved = 0
 
@@ -38,7 +38,8 @@ def capture_images(save_dir, count=10, label="Capture"):
         if not ret:
             break
 
-        cv2.imshow(label, frame)
+        if show_gui:
+            cv2.imshow(label, frame)
 
         key = cv2.waitKey(1)
 
@@ -71,8 +72,8 @@ def augment_image(img):
     results.append(cv2.convertScaleAbs(img, alpha=0.5, beta=0))
 
     # noise
-    noise = np.random.normal(0, 25, img.shape).astype(np.uint8)
-    noisy = cv2.add(img, noise)
+    noise = np.random.normal(0, 25, img.shape)
+    noisy = np.clip(img.astype(np.float32) + noise, 0, 255).astype(np.uint8)
     results.append(noisy)
 
     return results

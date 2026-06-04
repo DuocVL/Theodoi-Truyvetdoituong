@@ -229,7 +229,7 @@ export type SubjectGroupByOutputType = {
   created_by: string
   created_at: Date
   update_at: Date
-  deleted_at: Date
+  deleted_at: Date | null
   _count: SubjectCountAggregateOutputType | null
   _min: SubjectMinAggregateOutputType | null
   _max: SubjectMaxAggregateOutputType | null
@@ -269,7 +269,7 @@ export type SubjectWhereInput = {
   created_by?: Prisma.StringFilter<"Subject"> | string
   created_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
-  deleted_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   alert?: Prisma.AlertListRelationFilter
@@ -295,7 +295,7 @@ export type SubjectOrderByWithRelationInput = {
   created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
-  deleted_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   creator?: Prisma.UserOrderByWithRelationInput
   account?: Prisma.AccountOrderByWithRelationInput
   alert?: Prisma.AlertOrderByRelationAggregateInput
@@ -324,7 +324,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   created_by?: Prisma.StringFilter<"Subject"> | string
   created_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
-  deleted_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   alert?: Prisma.AlertListRelationFilter
@@ -350,7 +350,7 @@ export type SubjectOrderByWithAggregationInput = {
   created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
-  deleted_at?: Prisma.SortOrder
+  deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.SubjectCountOrderByAggregateInput
   _max?: Prisma.SubjectMaxOrderByAggregateInput
   _min?: Prisma.SubjectMinOrderByAggregateInput
@@ -375,7 +375,7 @@ export type SubjectScalarWhereWithAggregatesInput = {
   created_by?: Prisma.StringWithAggregatesFilter<"Subject"> | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Subject"> | Date | string
   update_at?: Prisma.DateTimeWithAggregatesFilter<"Subject"> | Date | string
-  deleted_at?: Prisma.DateTimeWithAggregatesFilter<"Subject"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Subject"> | Date | string | null
 }
 
 export type SubjectCreateInput = {
@@ -392,7 +392,7 @@ export type SubjectCreateInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -418,7 +418,7 @@ export type SubjectUncheckedCreateInput = {
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -440,7 +440,7 @@ export type SubjectUpdateInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -466,7 +466,7 @@ export type SubjectUncheckedUpdateInput = {
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -490,7 +490,7 @@ export type SubjectCreateManyInput = {
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type SubjectUpdateManyMutationInput = {
@@ -507,7 +507,7 @@ export type SubjectUpdateManyMutationInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SubjectUncheckedUpdateManyInput = {
@@ -526,7 +526,7 @@ export type SubjectUncheckedUpdateManyInput = {
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type SubjectNullableScalarRelationFilter = {
@@ -756,7 +756,7 @@ export type SubjectCreateWithoutAccountInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
@@ -780,7 +780,7 @@ export type SubjectUncheckedCreateWithoutAccountInput = {
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -818,7 +818,7 @@ export type SubjectUpdateWithoutAccountInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
@@ -842,7 +842,7 @@ export type SubjectUncheckedUpdateWithoutAccountInput = {
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -864,7 +864,7 @@ export type SubjectCreateWithoutCreatorInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
@@ -888,7 +888,7 @@ export type SubjectUncheckedCreateWithoutCreatorInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -941,7 +941,7 @@ export type SubjectScalarWhereInput = {
   created_by?: Prisma.StringFilter<"Subject"> | string
   created_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
-  deleted_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
+  deleted_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
 }
 
 export type SubjectCreateWithoutFaceDataInput = {
@@ -958,7 +958,7 @@ export type SubjectCreateWithoutFaceDataInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -983,7 +983,7 @@ export type SubjectUncheckedCreateWithoutFaceDataInput = {
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -1020,7 +1020,7 @@ export type SubjectUpdateWithoutFaceDataInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -1045,7 +1045,7 @@ export type SubjectUncheckedUpdateWithoutFaceDataInput = {
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1066,7 +1066,7 @@ export type SubjectCreateWithoutSubjectZoneInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -1091,7 +1091,7 @@ export type SubjectUncheckedCreateWithoutSubjectZoneInput = {
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -1128,7 +1128,7 @@ export type SubjectUpdateWithoutSubjectZoneInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -1153,7 +1153,7 @@ export type SubjectUncheckedUpdateWithoutSubjectZoneInput = {
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1174,7 +1174,7 @@ export type SubjectCreateWithoutCheckinInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -1199,7 +1199,7 @@ export type SubjectUncheckedCreateWithoutCheckinInput = {
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
@@ -1236,7 +1236,7 @@ export type SubjectUpdateWithoutCheckinInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -1261,7 +1261,7 @@ export type SubjectUncheckedUpdateWithoutCheckinInput = {
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1282,7 +1282,7 @@ export type SubjectCreateWithoutAlertInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
@@ -1307,7 +1307,7 @@ export type SubjectUncheckedCreateWithoutAlertInput = {
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
@@ -1344,7 +1344,7 @@ export type SubjectUpdateWithoutAlertInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
@@ -1369,7 +1369,7 @@ export type SubjectUncheckedUpdateWithoutAlertInput = {
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1390,7 +1390,7 @@ export type SubjectCreateWithoutEventsInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
@@ -1415,7 +1415,7 @@ export type SubjectUncheckedCreateWithoutEventsInput = {
   created_by: string
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
   checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
@@ -1452,7 +1452,7 @@ export type SubjectUpdateWithoutEventsInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
@@ -1477,7 +1477,7 @@ export type SubjectUncheckedUpdateWithoutEventsInput = {
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1499,7 +1499,7 @@ export type SubjectCreateManyCreatorInput = {
   monitoring_end?: Date | string | null
   created_at?: Date | string
   update_at?: Date | string
-  deleted_at: Date | string
+  deleted_at?: Date | string | null
 }
 
 export type SubjectUpdateWithoutCreatorInput = {
@@ -1516,7 +1516,7 @@ export type SubjectUpdateWithoutCreatorInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
@@ -1540,7 +1540,7 @@ export type SubjectUncheckedUpdateWithoutCreatorInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
   checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1563,7 +1563,7 @@ export type SubjectUncheckedUpdateManyWithoutCreatorInput = {
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deleted_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -1768,7 +1768,7 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     created_by: string
     created_at: Date
     update_at: Date
-    deleted_at: Date
+    deleted_at: Date | null
   }, ExtArgs["result"]["subject"]>
   composites: {}
 }

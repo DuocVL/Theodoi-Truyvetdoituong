@@ -52,11 +52,13 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Account: 'Account',
+  ActivationToken: 'ActivationToken',
   User: 'User',
   Role: 'Role',
   UserRole: 'UserRole',
   Subject: 'Subject',
   RefreshToken: 'RefreshToken',
+  PasswordResetToken: 'PasswordResetToken',
   Device: 'Device',
   FaceData: 'FaceData',
   Zone: 'Zone',
@@ -66,7 +68,8 @@ export const ModelName = {
   EventLog: 'EventLog',
   SystemLog: 'SystemLog',
   RequestLog: 'RequestLog',
-  AuthLog: 'AuthLog'
+  AuthLog: 'AuthLog',
+  AuthImage: 'AuthImage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -90,6 +93,7 @@ export const AccountScalarFieldEnum = {
   type: 'type',
   username: 'username',
   password: 'password',
+  email: 'email',
   status: 'status',
   created_at: 'created_at'
 } as const
@@ -97,11 +101,21 @@ export const AccountScalarFieldEnum = {
 export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
 
 
+export const ActivationTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  account_id: 'account_id',
+  expires_at: 'expires_at',
+  created_at: 'created_at'
+} as const
+
+export type ActivationTokenScalarFieldEnum = (typeof ActivationTokenScalarFieldEnum)[keyof typeof ActivationTokenScalarFieldEnum]
+
+
 export const UserScalarFieldEnum = {
   id: 'id',
   account_id: 'account_id',
   full_name: 'full_name',
-  email: 'email',
   status: 'status',
   created_at: 'created_at',
   update_at: 'update_at'
@@ -162,6 +176,17 @@ export const RefreshTokenScalarFieldEnum = {
 export type RefreshTokenScalarFieldEnum = (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 
+export const PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  account_id: 'account_id',
+  expires_at: 'expires_at',
+  created_at: 'created_at'
+} as const
+
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
 export const DeviceScalarFieldEnum = {
   id: 'id',
   account_id: 'account_id',
@@ -182,7 +207,7 @@ export const FaceDataScalarFieldEnum = {
   id: 'id',
   subject_id: 'subject_id',
   image_url: 'image_url',
-  is_active: 'is_active',
+  status: 'status',
   created_at: 'created_at',
   update_at: 'update_at'
 } as const
@@ -302,6 +327,16 @@ export const AuthLogScalarFieldEnum = {
 } as const
 
 export type AuthLogScalarFieldEnum = (typeof AuthLogScalarFieldEnum)[keyof typeof AuthLogScalarFieldEnum]
+
+
+export const AuthImageScalarFieldEnum = {
+  id: 'id',
+  account_id: 'account_id',
+  image_url: 'image_url',
+  created_at: 'created_at'
+} as const
+
+export type AuthImageScalarFieldEnum = (typeof AuthImageScalarFieldEnum)[keyof typeof AuthImageScalarFieldEnum]
 
 
 export const SortOrder = {

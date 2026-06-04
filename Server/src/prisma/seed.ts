@@ -1,7 +1,7 @@
-import { prismaClient } from "../configs/prisma.js"
+import { prisma } from "../configs/prisma.js"
 
 async function main() {
-  await prismaClient.role.createMany({
+  await prisma.role.createMany({
     data: [
       { name: "ADMIN", description: "Quản trị hệ thống" },
       { name: "USER", description: "Người sử dụng" }
@@ -13,4 +13,4 @@ async function main() {
 main()
   .then(() => console.log("Seed done"))
   .catch(e => console.error(e))
-  .finally(() => prismaClient.$disconnect())
+  .finally(() => prisma.$disconnect())

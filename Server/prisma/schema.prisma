@@ -1,4 +1,3 @@
-
 generator client {
   provider        = "prisma-client"
   output          = "../generated/prisma"
@@ -8,7 +7,6 @@ generator client {
 datasource db {
   provider   = "postgresql"
   extensions = [postgis, vector]
-  url        = env("DATABASE_URL")
 }
 
 enum AccountType {
@@ -24,32 +22,33 @@ enum AccountStatus {
 }
 
 model Account {
-  id         String      @id @default(uuid())
+  id         String        @id @default(uuid())
   type       AccountType
-  username   String      @unique
-  password   String?     // Changed to optional
-  email      String?     @unique
+  username   String        @unique
+  password   String? // Changed to optional
+  email      String?       @unique
   status     AccountStatus @default(PENDING_ACTIVATION) // Use enum and change default
-  created_at DateTime    @default(now())
+  created_at DateTime      @default(now())
 
   user    User?
   subject Subject?
 
-  refreshToken         RefreshToken[]
-  devices              Device[]
-  passwordResetTokens  PasswordResetToken[]
-  activationTokens     ActivationToken[] // Add relation
+  refreshToken        RefreshToken[]
+  devices             Device[]
+  passwordResetTokens PasswordResetToken[]
+  activationTokens    ActivationToken[] // Add relation
+  auditLogs           AuthImage[]
 
   @@map("accounts")
 }
 
 // New model for activation tokens
 model ActivationToken {
-  id          String   @id @default(uuid())
-  token       String   @unique
-  account_id  String
-  expires_at  DateTime
-  created_at  DateTime @default(now())
+  id         String   @id @default(uuid())
+  token      String   @unique
+  account_id String
+  expires_at DateTime
+  created_at DateTime @default(now())
 
   account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
 
@@ -112,8 +111,8 @@ model Subject {
   monitoring_end   DateTime?
 
   created_by String
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
+  created_at DateTime  @default(now())
+  update_at  DateTime  @updatedAt
   deleted_at DateTime?
 
   creator User    @relation("UserToSubject", fields: [created_by], references: [id])
@@ -180,7 +179,7 @@ model FaceData {
   subject_id String
   embedding  Unsupported("vector")
   image_url  String
-  status  String 
+  status     String
   created_at DateTime              @default(now())
   update_at  DateTime              @updatedAt
   subject    Subject               @relation("SubjectToFaceData", fields: [subject_id], references: [id], onDelete: Cascade)
@@ -327,6 +326,7 @@ model AuthLog {
   @@index([account_id])
   @@map("auth_log")
 }
+
 model AuthImage {
   id         String   @id @default(uuid())
   account_id String
@@ -337,4 +337,3 @@ model AuthImage {
 
   @@map("auth_images")
 }
-

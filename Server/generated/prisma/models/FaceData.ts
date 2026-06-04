@@ -28,7 +28,7 @@ export type FaceDataMinAggregateOutputType = {
   id: string | null
   subject_id: string | null
   image_url: string | null
-  is_active: boolean | null
+  status: string | null
   created_at: Date | null
   update_at: Date | null
 }
@@ -37,7 +37,7 @@ export type FaceDataMaxAggregateOutputType = {
   id: string | null
   subject_id: string | null
   image_url: string | null
-  is_active: boolean | null
+  status: string | null
   created_at: Date | null
   update_at: Date | null
 }
@@ -46,7 +46,7 @@ export type FaceDataCountAggregateOutputType = {
   id: number
   subject_id: number
   image_url: number
-  is_active: number
+  status: number
   created_at: number
   update_at: number
   _all: number
@@ -57,7 +57,7 @@ export type FaceDataMinAggregateInputType = {
   id?: true
   subject_id?: true
   image_url?: true
-  is_active?: true
+  status?: true
   created_at?: true
   update_at?: true
 }
@@ -66,7 +66,7 @@ export type FaceDataMaxAggregateInputType = {
   id?: true
   subject_id?: true
   image_url?: true
-  is_active?: true
+  status?: true
   created_at?: true
   update_at?: true
 }
@@ -75,7 +75,7 @@ export type FaceDataCountAggregateInputType = {
   id?: true
   subject_id?: true
   image_url?: true
-  is_active?: true
+  status?: true
   created_at?: true
   update_at?: true
   _all?: true
@@ -157,7 +157,7 @@ export type FaceDataGroupByOutputType = {
   id: string
   subject_id: string
   image_url: string
-  is_active: boolean
+  status: string
   created_at: Date
   update_at: Date
   _count: FaceDataCountAggregateOutputType | null
@@ -187,7 +187,7 @@ export type FaceDataWhereInput = {
   id?: Prisma.StringFilter<"FaceData"> | string
   subject_id?: Prisma.StringFilter<"FaceData"> | string
   image_url?: Prisma.StringFilter<"FaceData"> | string
-  is_active?: Prisma.BoolFilter<"FaceData"> | boolean
+  status?: Prisma.StringFilter<"FaceData"> | string
   created_at?: Prisma.DateTimeFilter<"FaceData"> | Date | string
   update_at?: Prisma.DateTimeFilter<"FaceData"> | Date | string
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
@@ -197,7 +197,7 @@ export type FaceDataOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
   image_url?: Prisma.SortOrder
-  is_active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
   subject?: Prisma.SubjectOrderByWithRelationInput
@@ -210,7 +210,7 @@ export type FaceDataWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.FaceDataWhereInput | Prisma.FaceDataWhereInput[]
   subject_id?: Prisma.StringFilter<"FaceData"> | string
   image_url?: Prisma.StringFilter<"FaceData"> | string
-  is_active?: Prisma.BoolFilter<"FaceData"> | boolean
+  status?: Prisma.StringFilter<"FaceData"> | string
   created_at?: Prisma.DateTimeFilter<"FaceData"> | Date | string
   update_at?: Prisma.DateTimeFilter<"FaceData"> | Date | string
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
@@ -220,7 +220,7 @@ export type FaceDataOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
   image_url?: Prisma.SortOrder
-  is_active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
   _count?: Prisma.FaceDataCountOrderByAggregateInput
@@ -235,7 +235,7 @@ export type FaceDataScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"FaceData"> | string
   subject_id?: Prisma.StringWithAggregatesFilter<"FaceData"> | string
   image_url?: Prisma.StringWithAggregatesFilter<"FaceData"> | string
-  is_active?: Prisma.BoolWithAggregatesFilter<"FaceData"> | boolean
+  status?: Prisma.StringWithAggregatesFilter<"FaceData"> | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<"FaceData"> | Date | string
   update_at?: Prisma.DateTimeWithAggregatesFilter<"FaceData"> | Date | string
 }
@@ -243,7 +243,7 @@ export type FaceDataScalarWhereWithAggregatesInput = {
 export type FaceDataUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   image_url?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneRequiredWithoutFaceDataNestedInput
@@ -253,7 +253,7 @@ export type FaceDataUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
   image_url?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -261,7 +261,7 @@ export type FaceDataUncheckedUpdateInput = {
 export type FaceDataUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   image_url?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -270,7 +270,7 @@ export type FaceDataUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
   image_url?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -289,7 +289,7 @@ export type FaceDataCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
   image_url?: Prisma.SortOrder
-  is_active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
 }
@@ -298,7 +298,7 @@ export type FaceDataMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
   image_url?: Prisma.SortOrder
-  is_active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
 }
@@ -307,7 +307,7 @@ export type FaceDataMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
   image_url?: Prisma.SortOrder
-  is_active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
 }
@@ -357,7 +357,7 @@ export type FaceDataScalarWhereInput = {
   id?: Prisma.StringFilter<"FaceData"> | string
   subject_id?: Prisma.StringFilter<"FaceData"> | string
   image_url?: Prisma.StringFilter<"FaceData"> | string
-  is_active?: Prisma.BoolFilter<"FaceData"> | boolean
+  status?: Prisma.StringFilter<"FaceData"> | string
   created_at?: Prisma.DateTimeFilter<"FaceData"> | Date | string
   update_at?: Prisma.DateTimeFilter<"FaceData"> | Date | string
 }
@@ -365,7 +365,7 @@ export type FaceDataScalarWhereInput = {
 export type FaceDataUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   image_url?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -373,7 +373,7 @@ export type FaceDataUpdateWithoutSubjectInput = {
 export type FaceDataUncheckedUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   image_url?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -381,7 +381,7 @@ export type FaceDataUncheckedUpdateWithoutSubjectInput = {
 export type FaceDataUncheckedUpdateManyWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   image_url?: Prisma.StringFieldUpdateOperationsInput | string
-  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -392,7 +392,7 @@ export type FaceDataSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   subject_id?: boolean
   image_url?: boolean
-  is_active?: boolean
+  status?: boolean
   created_at?: boolean
   update_at?: boolean
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
@@ -403,7 +403,7 @@ export type FaceDataSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   subject_id?: boolean
   image_url?: boolean
-  is_active?: boolean
+  status?: boolean
   created_at?: boolean
   update_at?: boolean
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
@@ -413,12 +413,12 @@ export type FaceDataSelectScalar = {
   id?: boolean
   subject_id?: boolean
   image_url?: boolean
-  is_active?: boolean
+  status?: boolean
   created_at?: boolean
   update_at?: boolean
 }
 
-export type FaceDataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "image_url" | "is_active" | "created_at" | "update_at", ExtArgs["result"]["faceData"]>
+export type FaceDataOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "image_url" | "status" | "created_at" | "update_at", ExtArgs["result"]["faceData"]>
 export type FaceDataInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }
@@ -435,7 +435,7 @@ export type $FaceDataPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     subject_id: string
     image_url: string
-    is_active: boolean
+    status: string
     created_at: Date
     update_at: Date
   }, ExtArgs["result"]["faceData"]>
@@ -794,7 +794,7 @@ export interface FaceDataFieldRefs {
   readonly id: Prisma.FieldRef<"FaceData", 'String'>
   readonly subject_id: Prisma.FieldRef<"FaceData", 'String'>
   readonly image_url: Prisma.FieldRef<"FaceData", 'String'>
-  readonly is_active: Prisma.FieldRef<"FaceData", 'Boolean'>
+  readonly status: Prisma.FieldRef<"FaceData", 'String'>
   readonly created_at: Prisma.FieldRef<"FaceData", 'DateTime'>
   readonly update_at: Prisma.FieldRef<"FaceData", 'DateTime'>
 }

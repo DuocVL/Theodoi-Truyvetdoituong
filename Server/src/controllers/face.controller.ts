@@ -2,7 +2,8 @@
 import { NextFunction, Response } from 'express';
 import multer from 'multer';
 import FaceService from '../services/face.service';
-import { PrismaClient, Prisma } from '../../generated/prisma';
+import { Prisma } from '../../generated/prisma/client';
+import { prisma } from '../configs/prisma';
 import { RequestWithUser } from '../types/data';
 import { faceVerificationQueue } from '../queues/face-verification.queue';
 
@@ -11,7 +12,6 @@ const upload = multer({ storage: storage, limits: { files: 5, fileSize: 10 * 102
 
 class FaceController {
   public faceService = new FaceService();
-  public prisma = new PrismaClient();
   public uploadMiddleware = upload.array('files', 5);
 
   public register = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
@@ -23,7 +23,7 @@ class FaceController {
       }
 
       const accountId = req.user.id;
-      const subject = await this.prisma.subject.findUnique({ where: { account_id: accountId } });
+      const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
 
       if (!subject) {
         res.status(403).json({ message: 'Forbidden: User is not a subject.' });
@@ -32,7 +32,7 @@ class FaceController {
 
       const embedding = await this.faceService.registerFace(files);
       
-      await this.prisma.$executeRaw`
+      await prisma.$executeRaw`
         INSERT INTO "face_data" (id, subject_id, embedding, image_url, status, created_at, update_at)
         VALUES (gen_random_uuid(), ${subject.id}, ${JSON.stringify(embedding)}::vector, 'initial_registration', 'ACTIVE', NOW(), NOW())
         ON CONFLICT (subject_id) DO UPDATE 
@@ -71,7 +71,7 @@ class FaceController {
       }
 
       const accountId = req.user.id;
-      const subject = await this.prisma.subject.findUnique({ where: { account_id: accountId } });
+      const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
       if (!subject) {
         res.status(403).json({ message: 'Forbidden: User is not a subject.' });
         return;
@@ -81,7 +81,7 @@ class FaceController {
       const geoJsonString = JSON.stringify({ type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] });
       const rawQuery = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
 
-      const checkinRecords = await this.prisma.$queryRaw<any[]>`
+      const checkinRecords = await prisma.$queryRaw<any[]>`
         INSERT INTO "checkins" (subject_id, location, status, face_verified, confidence, checkin_time)
         VALUES (${subject.id}, ${rawQuery}, 'PROCESSING', false, 0, NOW())
         RETURNING id;
