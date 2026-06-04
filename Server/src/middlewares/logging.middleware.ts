@@ -3,80 +3,86 @@ import { v4 as uuidv4 } from 'uuid';
 import { logger } from "../utils/logger";
 import { createRequestLog } from '../repositories/log.repository';
 
+/**
+ * A comprehensive logging middleware that captures request, response, and performance metrics.
+ * It performs dual logging: a detailed log to the database and a concise log to the console/file.
+ */
 export const loggingMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const start = Date.now();
-
   const requestId = uuidv4();
-
-  // attach to request for use elsewhere
-  (req as any).requestId = requestId;
+  req.requestId = requestId; // Attach for use in other parts of the app, like error handling
 
   const { method, originalUrl, body } = req;
 
-  const ip =
-    req.headers["x-forwarded-for"] ||
-    req.socket.remoteAddress ||
-    null;
+  const ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || '').toString();
+  const userAgent = req.headers["user-agent"] || 'unknown';
 
-  const userAgent = req.headers["user-agent"] || null;
-
-  let requestBody = body;
-
-  if (requestBody?.password) {
-    requestBody = { ...requestBody, password: "***" };
+  // Sanitize sensitive information from the request body before logging
+  let sanitizedBody = { ...body };
+  if (sanitizedBody?.password) {
+    sanitizedBody.password = "[REDACTED]";
   }
 
-  // intercept response
-  const oldSend = res.send;
+  // Create a child logger with the requestId to correlate all logs for this request
+  const requestLogger = logger.child({ requestId });
+  requestLogger.info(`--> ${method} ${originalUrl}`, {
+    ip,
+    userAgent,
+    body: sanitizedBody,
+  });
+
+  // Monkey-patch res.send to capture the response body
+  const originalSend = res.send;
   let responseBody: any;
-
   res.send = function (body) {
-    responseBody = body;
-    return oldSend.call(this, body);
-  }
+    try {
+        // Only attempt to parse if it's a string (likely JSON)
+        responseBody = typeof body === 'string' ? JSON.parse(body) : body;
+    } catch (e) {
+        responseBody = body; // if parsing fails, keep the original body
+    }
+    return originalSend.apply(this, arguments as any);
+  };
 
   res.on("finish", async () => {
     const duration = Date.now() - start;
+    const { statusCode } = res;
 
+    // Log the response to the console/file
+    requestLogger.info(`<-- ${method} ${originalUrl} ${statusCode} ${duration}ms`, {
+      statusCode,
+      duration,
+      responseBody
+    });
+
+    // Asynchronously log the detailed request record to the database
     try {
       await createRequestLog({
         id: requestId,
-        user_id: (req as any).user?.id || null,
+        // Safely access properties from the request object
+        account: req.account ? { connect: { id: req.account.id } } : undefined,
         method,
         path: originalUrl,
-        status_code: res.statusCode,
+        status_code: statusCode,
         duration_ms: duration,
-        ip_address: ip?.toString(),
+        ip_address: ip,
         user_agent: userAgent,
-        device_id: (req as any).deviceId || null,
-        request_body: requestBody,
-        response_body: safeParseJSON(responseBody)
+        device_id: req.tokenPayload?.device_id || null,
+        request_body: sanitizedBody,
+        response_body: responseBody, // Already parsed
       });
-    } catch (err) {
-      logger.error("RequestLog DB error", { err });
+    } catch (dbError) {
+      // If DB logging fails, log the error itself, but don't crash the app
+      logger.error("Failed to write request log to database", { 
+        error: dbError,
+        requestLog: { requestId } // Log minimal info for triage
+      });
     }
-
-    logger.info("HTTP Request", {
-      requestId,
-      method,
-      path: originalUrl,
-      status: res.statusCode,
-      duration
-    });
   });
 
   next();
-}
-
-function safeParseJSON(data: any) {
-  try {
-    if (typeof data === "string") return JSON.parse(data);
-    return data;
-  } catch {
-    return null;
-  }
-}
+};

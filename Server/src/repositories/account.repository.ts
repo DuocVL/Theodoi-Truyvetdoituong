@@ -6,6 +6,10 @@ export const create = async (data: Prisma.AccountCreateInput): Promise<Account> 
     return await prisma.account.create({ data });
 };
 
+export const findById = async (id: string): Promise<Account | null> => {
+    return await prisma.account.findUnique({ where: { id } });
+};
+
 export const findByUsername = async (username: string): Promise<Account | null> => {
     return await prisma.account.findUnique({ where: { username } });
 };
