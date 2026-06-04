@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { AccountStatus } from '../../generated/prisma';
 
 export const UpdateAccountDto = z.object({
-    status: z.string().optional(),
+    status: z.nativeEnum(AccountStatus).optional(),
 }).strict();
 
 // Schema for the refresh token request body
@@ -36,6 +37,13 @@ export const registerSchema = z.object({
 });
 
 export type RegisterDto = z.infer<typeof registerSchema>['body'];
+
+// Schema for account activation
+export const activateAccountSchema = z.object({
+  token: z.string().uuid("Invalid token format"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
+});
+
 
 // Schema for the logout request body
 export const logoutSchema = z.object({
