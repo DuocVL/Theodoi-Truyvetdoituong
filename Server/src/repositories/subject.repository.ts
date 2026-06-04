@@ -1,4 +1,4 @@
-import { Prisma } from '../../generated/prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../configs/prisma'
 
 export async function create(data: Prisma.SubjectCreateInput) {

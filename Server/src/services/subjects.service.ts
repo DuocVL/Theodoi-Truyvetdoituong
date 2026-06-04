@@ -1,5 +1,6 @@
 
-import { Prisma, PrismaClient } from '../../generated/prisma';
+import { Prisma } from '@prisma/client';
+import { prisma } from '../configs/prisma';
 import { HttpException } from '../exceptions/HttpException';
 import { createSubjectSchema, activateAccountSchema, updateSubjectSchema } from '../dtos/subjects.dto';
 import crypto from 'crypto';
@@ -11,12 +12,11 @@ type UpdateSubjectData = Zod.infer<typeof updateSubjectSchema>;
 type ActivateAccountData = Zod.infer<typeof activateAccountSchema>;
 
 class SubjectService {
-  private prisma = new PrismaClient();
   private emailService = new EmailService();
 
   public async createSubjectAndInvite(subjectData: CreateSubjectData, createdByUserId: string): Promise<any> {
     // Check for existing username or email
-    const existingAccount = await this.prisma.account.findFirst({
+    const existingAccount = await prisma.account.findFirst({
       where: {
         OR: [{ username: subjectData.username }, { email: subjectData.email }],
       },
@@ -27,7 +27,7 @@ class SubjectService {
     }
 
     // Use a transaction to ensure all or nothing
-    return this.prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx) => {
       // 1. Create Account
       const account = await tx.account.create({
         data: {
@@ -76,7 +76,7 @@ class SubjectService {
   }
 
   public async activateAccount(data: ActivateAccountData): Promise<void> {
-    return this.prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx) => {
         // 1. Find the token and the associated account
         const activationToken = await tx.activationToken.findUnique({
             where: { token: data.token },
@@ -115,7 +115,7 @@ class SubjectService {
   }
 
   public async findAllSubjects(): Promise<any[]> {
-    const subjects = await this.prisma.subject.findMany({
+    const subjects = await prisma.subject.findMany({
         include: {
             account: {
                 select: {
@@ -135,7 +135,7 @@ class SubjectService {
   }
 
   public async findSubjectById(subjectId: string): Promise<any> {
-      const subject = await this.prisma.subject.findUnique({
+      const subject = await prisma.subject.findUnique({
           where: { id: subjectId },
           include: {
               account: true, // include all account details
@@ -163,12 +163,12 @@ class SubjectService {
   }
 
   public async updateSubject(subjectId: string, subjectData: UpdateSubjectData): Promise<any> {
-      const subject = await this.prisma.subject.findUnique({ where: { id: subjectId } });
+      const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
       if (!subject) {
           throw new HttpException(404, 'Subject not found');
       }
 
-      const updatedSubject = await this.prisma.subject.update({
+      const updatedSubject = await prisma.subject.update({
           where: { id: subjectId },
           data: {
             full_name: subjectData.fullName,
@@ -187,7 +187,7 @@ class SubjectService {
 
   public async deleteSubject(subjectId: string): Promise<any> {
       // We should use a transaction to delete the subject and their account together
-      return this.prisma.$transaction(async (tx) => {
+      return prisma.$transaction(async (tx) => {
           const subject = await tx.subject.findUnique({ where: { id: subjectId } });
           if (!subject) {
               throw new HttpException(404, 'Subject not found');

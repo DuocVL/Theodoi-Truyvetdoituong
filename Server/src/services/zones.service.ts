@@ -1,5 +1,6 @@
 
-import { PrismaClient, Prisma, Zone } from '../../generated/prisma';
+import { Prisma, Zone } from '@prisma/client';
+import { prisma } from '../configs/prisma';
 import { HttpException } from '../exceptions/HttpException';
 import { createZoneSchema, updateZoneSchema } from '../dtos/zones.dto';
 
@@ -8,7 +9,6 @@ type CreateZoneDto = Zod.infer<typeof createZoneSchema>;
 type UpdateZoneDto = Zod.infer<typeof updateZoneSchema>;
 
 class ZoneService {
-  private prisma = new PrismaClient();
 
   // --- CREATE ---
   public async createZone(data: CreateZoneDto, createdByUserId: string): Promise<Zone> {
@@ -20,7 +20,7 @@ class ZoneService {
     // 2. Use ST_GeomFromGeoJSON to insert the geometry data
     const rawQuery = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
 
-    const newZone = await this.prisma.zone.create({
+    const newZone = await prisma.zone.create({
       data: {
         zone_name,
         description,
@@ -36,7 +36,7 @@ class ZoneService {
   // --- READ ---
   public async findAllZones(userId: string): Promise<any[]> {
     // We use $queryRaw to select and convert the geometry back to GeoJSON format
-    const zones = await this.prisma.$queryRaw`
+    const zones = await prisma.$queryRaw`
         SELECT 
             id, 
             zone_name, 
@@ -53,7 +53,7 @@ class ZoneService {
   }
 
   public async findZoneById(zoneId: string): Promise<any> {
-    const zone = await this.prisma.$queryRaw`
+    const zone = await prisma.$queryRaw`
         SELECT 
             id, 
             zone_name, 
@@ -83,7 +83,7 @@ class ZoneService {
   // --- UPDATE ---
   public async updateZone(zoneId: string, data: UpdateZoneDto): Promise<any> {
     // Check if zone exists
-    const existingZone = await this.prisma.zone.findUnique({ where: { id: zoneId } });
+    const existingZone = await prisma.zone.findUnique({ where: { id: zoneId } });
     if (!existingZone) {
       throw new HttpException(404, "Zone not found");
     }
@@ -96,7 +96,7 @@ class ZoneService {
       updateData.geom = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
     }
 
-    const updatedZone = await this.prisma.zone.update({
+    const updatedZone = await prisma.zone.update({
       where: { id: zoneId },
       data: updateData,
     });
@@ -107,12 +107,12 @@ class ZoneService {
 
   // --- DELETE ---
   public async deleteZone(zoneId: string): Promise<Zone> {
-    const existingZone = await this.prisma.zone.findUnique({ where: { id: zoneId } });
+    const existingZone = await prisma.zone.findUnique({ where: { id: zoneId } });
     if (!existingZone) {
       throw new HttpException(404, "Zone not found");
     }
 
-    const deletedZone = await this.prisma.zone.delete({
+    const deletedZone = await prisma.zone.delete({
       where: { id: zoneId },
     });
 

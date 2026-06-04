@@ -1,15 +1,9 @@
 
-import { PrismaClient } from '../../generated/prisma';
+import { prisma } from '../configs/prisma';
 
 class TrackingRepository {
-  private prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
   async findCheckinHistory(subjectId: string, startTime: Date, endTime: Date) {
-    return this.prisma.$queryRaw`
+    return prisma.$queryRaw`
       SELECT id::text, subject_id, ST_AsGeoJSON(location) as location, image_url, face_verified, confidence, status, checkin_time
       FROM checkins
       WHERE subject_id = ${subjectId}
@@ -20,7 +14,7 @@ class TrackingRepository {
   }
 
   async findLastCheckin(subjectId: string) {
-    const records = await this.prisma.$queryRaw<any[]>`
+    const records = await prisma.$queryRaw<any[]>`
       SELECT id::text, subject_id, ST_AsGeoJSON(location) as location, image_url, face_verified, confidence, status, checkin_time
       FROM checkins
       WHERE subject_id = ${subjectId}
@@ -31,7 +25,7 @@ class TrackingRepository {
   }
 
   async findAllLogs() {
-    return this.prisma.$queryRaw`
+    return prisma.$queryRaw`
       SELECT c.id::text, c.subject_id, ST_AsGeoJSON(c.location) as location, c.checkin_time, s.full_name as subject_name
       FROM checkins c
       JOIN subjects s ON c.subject_id = s.id

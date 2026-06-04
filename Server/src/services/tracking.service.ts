@@ -1,5 +1,5 @@
 
-import { Prisma } from '../../generated/prisma';
+import { Prisma } from '@prisma/client';
 import trackingRepository from '../repositories/tracking.repository';
 
 class TrackingService {

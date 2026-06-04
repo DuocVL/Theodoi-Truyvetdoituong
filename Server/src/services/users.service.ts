@@ -1,15 +1,15 @@
 
-import { PrismaClient, Role } from '../../generated/prisma';
+import { PrismaClient, Role } from '@prisma/client';
+import { prisma } from '../configs/prisma';
 import { HttpException } from '../exceptions/HttpException';
 import { updateUserSchema } from '../dtos/users.dto';
 
 type UpdateUserData = Zod.infer<typeof updateUserSchema>;
 
 class UserService {
-  private prisma = new PrismaClient();
 
   public async findAllUsers(): Promise<any[]> {
-    const users = await this.prisma.account.findMany({
+    const users = await prisma.account.findMany({
       where: {
         type: 'USER' // Filter for accounts that are users/officers
       },
@@ -26,7 +26,7 @@ class UserService {
   }
 
   public async findUserById(userId: string): Promise<any> {
-    const user = await this.prisma.account.findUnique({
+    const user = await prisma.account.findUnique({
       where: { id: userId, type: 'USER' },
       select: { 
         id: true,
@@ -52,14 +52,14 @@ class UserService {
   }
 
   public async updateUser(userId: string, userData: UpdateUserData): Promise<any> {
-    const user = await this.prisma.account.findUnique({ where: { id: userId, type: 'USER' } });
+    const user = await prisma.account.findUnique({ where: { id: userId, type: 'USER' } });
     if (!user) {
       throw new HttpException(404, 'User not found');
     }
 
     // Check if another user already has the new email or username if they are being changed
     if (userData.username || userData.email) {
-      const existingAccount = await this.prisma.account.findFirst({
+      const existingAccount = await prisma.account.findFirst({
         where: {
           NOT: { id: userId },
           OR: [
@@ -74,13 +74,21 @@ class UserService {
       }
     }
 
-    const updatedUser = await this.prisma.account.update({
+    const updatedUser = await prisma.account.update({
       where: { id: userId },
       data: {
         username: userData.username,
         email: userData.email,
         role: userData.role, // Allow changing the role
         status: userData.status
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        status: true,
+        role: true,
+        created_at: true
       }
     });
 
@@ -88,7 +96,7 @@ class UserService {
   }
 
   public async deleteUser(userId: string): Promise<any> {
-    const user = await this.prisma.account.findUnique({ where: { id: userId, type: 'USER' } });
+    const user = await prisma.account.findUnique({ where: { id: userId, type: 'USER' } });
     if (!user) {
       throw new HttpException(404, 'User not found');
     }
@@ -97,13 +105,13 @@ class UserService {
     // Here, we will implement a soft delete by setting status to INACTIVE.
     // For a hard delete, you would need to handle related records (e.g., reassign subjects_created).
 
-    const deletedUser = await this.prisma.account.update({
+    const deletedUser = await prisma.account.update({
         where: { id: userId },
         data: { status: 'INACTIVE' } // Soft delete
     });
 
     // For a hard delete, you would use:
-    // await this.prisma.account.delete({ where: { id: userId } });
+    // await prisma.account.delete({ where: { id: userId } });
 
     return { message: "User deactivated successfully." };
   }

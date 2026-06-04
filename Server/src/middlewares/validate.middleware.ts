@@ -1,8 +1,8 @@
 //Kiểm tra , chuẩn hóa đầu vào từ request
 import { Request, Response, NextFunction } from 'express';
-import { ZodSchema } from 'zod';
+import { ZodSchema, ZodError } from 'zod';
 
-export const validate = (schema: any) => {
+export const validate = (schema: ZodSchema) => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
     
@@ -19,12 +19,15 @@ export const validate = (schema: any) => {
 
             next();
         } catch (error) {
-            return res.status(400).json({
-                success: false,
-                message: "validation error"
-
-                //TODO ghi log
-            });
+            if (error instanceof ZodError) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Dữ liệu không hợp lệ",
+                    errors: error.flatten().fieldErrors,
+                });
+            }
+            // Chuyển các lỗi khác cho error handler tổng
+            next(error);
         }
     }
 }
