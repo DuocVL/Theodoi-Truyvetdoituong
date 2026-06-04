@@ -1,12 +1,13 @@
 
-import { PrismaClient } from '../../generated/prisma';
+import { Prisma, PrismaClient } from '../../generated/prisma';
 import { HttpException } from '../exceptions/HttpException';
-import { createSubjectSchema, activateAccountSchema } from '../dtos/subjects.dto';
+import { createSubjectSchema, activateAccountSchema, updateSubjectSchema } from '../dtos/subjects.dto';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import EmailService from './email.service';
 
 type CreateSubjectData = Zod.infer<typeof createSubjectSchema>;
+type UpdateSubjectData = Zod.infer<typeof updateSubjectSchema>;
 type ActivateAccountData = Zod.infer<typeof activateAccountSchema>;
 
 class SubjectService {
@@ -112,6 +113,96 @@ class SubjectService {
         await tx.activationToken.delete({ where: { id: activationToken.id }});
     });
   }
+
+  public async findAllSubjects(): Promise<any[]> {
+    const subjects = await this.prisma.subject.findMany({
+        include: {
+            account: {
+                select: {
+                    username: true,
+                    email: true,
+                    status: true
+                }
+            },
+            creator: {
+                select: {
+                  username: true
+                }
+            }
+        }
+    });
+    return subjects;
+  }
+
+  public async findSubjectById(subjectId: string): Promise<any> {
+      const subject = await this.prisma.subject.findUnique({
+          where: { id: subjectId },
+          include: {
+              account: true, // include all account details
+              check_ins: { // include recent checkin history
+                  orderBy: {
+                      timestamp: 'desc'
+                  },
+                  take: 10
+              },
+              creator: {
+                  select: {
+                      id: true,
+                      username: true,
+                      email: true
+                  }
+              }
+          }
+      });
+
+      if (!subject) {
+          throw new HttpException(404, 'Subject not found');
+      }
+
+      return subject;
+  }
+
+  public async updateSubject(subjectId: string, subjectData: UpdateSubjectData): Promise<any> {
+      const subject = await this.prisma.subject.findUnique({ where: { id: subjectId } });
+      if (!subject) {
+          throw new HttpException(404, 'Subject not found');
+      }
+
+      const updatedSubject = await this.prisma.subject.update({
+          where: { id: subjectId },
+          data: {
+            full_name: subjectData.fullName,
+            dob: subjectData.dob ? new Date(subjectData.dob) : undefined,
+            gender: subjectData.gender,
+            id_number: subjectData.idNumber,
+            address: subjectData.address,
+            phone: subjectData.phone,
+            monitoring_start: subjectData.monitoringStart ? new Date(subjectData.monitoringStart) : undefined,
+            monitoring_end: subjectData.monitoringEnd ? new Date(subjectData.monitoringEnd) : undefined,
+          }
+      });
+
+      return updatedSubject;
+  }
+
+  public async deleteSubject(subjectId: string): Promise<any> {
+      // We should use a transaction to delete the subject and their account together
+      return this.prisma.$transaction(async (tx) => {
+          const subject = await tx.subject.findUnique({ where: { id: subjectId } });
+          if (!subject) {
+              throw new HttpException(404, 'Subject not found');
+          }
+
+          // Delete related records first (checkins, etc.) if schema requires it
+          await tx.checkin.deleteMany({ where: { subject_id: subjectId } });
+          
+          // Finally delete the account (which will cascade to subject due to relation)
+          await tx.account.delete({ where: { id: subject.account_id } });
+
+          return { message: "Subject and associated account deleted successfully." };
+      });
+  }
+
 }
 
 export default SubjectService;

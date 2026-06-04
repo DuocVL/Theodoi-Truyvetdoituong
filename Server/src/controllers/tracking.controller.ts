@@ -1,9 +1,19 @@
 
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import trackingService from '../services/tracking.service';
 
 class TrackingController {
-  async getCheckinHistory(req: Request, res: Response) {
+  // New method to handle getting all logs
+  public getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const allLogs = await trackingService.getAllTrackingLogs();
+      res.status(200).json({ data: allLogs, message: 'Fetched all tracking logs' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  public getCheckinHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { subjectId } = req.params;
     const { from, to } = req.query;
 
@@ -19,11 +29,11 @@ class TrackingController {
       );
       res.json(history);
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching check-in history', error });
+      next(error);
     }
   }
 
-  async getLastLocation(req: Request, res: Response) {
+  public getLastLocation = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { subjectId } = req.params;
     try {
       const lastLocation = await trackingService.getLastLocation(subjectId);
@@ -32,7 +42,7 @@ class TrackingController {
       }
       res.json(lastLocation);
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching last location', error });
+      next(error);
     }
   }
 }

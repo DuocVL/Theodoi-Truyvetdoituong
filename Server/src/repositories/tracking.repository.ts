@@ -33,7 +33,18 @@ class TrackingRepository {
       },
     });
   }
+
+  // New method to get all tracking logs
+  async findAllLogs() {
+    return this.prisma.tracking_log.findMany({
+      orderBy: {
+        timestamp: 'asc',
+      },
+      include: {
+        subject: true, // Include subject details
+      },
+    });
+  }
 }
 
 export default new TrackingRepository();
-

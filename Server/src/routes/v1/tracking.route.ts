@@ -1,24 +1,21 @@
 
 import { Router } from 'express';
-import trackingController from '../../controllers/tracking.controller';
-import { auth, checkRole } from '../../middlewares/auth.middleware';
+import TrackingController from '../../controllers/tracking.controller';
+import { authMiddleware } from '../../middlewares/auth.middleware';
 
 const router = Router();
+const trackingController = new TrackingController();
 
-// Get check-in history for a subject
-router.get(
-  '/history/:subjectId',
-  auth,
-  checkRole(['admin', 'manager']),
-  trackingController.getCheckinHistory
-);
+// Middleware to protect all tracking routes
+router.use(authMiddleware);
 
-// Get the last known location of a subject
-router.get(
-  '/last-location/:subjectId',
-  auth,
-  checkRole(['admin', 'manager']),
-  trackingController.getLastLocation
-);
+// Route to get all tracking logs for the main dashboard view
+router.get('/', trackingController.getAll);
+
+// Get check-in history for a specific subject within a time range
+router.get('/history/:subjectId', trackingController.getCheckinHistory);
+
+// Get the last known location of a specific subject
+router.get('/last-location/:subjectId', trackingController.getLastLocation);
 
 export default router;
