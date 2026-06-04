@@ -1,20 +1,7 @@
-import { Request, Response, NextFunction } from "express";// Self-import for the class
+import { Request, Response, NextFunction } from "express";
+import { HttpException } from "../exceptions/http-exception"; // Correctly imported
 import { logger } from "../utils/logger";
 import { env } from "../configs/env";
-
-/**
- * A custom error class for handling expected HTTP errors (e.g., 404 Not Found, 400 Bad Request).
- */
-export class HttpException extends Error {
-  status: number;
-  message: string;
-
-  constructor(status: number, message: string) {
-    super(message);
-    this.status = status;
-    this.message = message;
-  }
-}
 
 /**
  * The global error handling middleware. It should be the last middleware in the chain.
