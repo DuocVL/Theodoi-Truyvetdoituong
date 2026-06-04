@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { prisma } from '../../utils/prismaClient';
+import { prisma } from '../configs/prisma';
 
 // Upload a single authentication photo (expects multer `file`)
 export const uploadAuthPhoto = async (req: Request, res: Response, next: NextFunction) => {

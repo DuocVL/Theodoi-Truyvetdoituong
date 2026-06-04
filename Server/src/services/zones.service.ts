@@ -1,5 +1,5 @@
 
-import { Prisma, Zone } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../configs/prisma';
 import { HttpException } from '../exceptions/HttpException';
 import { createZoneSchema, updateZoneSchema } from '../dtos/zones.dto';
@@ -11,7 +11,7 @@ type UpdateZoneDto = Zod.infer<typeof updateZoneSchema>;
 class ZoneService {
 
   // --- CREATE ---
-  public async createZone(data: CreateZoneDto, createdByUserId: string): Promise<Zone> {
+  public async createZone(data: CreateZoneDto, createdByUserId: string): Promise<any> {
     const { zone_name, description, is_active, geom } = data;
 
     // Use Prisma's raw query capabilities for PostGIS functions
@@ -106,7 +106,7 @@ class ZoneService {
   }
 
   // --- DELETE ---
-  public async deleteZone(zoneId: string): Promise<Zone> {
+  public async deleteZone(zoneId: string): Promise<any> {
     const existingZone = await prisma.zone.findUnique({ where: { id: zoneId } });
     if (!existingZone) {
       throw new HttpException(404, "Zone not found");

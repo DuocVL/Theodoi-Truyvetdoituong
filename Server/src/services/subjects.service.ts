@@ -1,10 +1,9 @@
 
-import { Prisma } from '@prisma/client';
 import { prisma } from '../configs/prisma';
 import { HttpException } from '../exceptions/HttpException';
 import { createSubjectSchema, activateAccountSchema, updateSubjectSchema } from '../dtos/subjects.dto';
 import crypto from 'crypto';
-import bcrypt from 'bcrypt';
+import { hashData } from '../utils/hash';
 import EmailService from './email.service';
 
 type CreateSubjectData = Zod.infer<typeof createSubjectSchema>;
@@ -98,7 +97,7 @@ class SubjectService {
         }
 
         // 2. Hash the new password
-        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const hashedPassword = await hashData(data.password);
 
         // 3. Update the account
         await tx.account.update({
