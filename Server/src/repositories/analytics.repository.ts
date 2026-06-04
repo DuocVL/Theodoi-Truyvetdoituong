@@ -1,4 +1,3 @@
-
 import { prisma } from '../configs/prisma';
 
 // This is a placeholder for a more complex analytics query.

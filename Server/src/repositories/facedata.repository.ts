@@ -1,7 +1,7 @@
 import { prisma } from '../configs/prisma';
 import type { FaceData, Prisma } from '../../generated/prisma/client';
 
-export const createFaceData = async (data: Prisma.FaceDataCreateInput): Promise<FaceData> => {
+export const createFaceData = async (data: Prisma.FaceData): Promise<FaceData> => {
   return await prisma.faceData.create({ data });
 };
 
