@@ -7,6 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "start:worker": "tsx src/workers/face-verification.worker.ts",
     "seed": "tsx prisma/seed.ts",
     "studio": "prisma studio"
   },
