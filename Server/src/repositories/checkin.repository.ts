@@ -1,5 +1,5 @@
 import { prisma } from '../configs/prisma';
-import type { Checkin, Prisma } from '@prisma/client';
+import type { Checkin, Prisma } from '../../generated/prisma/client';
 
 export const createCheckin = async (
   data: Prisma.CheckinCreateInput

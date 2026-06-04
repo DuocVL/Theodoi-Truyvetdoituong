@@ -1,6 +1,5 @@
-
 import { prisma } from '../configs/prisma';
-import { Alert, Prisma } from '@prisma/client';
+import { Alert, Prisma } from '../../generated/prisma/client';
 
 export const createAlert = async (
   data: Prisma.AlertCreateInput

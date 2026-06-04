@@ -1,5 +1,5 @@
 import { prisma } from '../configs/prisma';
-import { PasswordResetToken } from '@prisma/client';
+import { PasswordResetToken } from '../../generated/prisma/client';
 
 export const create = async (accountId: string, token: string, expiresAt: Date): Promise<PasswordResetToken> => {
     return await prisma.passwordResetToken.create({
