@@ -1,6 +1,6 @@
 
 import { prisma } from '../configs/prisma';
-import { Zone, Prisma } from '@prisma/client';
+import { Zone, Prisma } from '../../generated/prisma/client';
 
 export const createZone = async (
   data: Prisma.ZoneCreateInput

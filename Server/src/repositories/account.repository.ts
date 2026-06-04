@@ -1,6 +1,7 @@
 import { prisma } from '../configs/prisma';
 import { Account , Prisma } from '../../generated/prisma/client';
 
+
 export const create = async (data: Prisma.AccountCreateInput): Promise<Account> => {
     return await prisma.account.create({ data });
 };
