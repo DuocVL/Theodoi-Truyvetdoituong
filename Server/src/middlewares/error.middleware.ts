@@ -30,7 +30,7 @@ export const errorMiddleware = (
     ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
     // User Context (if available)
     accountId: req.account?.id,
-    deviceId: req.tokenPayload?.device_id,
+    deviceId: req.account?.device_id,
   });
 
   // In a development environment, you might want to send the full error back

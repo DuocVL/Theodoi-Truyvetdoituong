@@ -1,16 +1,12 @@
-
 import axios from 'axios';
 import FormData from 'form-data';
 
-// This should be in your .env file
 const FACE_SERVICE_URL = process.env.FACE_SERVICE_URL || 'http://localhost:8000';
 
 class FaceService {
   /**
-   * Calls the Python service to get a representative embedding from multiple images.
-   * @param files An array of image files from multer.
-   * @returns The centroid embedding vector.
-   * @throws Will throw an error if the registration fails.
+   * Gọi Python service để lấy embedding đại diện từ nhiều ảnh
+   * Sử dụng trong quá trình đăng ký khuôn mặt
    */
   public async registerFace(
     files: Express.Multer.File[]
@@ -35,20 +31,20 @@ class FaceService {
       if (response.data.success && response.data.centroid) {
         return response.data.centroid;
       } else {
-        console.error('[FaceService] Registration failed:', response.data.message);
-        throw new Error(response.data.message || 'Failed to register face in the external service.');
+        const errorMsg = response.data.message || 'Failed to register face in the external service.';
+        console.error('[FaceService] Registration failed:', errorMsg);
+        throw new Error(errorMsg);
       }
     } catch (error) {
-      console.error('[FaceService] Error calling face service for registration:', error.message);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('[FaceService] Error calling face service for registration:', errorMsg);
       throw new Error('Could not communicate with the face recognition service.');
     }
   }
 
   /**
-   * Calls the Python service to verify a face against a stored embedding.
-   * @param files An array of image files from the check-in attempt.
-   * @param storedEmbedding The embedding stored in the database.
-   * @returns An object indicating if the face matched and other details.
+   * Gọi Python service để xác thực khuôn mặt so với embedding đã lưu
+   * Sử dụng trong quá trình check-in
    */
   public async verifyFace(
     files: Express.Multer.File[],
@@ -76,16 +72,17 @@ class FaceService {
       const { matched, avg_distance, reason } = response.data;
       
       return {
-          matched: matched,
-          avg_distance: avg_distance || -1,
-          reason: reason,
+        matched: matched,
+        avg_distance: avg_distance || -1,
+        reason: reason,
       };
 
     } catch (error) {
-      console.error('[FaceService] Error calling face service for verification:', error.message);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error occurred';
+      console.error('[FaceService] Error calling face service for verification:', errorMsg);
       throw new Error('Could not communicate with the face recognition service.');
     }
   }
 }
 
-export default FaceService;
+export default new FaceService();

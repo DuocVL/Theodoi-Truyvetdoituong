@@ -1,10 +1,9 @@
 
-import { Prisma } from '../../generated/prisma/client';
 import { prisma } from '../configs/prisma';
 import { HttpException } from '../exceptions/http-exception';
 import { createZoneSchema, updateZoneSchema } from '../dtos/zones.dto';
 import Zod from 'zod';
-
+import * as zoneRepository from '../repositories/zone.repository';
 
 // Infer types from Zod schemas
 type CreateZoneDto = Zod.infer<typeof createZoneSchema>;
@@ -14,112 +13,161 @@ class ZoneService {
 
   // --- CREATE ---
   public async createZone(data: CreateZoneDto, createdByUserId: string): Promise<any> {
-    const { zone_name, description, is_active, geom } = data;
-
-    // Use Prisma's raw query capabilities for PostGIS functions
-    // 1. Convert GeoJSON to a string
-    const geoJsonString = JSON.stringify(geom);
-    // 2. Use ST_GeomFromGeoJSON to insert the geometry data
-    const rawQuery = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
-
-    const newZone = await prisma.zone.create({
-      data: {
-        zone_name,
-        description,
-        is_active,
+    try {
+      const zoneData = {
+        zone_name: data.zone_name,
+        description: data.description,
+        is_active: data.is_active,
         created_by: createdByUserId,
-        geom: rawQuery, // Assign the raw SQL query here
-      },
-    });
+        geom: data.geom,
+      };
 
-    return newZone;
+      // Use repository layer for database operations
+      const newZone = await zoneRepository.createZone(zoneData);
+      
+      // Convert geometry to GeoJSON format for response
+      if (newZone.geom) {
+        newZone.geom = await this.convertGeometryToGeoJSON(newZone.geom);
+      }
+
+      return newZone;
+    } catch (error) {
+      throw new HttpException(500, `Failed to create zone: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   // --- READ ---
   public async findAllZones(userId: string): Promise<any[]> {
-    // We use $queryRaw to select and convert the geometry back to GeoJSON format
-    const zones = await prisma.$queryRaw`
+    try {
+      // Use raw query to fetch zones with GeoJSON geometry
+      const zones = await prisma.$queryRaw`
         SELECT 
-            id, 
-            zone_name, 
-            description, 
-            is_active, 
-            created_by, 
-            created_at, 
-            update_at, 
-            ST_AsGeoJSON(geom) as geom
+          id, 
+          zone_name, 
+          description, 
+          is_active, 
+          created_by, 
+          created_at, 
+          update_at, 
+          ST_AsGeoJSON(geom) as geom
         FROM zones
         WHERE created_by = ${userId}::uuid
-    `;
-    return zones as any[];
+        ORDER BY created_at DESC
+      `;
+      
+      // Parse geom field from string to JSON
+      return (zones as any[]).map(zone => ({
+        ...zone,
+        geom: zone.geom ? JSON.parse(zone.geom) : null,
+      }));
+    } catch (error) {
+      throw new HttpException(500, `Failed to fetch zones: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   public async findZoneById(zoneId: string): Promise<any> {
-    const zone = await prisma.$queryRaw`
+    try {
+      // Use raw query to fetch single zone with GeoJSON geometry
+      const zones = await prisma.$queryRaw`
         SELECT 
-            id, 
-            zone_name, 
-            description, 
-            is_active, 
-            created_by, 
-            created_at, 
-            update_at, 
-            ST_AsGeoJSON(geom) as geom
+          id, 
+          zone_name, 
+          description, 
+          is_active, 
+          created_by, 
+          created_at, 
+          update_at, 
+          ST_AsGeoJSON(geom) as geom
         FROM zones
         WHERE id = ${zoneId}::uuid
-    `;
+      `;
 
-    const result = (zone as any[])[0];
-    if (!result) {
-      throw new HttpException(404, "Zone not found");
+      const zone = (zones as any[])[0];
+      if (!zone) {
+        throw new HttpException(404, 'Zone not found');
+      }
+
+      // Parse geom field from string to JSON object
+      if (zone.geom) {
+        zone.geom = JSON.parse(zone.geom);
+      }
+
+      return zone;
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new HttpException(500, `Failed to fetch zone: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-
-    // The geom field is a string, parse it back to a JSON object
-    if (result.geom) {
-        result.geom = JSON.parse(result.geom);
-    }
-
-    return result;
   }
 
   // --- UPDATE ---
   public async updateZone(zoneId: string, data: UpdateZoneDto): Promise<any> {
-    // Check if zone exists
-    const existingZone = await prisma.zone.findUnique({ where: { id: zoneId } });
-    if (!existingZone) {
-      throw new HttpException(404, "Zone not found");
-    }
+    try {
+      // Verify zone exists
+      const existingZone = await this.findZoneById(zoneId);
+      if (!existingZone) {
+        throw new HttpException(404, 'Zone not found');
+      }
 
-    const updateData: any = { ...data };
-    
-    // If the geometry is being updated, we need to use the raw query method again
-    if (data.geom) {
-      const geoJsonString = JSON.stringify(data.geom);
-      updateData.geom = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
-    }
+      const updateData = {
+        zone_name: data.zone_name,
+        description: data.description,
+        is_active: data.is_active,
+        geom: data.geom,
+      };
 
-    const updatedZone = await prisma.zone.update({
-      where: { id: zoneId },
-      data: updateData,
-    });
-    
-    // We need to re-fetch to get the geom as GeoJSON
-    return this.findZoneById(zoneId);
+      // Use repository layer for database operations
+      const updatedZone = await zoneRepository.updateZone(zoneId, updateData);
+
+      // Convert geometry to GeoJSON format for response
+      if (updatedZone.geom) {
+        updatedZone.geom = await this.convertGeometryToGeoJSON(updatedZone.geom);
+      }
+
+      // Re-fetch with proper GeoJSON format
+      return this.findZoneById(zoneId);
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new HttpException(500, `Failed to update zone: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   // --- DELETE ---
   public async deleteZone(zoneId: string): Promise<any> {
-    const existingZone = await prisma.zone.findUnique({ where: { id: zoneId } });
-    if (!existingZone) {
-      throw new HttpException(404, "Zone not found");
+    try {
+      // Verify zone exists
+      const existingZone = await this.findZoneById(zoneId);
+      if (!existingZone) {
+        throw new HttpException(404, 'Zone not found');
+      }
+
+      // Use repository layer for database operations
+      const deletedZone = await zoneRepository.deleteZone(zoneId);
+
+      return {
+        id: deletedZone.id,
+        message: 'Zone deleted successfully',
+      };
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw new HttpException(500, `Failed to delete zone: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
 
-    const deletedZone = await prisma.zone.delete({
-      where: { id: zoneId },
-    });
-
-    return deletedZone;
+  // --- HELPER ---
+  /**
+   * Helper method to convert geometry to GeoJSON format
+   * If already a string, parse it; if object, return as-is
+   */
+  private async convertGeometryToGeoJSON(geom: any): Promise<any> {
+    if (typeof geom === 'string') {
+      try {
+        return JSON.parse(geom);
+      } catch {
+        return geom;
+      }
+    }
+    return geom;
   }
 }
 
-export default ZoneService;
+export default new ZoneService();

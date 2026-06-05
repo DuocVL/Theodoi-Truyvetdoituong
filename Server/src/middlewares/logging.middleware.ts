@@ -4,85 +4,168 @@ import { logger } from "../utils/logger";
 import { createRequestLog } from '../repositories/log.repository';
 
 /**
- * A comprehensive logging middleware that captures request, response, and performance metrics.
- * It performs dual logging: a detailed log to the database and a concise log to the console/file.
+ * Middleware ghi nhật ký (logging) toàn diện cho HTTP requests
+ * 
+ * Chức năng:
+ * 1. Tạo requestId duy nhất cho mỗi request (dùng UUID)
+ * 2. Ghi request details (method, URL, IP, user agent, body)
+ * 3. Capture response details (status code, duration, response body)
+ * 4. Ghi log vào database và console
+ * 5. Sanitize sensitive data (password, token) trước khi log
  */
 export const loggingMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  //Bắt đầu đo thời gian request processing
   const start = Date.now();
   const requestId = uuidv4();
-  req.requestId = requestId; // Attach for use in other parts of the app, like error handling
+  
+  // 📌Attach requestId vào request để dùng ở phần khác (error handler, etc)
+  req.requestId = requestId;
 
   const { method, originalUrl, body } = req;
 
+  // 🌐 Lấy IP address từ proxy headers hoặc socket connection
   const ip = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || '').toString();
   const userAgent = req.headers["user-agent"] || 'unknown';
 
-  // Sanitize sensitive information from the request body before logging
+  // 🔐 Sanitize sensitive information từ request body trước khi log
+  // Ví dụ: không log password, tokens, credit card, v.v.
   let sanitizedBody = { ...body };
   if (sanitizedBody?.password) {
     sanitizedBody.password = "[REDACTED]";
   }
 
-  // Create a child logger with the requestId to correlate all logs for this request
-  const requestLogger = logger.child({ requestId });
-  requestLogger.info(`--> ${method} ${originalUrl}`, {
+  // 📝 Log request inlet (khi request vừa đến)
+  logger.info(`--> ${method} ${originalUrl}`, {
+    requestId,  // 🔗 Dùng requestId để track request này
     ip,
     userAgent,
     body: sanitizedBody,
   });
 
-  // Monkey-patch res.send to capture the response body
+  /**
+   * 🔥 Monkey-patch res.send để capture response body
+   * 
+   * Tại sao cần patch?
+   * - Express middleware không có built-in hook để capture response body
+   * - res.send() là điểm duy nhất response data được gửi
+   * - Cần patch để log response content (không chỉ status code)
+   */
   const originalSend = res.send;
   let responseBody: any;
-  res.send = function (body) {
+  
+  // ⚠️ Sử dụng arrow function để preserve 'this' context
+  res.send = function (data: any) {
     try {
-        // Only attempt to parse if it's a string (likely JSON)
-        responseBody = typeof body === 'string' ? JSON.parse(body) : body;
+      // 🔍 Nếu response là string (likely JSON), parse nó
+      if (typeof data === 'string') {
+        try {
+          responseBody = JSON.parse(data);
+        } catch (parseError) {
+          // Nếu parse fail, giữ nguyên string
+          responseBody = data;
+        }
+      } else if (Buffer.isBuffer(data)) {
+        // 🔄 Nếu response là Buffer, convert to string rồi parse
+        try {
+          responseBody = JSON.parse(data.toString());
+        } catch (parseError) {
+          responseBody = data.toString();
+        }
+      } else {
+        // Object / khác - keep as-is
+        responseBody = data;
+      }
     } catch (e) {
-        responseBody = body; // if parsing fails, keep the original body
+      // 🛡️ Catch-all: nếu có lỗi gì, keep original data
+      responseBody = data;
     }
-    return originalSend.apply(this, arguments as any);
+
+    // ✅ Gọi original res.send() để gửi response cho client
+    return originalSend.apply(this, [data]);
   };
 
+  /**
+   * 🏁 Hook khi response finish (response đã gửi hết về client)
+   * 
+   * Lý do dùng res.on("finish"):
+   * - Đảm bảo response đã hoàn toàn được gửi trước khi log
+   * - Có thể lấy duration chính xác
+   * - Tránh lỗi "write after end" của response stream
+   */
   res.on("finish", async () => {
+    // ⏱️ Tính duration: từ khi nhận request đến khi response finish
     const duration = Date.now() - start;
     const { statusCode } = res;
 
-    // Log the response to the console/file
-    requestLogger.info(`<-- ${method} ${originalUrl} ${statusCode} ${duration}ms`, {
+    /**
+     * 📤 Log response outlet (khi response hoàn thành)
+     * Format: <-- METHOD URL STATUS_CODE DURATION
+     * Ví dụ: <-- GET /api/users 200 45ms
+     */
+    logger.info(`<-- ${method} ${originalUrl} ${statusCode} ${duration}ms`, {
+      requestId,
       statusCode,
       duration,
-      responseBody
+      responseBody: typeof responseBody === 'object' 
+        ? JSON.stringify(responseBody).substring(0, 500) // Giới hạn 500 ký tự để log không quá dài
+        : responseBody,
     });
 
-    // Asynchronously log the detailed request record to the database
+    /**
+     * 💾 Ghi request log vào database bất đồng bộ (async)
+     * 
+     * Tại sao async?
+     * - DB write có thể mất thời gian
+     * - Không muốn block response về client
+     * - res.on("finish") được trigger sau khi response đã gửi
+     * 
+     * Tại sao không await ở middleware?
+     * - Response đã gửi rồi, không cần chờ DB
+     * - Nếu DB fail, không ảnh hưởng đến user
+     */
     try {
       await createRequestLog({
         id: requestId,
-        // Safely access properties from the request object
-        account: req.account ? { connect: { id: req.account.id } } : undefined,
+        // ⚠️ RequestLog model có user_id (String), không phải account relation
+        // Nếu req.account.type === "USER", user_id = user ID
+        // Nếu req.account.type === "SUBJECT", user_id = null (subjects không có user profile)
+        user_id: req.account?.id || null,
         method,
         path: originalUrl,
         status_code: statusCode,
         duration_ms: duration,
         ip_address: ip,
         user_agent: userAgent,
-        device_id: req.tokenPayload?.device_id || null,
+        // 📱 device_id dùng để track request từ device nào (mobile/web/etc)
+        device_id: req.account?.device_id || null,
         request_body: sanitizedBody,
-        response_body: responseBody, // Already parsed
+        response_body: responseBody, // Already parsed to JSON
       });
     } catch (dbError) {
-      // If DB logging fails, log the error itself, but don't crash the app
+      /**
+       * 🚨 DB logging fail handling
+       * 
+       * Không throw lỗi vì:
+       * - Response đã gửi cho client
+       * - Không thể change response nữa
+       * 
+       * Chỉ log error để admin biết:
+       * - DB connection có vấn đề?
+       * - Disk space full?
+       * - RequestLog table corrupted?
+       */
       logger.error("Failed to write request log to database", { 
-        error: dbError,
-        requestLog: { requestId } // Log minimal info for triage
+        requestId,
+        error: dbError instanceof Error ? dbError.message : String(dbError),
+        request: { method, path: originalUrl }
       });
     }
   });
 
+  // ✅ Cho phép request tiếp tục tới controller layer
   next();
 };

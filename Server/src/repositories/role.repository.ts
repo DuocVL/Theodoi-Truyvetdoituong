@@ -5,7 +5,7 @@ export const createRole = async (data: Prisma.RoleCreateInput): Promise<Role> =>
   return await prisma.role.create({ data });
 };
 
-export const getRoleById = async (id: string): Promise<Role | null> => {
+export const getRoleById = async (id: number): Promise<Role | null> => {
   return await prisma.role.findUnique({ where: { id } });
 };
 
@@ -18,7 +18,7 @@ export const getAllRoles = async (): Promise<Role[]> => {
 };
 
 export const updateRole = async (
-  id: string,
+  id: number,
   data: Prisma.RoleUpdateInput
 ): Promise<Role> => {
   return await prisma.role.update({
@@ -27,6 +27,6 @@ export const updateRole = async (
   });
 };
 
-export const deleteRole = async (id: string): Promise<Role> => {
+export const deleteRole = async (id: number): Promise<Role> => {
   return await prisma.role.delete({ where: { id } });
 };

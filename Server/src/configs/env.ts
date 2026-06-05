@@ -8,6 +8,7 @@ const envSchema = z.object({
     JWT_REFRESH_SECRET: z.string().min(32),
 
     DATABASE_URL: z.url(),
+    REDIS_URL: z.url().default("redis://localhost:6379"),
 });
 
 export const env = envSchema.parse(process.env);

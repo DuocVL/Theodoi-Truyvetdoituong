@@ -48,3 +48,57 @@ export const findByIdWithRelations = async (id: string): Promise<any> => {
         }
     });
 };
+
+export const findMany = async (where?: Prisma.AccountWhereInput, include?: Prisma.AccountInclude): Promise<Account[]> => {
+    return await prisma.account.findMany({
+        where,
+        include
+    });
+};
+
+export const findFirst = async (where: Prisma.AccountWhereInput): Promise<Account | null> => {
+    return await prisma.account.findFirst({ where });
+};
+
+export const update = async (id: string, data: Prisma.AccountUpdateInput): Promise<Account> => {
+    return await prisma.account.update({
+        where: { id },
+        data
+    });
+};
+
+export const findByIdWithUserProfile = async (id: string): Promise<any> => {
+    return await prisma.account.findUnique({
+        where: { id },
+        include: {
+            user: {
+                select: {
+                    id: true,
+                    full_name: true,
+                    status: true,
+                    avatar_id: true,
+                    created_at: true,
+                    update_at: true,
+                    userRole: {
+                        include: {
+                            role: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    description: true
+                                }
+                            }
+                        }
+                    },
+                    subject: {
+                        select: {
+                            id: true,
+                            full_name: true,
+                            status: true
+                        }
+                    }
+                }
+            }
+        }
+    });
+};

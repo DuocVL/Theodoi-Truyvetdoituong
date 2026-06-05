@@ -6,7 +6,6 @@ import * as activationService from './activation.service';
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
 import { compareData, hashData } from '../utils/hash';
 import { AccountPayload  } from "../types/data";
-import { Prisma } from "../../generated/prisma/client"; 
 import { HttpException } from "../exceptions/http-exception";
 import { sendPasswordResetEmail } from '../utils/email';
 import crypto from 'crypto';
