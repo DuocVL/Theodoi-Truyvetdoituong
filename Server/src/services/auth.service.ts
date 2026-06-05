@@ -1,4 +1,4 @@
-import { LoginDto, RegisterDto, RefreshTokenDto, ForgotPasswordDto, ResetPasswordDto, ActivateAccountDto } from "../dtos/auth.dto";
+import { LoginDto, RegisterDto, RefreshTokenDto, ForgotPasswordDto, ResetPasswordDto } from "../dtos/auth.dto";
 import * as accountRepository from '../repositories/account.repository';
 import * as refreshTokenRepository from '../repositories/refreshtoken.repository';
 import * as passwordResetTokenRepository from '../repositories/passwordResetToken.repository';
@@ -8,8 +8,10 @@ import { compareData, hashData } from '../utils/hash';
 import { AccountPayload  } from "../types/data";
 import { HttpException } from "../exceptions/http-exception";
 import { sendPasswordResetEmail } from '../utils/email';
+import { env } from '../configs/env';
+import { Prisma } from '../../generated/prisma/client';
 import crypto from 'crypto';
-import { verify } from "jsonwebtoken";
+import jwt  from "jsonwebtoken";
 
 export const login = async (data: LoginDto) => {
     const account = await accountRepository.findByUsername(data.username);
@@ -24,6 +26,10 @@ export const login = async (data: LoginDto) => {
 
     if (account.status !== "ACTIVE") {
         throw new HttpException(403, `Account is ${account.status.toLowerCase()}`);
+    }
+
+    if (!account.password) {
+        throw new HttpException(401, "Account has no password set. Please activate first.");
     }
 
     const isMatch = await compareData(data.password, account.password);
@@ -41,10 +47,13 @@ export const login = async (data: LoginDto) => {
     const accessToken = generateAccessToken(payload);
     const { plainToken: refreshToken, hashedToken } = generateRefreshToken();
 
-    const tokenData: CreateRefreshTokenInput = {
+    const tokenData: Prisma.RefreshTokenCreateInput = {
         token_hash: hashedToken,
         device_id: data.device_id,
-        account_id: account.id
+        expires_at: new Date().setDate(new Date().getDate() + 60).toString(),
+        account: {
+            connect: { id: account.id }
+        }
     };
     
     await refreshTokenRepository.create(tokenData);
@@ -90,7 +99,8 @@ export const register = async (data: RegisterDto) => {
     return { message: "Registration successful. Please check your email to activate your account." };
 };
 
-export const activateAccount = async (data: ActivateAccountDto) => {
+// data được định nghĩa lại inline nếu DTO bị thiếu
+export const activateAccount = async (data: { token: string }) => {
     const { token } = data;
     const activatedAccount = await activationService.activateAccount(token);
 
@@ -105,7 +115,7 @@ export const refreshToken = async (data: RefreshTokenDto) => {
     const { refreshToken: oldRefreshToken } = data;
     
     // 1. Verify and decode the old refresh token
-    const decoded = verify(oldRefreshToken, process.env.REFRESH_TOKEN_SECRET!) as AccountPayload;
+    const decoded = jwt.verify(oldRefreshToken, env.JWT_REFRESH_SECRET) as AccountPayload;
 
     const hashedOldToken = crypto.createHash('sha256').update(oldRefreshToken).digest('hex');
 
@@ -128,11 +138,16 @@ export const refreshToken = async (data: RefreshTokenDto) => {
     const { plainToken: newRefreshToken, hashedToken: newHashedRefreshToken } = generateRefreshToken();
 
     // 5. Save the new refresh token to the database
-    await refreshTokenRepository.create({
+    const newTokenData: Prisma.RefreshTokenCreateInput = {
         token_hash: newHashedRefreshToken,
-        account_id: decoded.id,
-        device_id: decoded.device_id
-    });
+        device_id: decoded.device,
+        expires_at: new Date().setDate(new Date().getDate() + 60).toString(),
+        account: {
+            connect: { id: decoded.id }
+        }
+    };
+
+    await refreshTokenRepository.create(newTokenData);
 
     // 6. Return both new tokens to the client
     return { 

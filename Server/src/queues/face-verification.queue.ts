@@ -1,6 +1,6 @@
 
 import { Queue } from 'bullmq';
-import { redisConnection } from '../config/redis.config';
+import { redisConnection } from '../configs/redis.config';
 
 const QUEUE_NAME = 'face-verification';
 
