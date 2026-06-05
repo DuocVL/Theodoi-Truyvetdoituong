@@ -25,7 +25,7 @@ class TrackingController {
     try {
       // Đảm bảo from và to là string đơn lẻ
       const history = await trackingService.getCheckinHistory(
-        subjectId,
+        subjectId as any,
         new Date(String(from)),
         new Date(String(to))
       );
@@ -38,7 +38,7 @@ class TrackingController {
   public getLastLocation = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { subjectId } = req.params;
     try {
-      const lastLocation = await trackingService.getLastLocation(subjectId);
+      const lastLocation = await trackingService.getLastLocation(subjectId as any);
       if (!lastLocation) {
         res.status(404).json({ message: 'No location found for this subject' });
         return;
