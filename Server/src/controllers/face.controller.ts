@@ -1,7 +1,7 @@
 
 import { NextFunction, Response } from 'express';
 import multer from 'multer';
-import FaceService from '../services/face.service';
+import faceService from '../services/face.service';
 import { Prisma } from '../../generated/prisma/client';
 import { prisma } from '../configs/prisma';
 import { RequestWithUser } from '../types/data';
@@ -11,7 +11,6 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage, limits: { files: 5, fileSize: 10 * 1024 * 1024 } });
 
 class FaceController {
-  public faceService = new FaceService();
   public uploadMiddleware = upload.array('files', 5);
 
   public register = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
@@ -30,7 +29,7 @@ class FaceController {
         return;
       }
 
-      const embedding = await this.faceService.registerFace(files);
+      const embedding = await faceService.registerFace(files);
       
       await prisma.$executeRaw`
         INSERT INTO "face_data" (id, subject_id, embedding, image_url, status, created_at, update_at)
