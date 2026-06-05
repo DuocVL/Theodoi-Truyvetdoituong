@@ -89,7 +89,7 @@ class EmailService {
    * In a real app, use a templating engine like EJS or Handlebars
    */
   private createHtmlTemplate(title: string, greeting: string, body: string, link: string, buttonText: string): string {
-    return \`
+    return `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <div style="max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
           <h2 style="color: #0056b3;">${title}</h2>
@@ -106,7 +106,7 @@ class EmailService {
           <p style="font-size: 0.8em; color: #888;">Nếu bạn không thực hiện yêu cầu này, bạn có thể bỏ qua email này một cách an toàn.</p>
         </div>
       </div>
-    \`;
+    `;
   }
 }
 
