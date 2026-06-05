@@ -3,19 +3,18 @@ import { HttpException } from '../exceptions/http-exception';
 import { createSubjectSchema, activateAccountSchema, updateSubjectSchema } from '../dtos/subjects.dto';
 import crypto from 'crypto';
 import { hashData } from '../utils/hash';
-import EmailService from './email.service';
+import { emailService } from './email.service'; // Use the singleton instance
 import Zod from 'zod';
-
+import { env } from '../configs/env';
 
 type CreateSubjectData = Zod.infer<typeof createSubjectSchema>;
 type UpdateSubjectData = Zod.infer<typeof updateSubjectSchema>;
 type ActivateAccountData = Zod.infer<typeof activateAccountSchema>;
 
 class SubjectService {
-  private emailService = new EmailService();
+  // No longer need: private emailService = new EmailService();
 
   public async createSubjectAndInvite(subjectData: CreateSubjectData, createdByUserId: string): Promise<any> {
-    // Check for existing username or email
     const existingAccount = await prisma.account.findFirst({
       where: {
         OR: [{ username: subjectData.username }, { email: subjectData.email }],
@@ -26,19 +25,15 @@ class SubjectService {
       throw new HttpException(409, `Account with this username or email already exists.`);
     }
 
-    // Use a transaction to ensure all or nothing
     return prisma.$transaction(async (tx) => {
-      // 1. Create Account
       const account = await tx.account.create({
         data: {
           username: subjectData.username,
           email: subjectData.email,
           type: 'SUBJECT',
-          // Password is null until activated
         },
       });
 
-      // 2. Create Subject profile
       const subject = await tx.subject.create({
         data: {
           full_name: subjectData.fullName,
@@ -54,9 +49,8 @@ class SubjectService {
         },
       });
 
-      // 3. Create Activation Token
       const token = crypto.randomUUID();
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
       await tx.activationToken.create({
         data: {
@@ -70,10 +64,10 @@ class SubjectService {
         throw new HttpException(400, 'Subject email is required to send activation invitation.');
       }
 
-      // 4. Send invitation email (mock)
-      // In a real app, the CLIENT_URL should come from config
-      const activationLink = `http://localhost:3000/auth/activate?token=${token}`;
-      await this.emailService.sendActivationEmail(account.email, subject.full_name, activationLink);
+      // Use the correct frontend URL from env config
+      const activationLink = `${env.FRONTEND_URL}/auth/activate?token=${token}`;
+      // Call the singleton service directly
+      await emailService.sendActivationEmail(account.email, subject.full_name, activationLink);
 
       return { subject, account };
     });
@@ -81,7 +75,6 @@ class SubjectService {
 
   public async activateAccount(data: ActivateAccountData): Promise<void> {
     return prisma.$transaction(async (tx) => {
-        // 1. Find the token and the associated account
         const activationToken = await tx.activationToken.findUnique({
             where: { token: data.token },
             include: { account: true },
@@ -92,7 +85,6 @@ class SubjectService {
         }
 
         if (new Date() > activationToken.expires_at) {
-            // Here you might add logic to resend the invitation
             await tx.activationToken.delete({ where: { id: activationToken.id }});
             throw new HttpException(410, 'Token has expired.');
         }
@@ -101,10 +93,8 @@ class SubjectService {
             throw new HttpException(400, 'Account is already active.');
         }
 
-        // 2. Hash the new password
         const hashedPassword = await hashData(data.password);
 
-        // 3. Update the account
         await tx.account.update({
             where: { id: activationToken.account_id },
             data: {
@@ -113,7 +103,6 @@ class SubjectService {
             },
         });
 
-        // 4. Delete the used token
         await tx.activationToken.delete({ where: { id: activationToken.id }});
     });
   }
@@ -149,8 +138,8 @@ class SubjectService {
       const subject = await prisma.subject.findUnique({
           where: { id: subjectId },
           include: {
-              account: true, // include all account details
-              checkin: { // include recent checkin history
+              account: true, 
+              checkin: { 
                   orderBy: {
                       checkin_time: 'desc'
                   },
@@ -202,17 +191,12 @@ class SubjectService {
   }
 
   public async deleteSubject(subjectId: string): Promise<any> {
-      // We should use a transaction to delete the subject and their account together
       return prisma.$transaction(async (tx) => {
           const subject = await tx.subject.findUnique({ where: { id: subjectId } });
           if (!subject) {
               throw new HttpException(404, 'Subject not found');
           }
 
-          // Delete related records first (checkins, etc.) if schema requires it
-          await tx.checkin.deleteMany({ where: { subject_id: subjectId } });
-          
-          // Finally delete the account (which will cascade to subject due to relation)
           await tx.account.delete({ where: { id: subject.account_id } });
 
           return { message: "Subject and associated account deleted successfully." };
