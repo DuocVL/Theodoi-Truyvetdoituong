@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import * as activationTokenRepository from '../repositories/activationToken.repository';
 import * as accountRepository from '../repositories/account.repository';
 import { sendActivationEmail } from '../utils/email';
-import { HttpException } from '../middlewares/error.middleware';
+import { HttpException } from '../exceptions/http-exception';
 import { Account } from '../../generated/prisma/client';
 
 const ACTIVATION_TOKEN_EXPIRES_IN = 24 * 3600 * 1000; // 24 hours
