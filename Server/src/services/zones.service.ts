@@ -1,8 +1,10 @@
 
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../generated/prisma/client';
 import { prisma } from '../configs/prisma';
-import { HttpException } from '../exceptions/HttpException';
+import { HttpException } from '../exceptions/http-exception';
 import { createZoneSchema, updateZoneSchema } from '../dtos/zones.dto';
+import Zod from 'zod';
+
 
 // Infer types from Zod schemas
 type CreateZoneDto = Zod.infer<typeof createZoneSchema>;

@@ -18,14 +18,16 @@ class TrackingController {
     const { from, to } = req.query;
 
     if (!from || !to) {
-      return res.status(400).json({ message: 'Missing required query parameters: from, to' });
+      res.status(400).json({ message: 'Missing required query parameters: from, to' });
+      return;
     }
 
     try {
+      // Đảm bảo from và to là string đơn lẻ
       const history = await trackingService.getCheckinHistory(
         subjectId,
-        new Date(from as string),
-        new Date(to as string)
+        new Date(String(from)),
+        new Date(String(to))
       );
       res.json(history);
     } catch (error) {
@@ -38,7 +40,8 @@ class TrackingController {
     try {
       const lastLocation = await trackingService.getLastLocation(subjectId);
       if (!lastLocation) {
-        return res.status(404).json({ message: 'No location found for this subject' });
+        res.status(404).json({ message: 'No location found for this subject' });
+        return;
       }
       res.json(lastLocation);
     } catch (error) {

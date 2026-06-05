@@ -10,7 +10,7 @@ class ZoneController {
   public create = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const zoneData = createZoneSchema.parse(req.body);
-      const createdByUserId = req.user.id;
+      const createdByUserId = req.account?.id;
       const newZone = await this.zoneService.createZone(zoneData, createdByUserId);
       res.status(201).json({ data: newZone, message: 'Zone created successfully' });
     } catch (error) {
