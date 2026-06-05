@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import SubjectService from '../services/subjects.service';
 import { RequestWithUser } from '../types/data';
-import { createSubjectSchema, activateAccountSchema, updateSubjectSchema } from '../dtos/subjects.dto';
+import { createSubjectSchema, updateSubjectSchema } from '../dtos/subjects.dto';
+import { activateAccountSchema } from '../dtos/auth.dto';
 import { z } from 'zod';
 
 class SubjectController {
@@ -9,12 +10,13 @@ class SubjectController {
 
   public create = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = (req as any).role;
+      const role = req.account?.role;
       if (role !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
+        res.status(403).json({ message: 'Forbidden' });
+        return;
       }
       const subjectData = createSubjectSchema.parse(req.body);
-      const createdByUserId = req.user.id;
+      const createdByUserId = req.account?.id || '';
       const result = await this.subjectService.createSubjectAndInvite(subjectData, createdByUserId);
       res.status(201).json({ message: 'Subject created and invitation sent successfully.', data: result.subject });
     } catch (error) {
@@ -53,9 +55,10 @@ class SubjectController {
 
   public update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = (req as any).role;
+      const role = req.account?.role;
       if (role !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
+        res.status(403).json({ message: 'Forbidden' });
+        return;
       }
       const subjectId = z.string().parse(req.params.id);
       const subjectData = updateSubjectSchema.parse(req.body);
@@ -68,9 +71,10 @@ class SubjectController {
 
   public delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = (req as any).role;
+      const role = req.account?.role;
       if (role !== 'admin') {
-        return res.status(403).json({ message: 'Forbidden' });
+        res.status(403).json({ message: 'Forbidden' });
+        return;
       }
       const subjectId = z.string().parse(req.params.id);
       await this.subjectService.deleteSubject(subjectId);

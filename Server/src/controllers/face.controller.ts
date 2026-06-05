@@ -22,7 +22,7 @@ class FaceController {
         return;
       }
 
-      const accountId = req.user.id;
+      const accountId = req.account?.id;
       const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
 
       if (!subject) {
@@ -55,7 +55,7 @@ class FaceController {
         return;
       }
 
-      const accountId = req.user.id;
+      const accountId = req.account?.id;
       const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
       if (!subject) {
         res.status(403).json({ message: 'Forbidden: User is not a subject.' });
