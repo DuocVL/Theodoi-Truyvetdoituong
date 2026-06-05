@@ -22,6 +22,11 @@ class FaceController {
       }
 
       const accountId = req.account?.id;
+      if (!accountId) {
+        res.status(401).json({ message: 'Unauthorized: Account ID not found.' });
+        return;
+      }
+
       const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
 
       if (!subject) {
@@ -34,8 +39,6 @@ class FaceController {
       await prisma.$executeRaw`
         INSERT INTO "face_data" (id, subject_id, embedding, image_url, status, created_at, update_at)
         VALUES (gen_random_uuid(), ${subject.id}, ${JSON.stringify(embedding)}::vector, 'initial_registration', 'ACTIVE', NOW(), NOW())
-        ON CONFLICT (subject_id) DO UPDATE 
-        SET embedding = ${JSON.stringify(embedding)}::vector, update_at = NOW();
       `;
 
       res.status(201).json({ message: 'Face registered successfully.' });
@@ -55,13 +58,33 @@ class FaceController {
       }
 
       const accountId = req.account?.id;
+      if (!accountId) {
+        res.status(401).json({ message: 'Unauthorized: Account ID not found.' });
+        return;
+      }
+
       const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
       if (!subject) {
         res.status(403).json({ message: 'Forbidden: User is not a subject.' });
         return;
       }
 
-      const geoJsonString = JSON.stringify({ type: 'Point', coordinates: [parseFloat(longitude), parseFloat(latitude)] });
+      const lat = Number(latitude);
+      const lng = Number(longitude);
+
+      if (
+        !Number.isFinite(lat) ||
+        !Number.isFinite(lng) ||
+        lat < -90 ||
+        lat > 90 ||
+        lng < -180 ||
+        lng > 180
+      ) {
+        res.status(400).json({ message: 'Invalid location coordinates.' });
+        return;
+      }
+
+      const geoJsonString = JSON.stringify({ type: 'Point', coordinates: [lng, lat] });
       const rawQuery = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
 
       const checkinRecords = await prisma.$queryRaw<any[]>`
@@ -72,7 +95,7 @@ class FaceController {
       const checkinRecord = checkinRecords[0];
 
       const jobData = {
-        checkinId: checkinRecord.id,
+        checkinId: checkinRecord.id.toString(),
         subjectId: subject.id,
         files: files.map(f => ({ 
             buffer: f.buffer.toString('base64'),
@@ -85,7 +108,7 @@ class FaceController {
 
       res.status(202).json({ 
         message: 'Check-in accepted and is being processed.',
-        checkinId: checkinRecord.id
+        checkinId: checkinRecord.id.toString()
       });
 
     } catch (error) {

@@ -15,6 +15,11 @@ export const createSubjectSchema = z.object({
   monitoringEnd: z.string().datetime().optional(),
 });
 
+export const activateAccountSchema = z.object({
+  token: z.string().uuid("Invalid token format"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
+});
+
 // Schema for updating an existing subject
 export const updateSubjectSchema = z.object({
   fullName: z.string().min(1, "Full name is required").optional(),

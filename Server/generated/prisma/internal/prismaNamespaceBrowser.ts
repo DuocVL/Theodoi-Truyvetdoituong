@@ -248,6 +248,7 @@ export const CheckinScalarFieldEnum = {
   face_verified: 'face_verified',
   confidence: 'confidence',
   status: 'status',
+  verification_reason: 'verification_reason',
   checkin_time: 'checkin_time'
 } as const
 

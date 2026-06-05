@@ -1,4 +1,5 @@
 import { z } from "zod";
+import "dotenv/config"
 
 const envSchema = z.object({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -8,7 +9,7 @@ const envSchema = z.object({
     JWT_REFRESH_SECRET: z.string().min(32),
 
     DATABASE_URL: z.url(),
-    REDIS_URL: z.url().default("redis://localhost:6379"),
+    REDIS_URL: z.url(),
 
     EMAIL_HOST: z.string(),
     EMAIL_PORT: z.coerce.number(),

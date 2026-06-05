@@ -3,6 +3,32 @@ import { v4 as uuidv4 } from 'uuid';
 import { logger } from "../utils/logger";
 import { createRequestLog } from '../repositories/log.repository';
 
+const SENSITIVE_FIELDS = new Set([
+  'password',
+  'newPassword',
+  'confirmPassword',
+  'token',
+  'accessToken',
+  'refreshToken',
+]);
+
+const redactSensitiveData = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(redactSensitiveData);
+  }
+
+  if (value && typeof value === 'object' && !Buffer.isBuffer(value)) {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+        key,
+        SENSITIVE_FIELDS.has(key) ? '[REDACTED]' : redactSensitiveData(item),
+      ])
+    );
+  }
+
+  return value;
+};
+
 /**
  * Middleware ghi nhật ký (logging) toàn diện cho HTTP requests
  * 
@@ -33,10 +59,7 @@ export const loggingMiddleware = async (
 
   // 🔐 Sanitize sensitive information từ request body trước khi log
   // Ví dụ: không log password, tokens, credit card, v.v.
-  let sanitizedBody = { ...body };
-  if (sanitizedBody?.password) {
-    sanitizedBody.password = "[REDACTED]";
-  }
+  const sanitizedBody = redactSensitiveData(body);
 
   // 📝 Log request inlet (khi request vừa đến)
   logger.info(`--> ${method} ${originalUrl}`, {
@@ -63,7 +86,7 @@ export const loggingMiddleware = async (
       // 🔍 Nếu response là string (likely JSON), parse nó
       if (typeof data === 'string') {
         try {
-          responseBody = JSON.parse(data);
+          responseBody = redactSensitiveData(JSON.parse(data));
         } catch (parseError) {
           // Nếu parse fail, giữ nguyên string
           responseBody = data;
@@ -71,13 +94,13 @@ export const loggingMiddleware = async (
       } else if (Buffer.isBuffer(data)) {
         // 🔄 Nếu response là Buffer, convert to string rồi parse
         try {
-          responseBody = JSON.parse(data.toString());
+          responseBody = redactSensitiveData(JSON.parse(data.toString()));
         } catch (parseError) {
           responseBody = data.toString();
         }
       } else {
         // Object / khác - keep as-is
-        responseBody = data;
+        responseBody = redactSensitiveData(data);
       }
     } catch (e) {
       // 🛡️ Catch-all: nếu có lỗi gì, keep original data

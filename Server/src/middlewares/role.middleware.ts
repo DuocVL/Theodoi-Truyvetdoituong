@@ -1,6 +1,7 @@
 // role.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import { AccountPayload } from '../types/data.js';
+import { prisma } from '../configs/prisma.js';
 
 /**
  * Middleware to attach the user's role to the request object.
@@ -11,19 +12,48 @@ import { AccountPayload } from '../types/data.js';
  * If the role cannot be determined, the request proceeds with undefined role –
  * downstream route handlers can decide whether to allow or forbid the action.
  */
-export const roleMiddleware = (req: Request, _res: Response, next: NextFunction) => {
+export const roleMiddleware = async (req: Request, _res: Response, next: NextFunction) => {
   const account = (req as any).account as AccountPayload | undefined;
-  if (account && typeof account === 'object') {
-    // Typical payload includes a `role` field. Adjust if your JWT uses a different name.
-    (req as any).role = (account as any).role || undefined;
+
+  if (!account?.id || account.type !== 'USER') {
+    req.role = undefined;
+    req.roles = [];
+    return next();
   }
-  next();
+
+  try {
+    const userAccount = await prisma.account.findUnique({
+      where: { id: account.id },
+      select: {
+        user: {
+          select: {
+            userRole: {
+              select: {
+                role: {
+                  select: { name: true },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const roles = userAccount?.user?.userRole.map((userRole) => userRole.role.name) ?? [];
+    req.roles = roles;
+    req.role = roles[0];
+    return next();
+  } catch (error) {
+    return next(error);
+  }
 };
 
 export const authorize = (allowedRoles: string[]) => {
   return (req: Request, _res: Response, next: NextFunction) => {
-    const userRole = (req as any).role as string | undefined;
-    if (userRole && allowedRoles.includes(userRole)) {
+    const normalizedAllowedRoles = allowedRoles.map((role) => role.toUpperCase());
+    const userRoles = (req.roles ?? []).map((role) => role.toUpperCase());
+
+    if (userRoles.some((role) => normalizedAllowedRoles.includes(role))) {
       return next();
     }
     // If role missing or not allowed, forbid

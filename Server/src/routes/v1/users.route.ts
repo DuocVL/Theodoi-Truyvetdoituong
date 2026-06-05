@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import UserController from '../../controllers/users.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { authorize } from '../../middlewares/role.middleware';
+import { authorize, roleMiddleware } from '../../middlewares/role.middleware';
 
 
 class UserRoute {
@@ -16,12 +16,12 @@ class UserRoute {
 
   private initializeRoutes() {
     // All user routes are protected and require ADMIN privileges
-    this.router.use(this.path, authMiddleware, authorize(['ADMIN']));
+    this.router.use(authMiddleware, roleMiddleware, authorize(['ADMIN']));
 
-    this.router.get(this.path, this.userController.getAll);
-    this.router.get(`${this.path}/:id`, this.userController.getById);
-    this.router.put(`${this.path}/:id`, this.userController.update);
-    this.router.delete(`${this.path}/:id`, this.userController.delete);
+    this.router.get('/', this.userController.getAll);
+    this.router.get('/:id', this.userController.getById);
+    this.router.put('/:id', this.userController.update);
+    this.router.delete('/:id', this.userController.delete);
   }
 }
 

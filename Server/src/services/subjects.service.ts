@@ -66,6 +66,10 @@ class SubjectService {
         },
       });
 
+      if (!account.email) {
+        throw new HttpException(400, 'Subject email is required to send activation invitation.');
+      }
+
       // 4. Send invitation email (mock)
       // In a real app, the CLIENT_URL should come from config
       const activationLink = `http://localhost:3000/auth/activate?token=${token}`;
@@ -126,7 +130,14 @@ class SubjectService {
             },
             creator: {
                 select: {
-                  username: true
+                  id: true,
+                  full_name: true,
+                  account: {
+                    select: {
+                      username: true,
+                      email: true
+                    }
+                  }
                 }
             }
         }
@@ -148,8 +159,13 @@ class SubjectService {
               creator: {
                   select: {
                       id: true,
-                      username: true,
-                      email: true
+                      full_name: true,
+                      account: {
+                        select: {
+                          username: true,
+                          email: true
+                        }
+                      }
                   }
               }
           }

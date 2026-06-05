@@ -20,7 +20,7 @@ interface FaceDataWithEmbedding extends FaceData {
  * Files được encode base64 để lưu vào Redis queue
  */
 interface FaceVerificationJobData {
-  checkinId: bigint;
+  checkinId: string;
   subjectId: string;
   files: {
     buffer: string;
@@ -39,7 +39,8 @@ interface FaceVerificationJobData {
  * 4. Handle error và retry
  */
 const processJob = async (job: Job<FaceVerificationJobData>) => {
-  const { checkinId, subjectId, files } = job.data;
+  const { subjectId, files } = job.data;
+  const checkinId = BigInt(job.data.checkinId);
   console.log(`[FaceVerificationWorker] Processing job ${job.id} for check-in ${checkinId}`);
 
   let imageFiles: Express.Multer.File[] = [];

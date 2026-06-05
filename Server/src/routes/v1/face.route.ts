@@ -16,7 +16,7 @@ class FaceRoute {
   private initializeRoutes() {
     // Route for registering a new face. Applies auth middleware and then multer middleware.
     this.router.post(
-      `${this.path}/register`,
+      '/register',
       authMiddleware,
       this.faceController.uploadMiddleware,
       this.faceController.register
@@ -24,7 +24,7 @@ class FaceRoute {
 
     // Route for performing a check-in. Also protected by auth and uses multer.
     this.router.post(
-      `${this.path}/check-in`,
+      '/check-in',
       authMiddleware,
       this.faceController.uploadMiddleware,
       this.faceController.checkIn

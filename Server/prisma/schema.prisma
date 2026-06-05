@@ -9,71 +9,51 @@ datasource db {
   extensions = [postgis, vector]
 }
 
-enum AccountType {
-  USER
-  SUBJECT
-}
-
-// New enum for account status
-enum AccountStatus {
-  PENDING_ACTIVATION
-  ACTIVE
-  SUSPENDED
-}
-
 model Account {
-  id         String        @id @default(uuid())
-  type       AccountType
-  username   String        @unique
-  password   String? // Changed to optional
-  email      String?       @unique
-  status     AccountStatus @default(PENDING_ACTIVATION) // Use enum and change default
-  created_at DateTime      @default(now())
-
-  user    User?
-  subject Subject?
-
-  refreshToken        RefreshToken[]
+  id                  String               @id @default(uuid())
+  type                AccountType
+  username            String               @unique
+  password            String?
+  email               String?              @unique
+  status              AccountStatus        @default(PENDING_ACTIVATION)
+  created_at          DateTime             @default(now())
+  activationTokens    ActivationToken[]
+  auditLogs           AuthImage[]
   devices             Device[]
   passwordResetTokens PasswordResetToken[]
-  activationTokens    ActivationToken[] // Add relation
-  auditLogs           AuthImage[]
+  refreshToken        RefreshToken[]
+  subject             Subject?
+  user                User?
 
   @@map("accounts")
 }
 
-// New model for activation tokens
 model ActivationToken {
   id         String   @id @default(uuid())
   token      String   @unique
   account_id String
   expires_at DateTime
   created_at DateTime @default(now())
-
-  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  account    Account  @relation(fields: [account_id], references: [id], onDelete: Cascade)
 
   @@map("activation_tokens")
 }
 
 model User {
-  id         String  @id @default(uuid())
-  account_id String  @unique
+  id         String      @id @default(uuid())
+  account_id String      @unique
   full_name  String
-  status     Boolean @default(true)
-
-  avatar_id  String? @unique
-  avatar     Image?  @relation("UserToAvatar", fields: [avatar_id], references: [id], onDelete: SetNull)
-
-  created_at DateTime @default(now())
-  update_at  DateTime @updatedAt
-
-  account Account @relation(fields: [account_id], references: [id])
-
-  alerts    Alert[]     @relation("ResolvedAlerts")
-  subject   Subject[]   @relation("UserToSubject")
-  auditLogs SystemLog[] @relation("UserToSystemLog")
-  zone      Zone[]      @relation("UserToZone")
-  userRole  UserRole[]  @relation("UserToUserRole")
+  status     Boolean     @default(true)
+  avatar_id  String?     @unique
+  created_at DateTime    @default(now())
+  update_at  DateTime    @updatedAt
+  alerts     Alert[]     @relation("ResolvedAlerts")
+  subject    Subject[]   @relation("UserToSubject")
+  auditLogs  SystemLog[] @relation("UserToSystemLog")
+  userRole   UserRole[]  @relation("UserToUserRole")
+  account    Account     @relation(fields: [account_id], references: [id])
+  avatar     Image?      @relation("UserToAvatar", fields: [avatar_id], references: [id])
+  zone       Zone[]      @relation("UserToZone")
 
   @@map("users")
 }
@@ -98,38 +78,31 @@ model UserRole {
 }
 
 model Subject {
-  id         String @id @default(uuid())
-  account_id String @unique
-
-  code      String    @unique @default(uuid())
-  full_name String
-  dob       DateTime?
-  gender    String?
-  id_number String?
-  address   String?
-  phone     String?
-
-  status           String    @default("ACTIVE")
+  id               String        @id @default(uuid())
+  account_id       String        @unique
+  code             String        @unique @default(uuid())
+  full_name        String
+  dob              DateTime?
+  gender           String?
+  id_number        String?
+  address          String?
+  phone            String?
+  status           String        @default("ACTIVE")
   monitoring_start DateTime?
   monitoring_end   DateTime?
-
-  avatar_id  String? @unique
-  avatar     Image?  @relation("SubjectToAvatar", fields: [avatar_id], references: [id], onDelete: SetNull)
-
-  created_by String
-  created_at DateTime  @default(now())
-  update_at  DateTime  @updatedAt
-  deleted_at DateTime?
-
-  creator User    @relation("UserToSubject", fields: [created_by], references: [id])
-  account Account @relation(fields: [account_id], references: [id])
-
-  alert    Alert[]    @relation("SubjectToAlert")
-  checkin  Checkin[]  @relation("SubjectToCheckin")
-  events   EventLog[] @relation("SubjectToEventLog")
-  faceData FaceData[] @relation("SubjectToFaceData")
-
-  subjectZone SubjectZone[] @relation("SubjectToSubjectZone")
+  avatar_id        String?       @unique
+  created_by       String
+  created_at       DateTime      @default(now())
+  update_at        DateTime      @updatedAt
+  deleted_at       DateTime?
+  alert            Alert[]       @relation("SubjectToAlert")
+  checkin          Checkin[]     @relation("SubjectToCheckin")
+  events           EventLog[]    @relation("SubjectToEventLog")
+  faceData         FaceData[]    @relation("SubjectToFaceData")
+  subjectZone      SubjectZone[] @relation("SubjectToSubjectZone")
+  account          Account       @relation(fields: [account_id], references: [id])
+  avatar           Image?        @relation("SubjectToAvatar", fields: [avatar_id], references: [id])
+  creator          User          @relation("UserToSubject", fields: [created_by], references: [id])
 
   @@index([full_name])
   @@index([status])
@@ -145,8 +118,7 @@ model RefreshToken {
   revoked    Boolean  @default(false)
   expires_at DateTime
   created_at DateTime @default(now())
-
-  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  account    Account  @relation(fields: [account_id], references: [id], onDelete: Cascade)
 
   @@map("refreshtokens")
 }
@@ -157,8 +129,7 @@ model PasswordResetToken {
   account_id String
   expires_at DateTime
   created_at DateTime @default(now())
-
-  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  account    Account  @relation(fields: [account_id], references: [id], onDelete: Cascade)
 
   @@map("password_reset_tokens")
 }
@@ -174,7 +145,7 @@ model Device {
   is_trusted   Boolean   @default(true)
   last_seen_at DateTime?
   created_at   DateTime  @default(now())
-  account      Account?  @relation(fields: [account_id], references: [id])
+  account      Account   @relation(fields: [account_id], references: [id])
 
   @@unique([account_id, device_uuid])
   @@map("devices")
@@ -226,11 +197,11 @@ model Checkin {
   subject_id    String
   location      Unsupported("geography")
   image_id      String?                  @unique
-  image         Image?                   @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
   face_verified Boolean                  @default(false)
   confidence    Float
   status        String                   @default("ON_TIME")
   checkin_time  DateTime                 @default(now())
+  image         Image?                   @relation("CheckinToImage", fields: [image_id], references: [id])
   subject       Subject                  @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
 
   @@index([subject_id, checkin_time])
@@ -269,26 +240,21 @@ model EventLog {
 }
 
 model SystemLog {
-  id        BigInt  @id @default(autoincrement())
-  user_id   String?
-  action    String
-  entity    String? // bảng bị tác động (Subject, Account,...)
-  entity_id String?
-
-  old_data Json? // dữ liệu trước
-  new_data Json? // dữ liệu sau
-
+  id         BigInt   @id @default(autoincrement())
+  user_id    String?
+  action     String
+  entity     String?
+  entity_id  String?
+  old_data   Json?
+  new_data   Json?
   ip_address String?
   user_agent String?
   device_id  String?
-
-  request_id String? // trace request
-  status     String? // SUCCESS / FAIL
+  request_id String?
+  status     String?
   error      String?
-
   created_at DateTime @default(now())
-
-  user User? @relation("UserToSystemLog", fields: [user_id], references: [id])
+  user       User?    @relation("UserToSystemLog", fields: [user_id], references: [id])
 
   @@index([user_id])
   @@index([entity, entity_id])
@@ -297,21 +263,18 @@ model SystemLog {
 }
 
 model RequestLog {
-  id          String  @id @default(uuid())
-  user_id     String?
-  method      String
-  path        String
-  status_code Int
-  duration_ms Int
-
-  ip_address String?
-  user_agent String?
-  device_id  String?
-
+  id            String   @id @default(uuid())
+  user_id       String?
+  method        String
+  path          String
+  status_code   Int
+  duration_ms   Int
+  ip_address    String?
+  user_agent    String?
+  device_id     String?
   request_body  Json?
   response_body Json?
-
-  created_at DateTime @default(now())
+  created_at    DateTime @default(now())
 
   @@index([user_id])
   @@index([created_at])
@@ -319,15 +282,13 @@ model RequestLog {
 }
 
 model AuthLog {
-  id         String @id @default(uuid())
+  id         String   @id @default(uuid())
   account_id String
-  action     String // LOGIN, LOGOUT, REFRESH
-  status     String // SUCCESS / FAIL
-
+  action     String
+  status     String
   ip_address String?
   user_agent String?
   device_id  String?
-
   created_at DateTime @default(now())
 
   @@index([account_id])
@@ -339,22 +300,40 @@ model AuthImage {
   account_id String
   image_url  String
   created_at DateTime @default(now())
-
-  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  account    Account  @relation(fields: [account_id], references: [id], onDelete: Cascade)
 
   @@map("auth_images")
 }
 
 model Image {
-  id         String   @id @default(uuid())
-  url        String
-  alt_text   String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  userAvatar    User?    @relation("UserToAvatar")
-  subjectAvatar Subject? @relation("SubjectToAvatar")
+  id            String   @id @default(uuid())
+  url           String
+  alt_text      String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
   checkinImage  Checkin? @relation("CheckinToImage")
+  subjectAvatar Subject? @relation("SubjectToAvatar")
+  userAvatar    User?    @relation("UserToAvatar")
 
   @@map("images")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+enum AccountType {
+  USER
+  SUBJECT
+}
+
+enum AccountStatus {
+  PENDING_ACTIVATION
+  ACTIVE
+  SUSPENDED
 }

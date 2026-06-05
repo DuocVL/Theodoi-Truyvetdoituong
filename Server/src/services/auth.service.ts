@@ -50,7 +50,7 @@ export const login = async (data: LoginDto) => {
     const tokenData: Prisma.RefreshTokenCreateInput = {
         token_hash: hashedToken,
         device_id: data.device_id,
-        expires_at: new Date().setDate(new Date().getDate() + 60).toString(),
+        expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
         account: {
             connect: { id: account.id }
         }
@@ -115,7 +115,12 @@ export const refreshToken = async (data: RefreshTokenDto) => {
     const { refreshToken: oldRefreshToken } = data;
     
     // 1. Verify and decode the old refresh token
-    const decoded = jwt.verify(oldRefreshToken, env.JWT_REFRESH_SECRET) as AccountPayload;
+    let decoded: AccountPayload;
+    try {
+        decoded = jwt.verify(oldRefreshToken, env.JWT_REFRESH_SECRET) as AccountPayload;
+    } catch {
+        throw new HttpException(401, "Invalid refresh token");
+    }
 
     const hashedOldToken = crypto.createHash('sha256').update(oldRefreshToken).digest('hex');
 
@@ -140,8 +145,8 @@ export const refreshToken = async (data: RefreshTokenDto) => {
     // 5. Save the new refresh token to the database
     const newTokenData: Prisma.RefreshTokenCreateInput = {
         token_hash: newHashedRefreshToken,
-        device_id: decoded.device,
-        expires_at: new Date().setDate(new Date().getDate() + 60).toString(),
+        device_id: decoded.device_id,
+        expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
         account: {
             connect: { id: decoded.id }
         }

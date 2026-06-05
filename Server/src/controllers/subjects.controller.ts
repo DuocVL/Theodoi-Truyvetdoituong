@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import SubjectService from '../services/subjects.service';
 import { RequestWithUser } from '../types/data';
-import { createSubjectSchema, updateSubjectSchema } from '../dtos/subjects.dto';
-import { activateAccountSchema } from '../dtos/auth.dto';
+import { activateAccountSchema, createSubjectSchema, updateSubjectSchema } from '../dtos/subjects.dto';
 import { z } from 'zod';
 
 class SubjectController {
@@ -10,8 +9,8 @@ class SubjectController {
 
   public create = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = req.account?.role;
-      if (role !== 'admin') {
+      const role = req.role?.toUpperCase();
+      if (role !== 'ADMIN') {
         res.status(403).json({ message: 'Forbidden' });
         return;
       }
@@ -55,8 +54,8 @@ class SubjectController {
 
   public update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = req.account?.role;
-      if (role !== 'admin') {
+      const role = req.role?.toUpperCase();
+      if (role !== 'ADMIN') {
         res.status(403).json({ message: 'Forbidden' });
         return;
       }
@@ -71,8 +70,8 @@ class SubjectController {
 
   public delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = req.account?.role;
-      if (role !== 'admin') {
+      const role = req.role?.toUpperCase();
+      if (role !== 'ADMIN') {
         res.status(403).json({ message: 'Forbidden' });
         return;
       }

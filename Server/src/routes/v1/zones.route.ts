@@ -14,13 +14,13 @@ class ZoneRoute {
   }
 
   private initializeRoutes() {
-    this.router.use(this.path, authMiddleware); // Apply auth middleware to all zone routes
+    this.router.use(authMiddleware); // Apply auth middleware to all zone routes
 
-    this.router.post(this.path, this.zoneController.create);
-    this.router.get(this.path, this.zoneController.getAll);
-    this.router.get(`${this.path}/:id`, this.zoneController.getById);
-    this.router.put(`${this.path}/:id`, this.zoneController.update);
-    this.router.delete(`${this.path}/:id`, this.zoneController.delete);
+    this.router.post('/', this.zoneController.create);
+    this.router.get('/', this.zoneController.getAll);
+    this.router.get('/:id', this.zoneController.getById);
+    this.router.put('/:id', this.zoneController.update);
+    this.router.delete('/:id', this.zoneController.delete);
   }
 }
 

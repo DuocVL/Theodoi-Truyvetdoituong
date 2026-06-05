@@ -13,6 +13,8 @@ declare global{
     namespace Express{
         interface Request{
             account?: AccountPayload;
+            role?: string;
+            roles?: string[];
             requestId: string;
         }
     }
