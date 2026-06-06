@@ -9,8 +9,22 @@ import v1Routes from './routes/v1';
 
 const app = express();
 
+// Define allowed origins
+const allowedOrigins = [env.FRONTEND_URL, 'http://localhost:5173'];
+
 // Middlewares
-app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
+app.use(cors({ 
+    origin: (origin, callback) => {
+        // allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true 
+}));
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,7 +34,6 @@ app.use(loggingMiddleware);
 app.use('/api/v1', v1Routes);
 
 // Static file serving for uploaded images
-// This creates an absolute path to the 'uploads' folder in your project root
 app.use('/uploads/auth_images', express.static(path.resolve(process.cwd(), 'uploads/auth_images')));
 
 // Error handling middleware (should be last)
