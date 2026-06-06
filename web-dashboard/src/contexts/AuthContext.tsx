@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (token) {
                 try {
                     const currentUser = await getMe();
-                    setUser(currentUser.user);
+                    setUser(currentUser);
                     setIsAuthenticated(true); // Cập nhật trạng thái
                 } catch (error) {
                     console.error("Auth verification failed", error);
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // 3. Gọi getMe() để lấy thông tin người dùng
         try {
             const currentUser = await getMe();
-            setUser(currentUser.user);
+            setUser(currentUser);
             setIsAuthenticated(true); // 4. Cập nhật trạng thái
         } catch (error) {
             // Nếu getMe thất bại, xóa token và báo lỗi
