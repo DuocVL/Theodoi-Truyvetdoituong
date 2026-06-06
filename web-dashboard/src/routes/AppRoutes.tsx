@@ -5,19 +5,19 @@ import DashboardPage from '../pages/DashboardPage';
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
+import ActivateAccountPage from '../pages/ActivateAccountPage'; // Import the new page
 import SubjectListPage from '../pages/SubjectListPage';
 import AddSubjectPage from '../pages/AddSubjectPage';
 import EditSubjectPage from '../pages/EditSubjectPage';
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 import MapPage from '../pages/MapPage';
-import Spinner from '../components/Spinner'; // Import Spinner
+import Spinner from '../components/Spinner';
 
 const AppRoutes: React.FC = () => {
   const { user, loading } = useAuth();
   const isAuthenticated = !!user;
 
-  // Sử dụng Spinner cho trạng thái loading ban đầu
   if (loading) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', gap: '1rem' }}>
@@ -34,6 +34,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" />} />
         <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPasswordPage /> : <Navigate to="/dashboard" />} />
         <Route path="/reset-password" element={!isAuthenticated ? <ResetPasswordPage /> : <Navigate to="/dashboard" />} />
+        <Route path="/activate-account" element={<ActivateAccountPage />} /> {/* Add activation route */}
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
@@ -42,7 +43,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/subjects/edit/:id" element={<ProtectedRoute><EditSubjectPage /></ProtectedRoute>} />
         <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
 
-        {/* Redirect mặc định */}
+        {/* Default Redirect */}
         <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
       </Routes>
   );

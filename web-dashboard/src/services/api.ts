@@ -47,8 +47,7 @@ interface AuthResponse {
 // API CLIENT CONFIGURATION
 // ==================================================================
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
-console.log(API_URL);
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3333/api/v1';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -68,15 +67,17 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', {
-      message: error.message,
-      url: error.config.url,
-      status: error.response?.status,
-      data: error.response?.data,
-    });
+    console.error('API Error:',
+      {
+        message: error.message,
+        url: error.config.url,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
     if (error.response?.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
+        // Consider redirecting to login page here
     }
     return Promise.reject(error);
   }
@@ -93,6 +94,16 @@ export const login = async (username: string, password: string, device_id: strin
   return response.data;
 };
 
+export const register = async (data: RegisterData): Promise<{ message: string }> => {
+  const response = await apiClient.post('/auth/register', data);
+  return response.data;
+};
+
+export const activateAccount = async (token: string): Promise<{ message: string }> => {
+  const response = await apiClient.post('/auth/activate-account', { token });
+  return response.data;
+};
+
 export const getMe = async (): Promise<User> => {
   const response = await apiClient.get<{ user: User }>('/auth/me');
   return response.data.user;
@@ -103,12 +114,6 @@ export const forgotPassword = async (email: string): Promise<{ message: string }
   return response.data;
 };
 
-export const register = async (data: RegisterData): Promise<{ message: string }> => {
-  const response = await apiClient.post('/auth/register', data);
-  return response.data;
-};
-
-// Thêm hàm resetPassword
 export const resetPassword = async (token: string, password: string): Promise<{ message: string }> => {
   const response = await apiClient.post('/auth/reset-password', { token, password });
   return response.data;
