@@ -215,13 +215,13 @@ const DashboardPage: React.FC = () => {
                 {stats.recent.length > 0 ? (
                     <Table>
                         <thead>
-                            <tr><th>Họ và tên</th><th>Mã định danh</th><th>Trạng thái</th><th>Ngày tạo</th></tr>
+                            <tr><th>Họ và tên</th><th>Username</th><th>Trạng thái</th><th>Ngày tạo</th></tr>
                         </thead>
                         <tbody>
                             {stats.recent.map(s => (
                                 <tr key={s._id}>
                                     <td>{s.fullName}</td>
-                                    <td>{s.identifier}</td>
+                                    <td>{s.username}</td>
                                     <td><StatusBadge status={s.status}>{s.status}</StatusBadge></td>
                                     <td>{new Date(s.createdAt).toLocaleDateString()}</td>
                                 </tr>

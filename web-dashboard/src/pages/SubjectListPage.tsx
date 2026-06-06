@@ -216,7 +216,7 @@ const SubjectListPage: React.FC = () => {
   const filteredSubjects = useMemo(() => 
     subjects.filter(s => 
       s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (s.identifier && s.identifier.toLowerCase().includes(searchTerm.toLowerCase()))
+      (s.username && s.username.toLowerCase().includes(searchTerm.toLowerCase()))
     ), [subjects, searchTerm]);
 
   const handleDelete = async (id: string) => {
@@ -250,7 +250,7 @@ const SubjectListPage: React.FC = () => {
                 <SearchIcon />
                 <SearchInput
                     type="text"
-                    placeholder="Tìm kiếm theo tên hoặc mã định danh..."
+                    placeholder="Tìm kiếm theo tên hoặc username..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -265,7 +265,7 @@ const SubjectListPage: React.FC = () => {
                     <TableHead>
                         <tr>
                             <th>Họ tên</th>
-                            <th>Mã định danh</th>
+                            <th>Username</th>
                             <th>Trạng thái</th>
                             <th style={{textAlign: 'right'}}>Hành động</th>
                         </tr>
@@ -274,7 +274,7 @@ const SubjectListPage: React.FC = () => {
                         {filteredSubjects.length > 0 ? filteredSubjects.map(s => (
                             <TableRow key={s._id}>
                                 <TableCell>{s.fullName}</TableCell>
-                                <TableCell>{s.identifier}</TableCell>
+                                <TableCell>{s.username}</TableCell>
                                 <TableCell><StatusBadge status={s.status}>{s.status}</StatusBadge></TableCell>
                                 <TableCell style={{textAlign: 'right'}}>
                                     <ActionButtons>
