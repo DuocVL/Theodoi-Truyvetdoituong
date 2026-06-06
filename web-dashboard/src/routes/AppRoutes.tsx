@@ -6,6 +6,8 @@ import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
 import SubjectListPage from '../pages/SubjectListPage';
+import AddSubjectPage from '../pages/AddSubjectPage';
+import EditSubjectPage from '../pages/EditSubjectPage'; // Import trang mới
 import ProtectedRoute from './ProtectedRoute';
 import { useAuth } from '../contexts/AuthContext';
 import MapPage from '../pages/MapPage';
@@ -13,9 +15,8 @@ import MapPage from '../pages/MapPage';
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
 
-  // Wait until the authentication check is complete before rendering routes
   if (loading) {
-    return <div>Loading...</div>; // Or a proper spinner component
+    return <div>Loading...</div>; 
   }
 
   return (
@@ -35,6 +36,14 @@ const AppRoutes: React.FC = () => {
         <Route
           path="/subjects"
           element={<ProtectedRoute><SubjectListPage /></ProtectedRoute>}
+        />
+        <Route
+          path="/subjects/add"
+          element={<ProtectedRoute><AddSubjectPage /></ProtectedRoute>}
+        />
+        <Route // Route cho trang sửa
+          path="/subjects/edit/:id"
+          element={<ProtectedRoute><EditSubjectPage /></ProtectedRoute>}
         />
          <Route
           path="/map"

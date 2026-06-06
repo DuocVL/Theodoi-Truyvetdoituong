@@ -1,20 +1,27 @@
 import axios from 'axios';
 
-// Create an Axios instance
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+// Định nghĩa kiểu dữ liệu cho một đối tượng Subject
+interface SubjectPayload {
+  fullName: string;
+  dateOfBirth?: string;
+  identifier: string;
+  status: string;
+  notes?: string;
+  imageUrl?: string;
+}
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+
+const apiClient = axios.create({
+  baseURL: API_URL,
 });
 
-// Add a request interceptor to include the token in headers
-api.interceptors.request.use(
+// Interceptor để đính kèm token vào mỗi request
+apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
-      // The token in localStorage is a plain string, no need to parse JSON
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
@@ -23,4 +30,45 @@ api.interceptors.request.use(
   }
 );
 
-export default api;
+// --- AUTH --- //
+export const login = async (username: string, password: string): Promise<any> => {
+  const response = await apiClient.post('/auth/login', { username, password });
+  return response.data;
+};
+
+export const getMe = async (): Promise<any> => {
+  const response = await apiClient.get('/auth/me');
+  return response.data;
+};
+
+// --- SUBJECTS --- //
+export const getSubjects = async (): Promise<any> => {
+  const response = await apiClient.get('/subjects');
+  return response.data;
+};
+
+export const getSubjectById = async (id: string): Promise<any> => {
+  const response = await apiClient.get(`/subjects/${id}`);
+  return response.data;
+};
+
+export const createSubject = async (subjectData: SubjectPayload): Promise<any> => {
+  const response = await apiClient.post('/subjects', subjectData);
+  return response.data;
+};
+
+export const updateSubject = async (id: string, subjectData: Partial<SubjectPayload>): Promise<any> => {
+  const response = await apiClient.put(`/subjects/${id}`, subjectData);
+  return response.data;
+};
+
+export const deleteSubject = async (id: string): Promise<any> => {
+  const response = await apiClient.delete(`/subjects/${id}`);
+  return response.data;
+};
+
+// --- TRACKING --- //
+export const getTrackingDataBySubjectId = async (subjectId: string): Promise<any> => {
+    const response = await apiClient.get(`/tracking/${subjectId}`);
+    return response.data;
+};
