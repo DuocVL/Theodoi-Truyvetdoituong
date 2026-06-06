@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { getSubjects } from '../services/api';
-import { useNavigate } from 'react-router-dom';
+import Spinner from '../components/Spinner'; // Import Spinner
 
-// Giao diện chính của Dashboard
+// Styled Components (giữ nguyên)
 const DashboardContainer = styled.div`
     padding: 2rem;
-    color: #fff; // Đặt màu chữ mặc định là trắng
+    color: #fff;
 `;
 
 const WelcomeMessage = styled.h1`
@@ -15,14 +15,12 @@ const WelcomeMessage = styled.h1`
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 `;
 
-// Lưới chứa các thẻ thống kê
 const StatsGrid = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
 `;
 
-// Thiết kế cho từng thẻ thống kê
 const StatCard = styled.div`
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
@@ -50,7 +48,6 @@ const CardValue = styled.p`
     color: #fff;
 `;
 
-// Danh sách các đối tượng gần đây
 const RecentList = styled.div`
     margin-top: 3rem;
     background: rgba(255, 255, 255, 0.1);
@@ -69,26 +66,43 @@ const ListItem = styled.div`
     }
 `;
 
+const Error = styled.p`
+    color: #f8d7da;
+    background-color: #721c24;
+    padding: 1rem;
+    border-radius: 5px;
+    text-align: center;
+`;
+
 interface Subject {
   _id: string; 
   fullName: string;
   status: string;
   identifier: string;
-  createdAt: string; // Giả định có trường createdAt để sắp xếp
+  createdAt: string;
 }
 
 const DashboardPage: React.FC = () => {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchAllSubjects = async () => {
+            setLoading(true);
+            setError(null);
             try {
                 const data = await getSubjects();
-                setSubjects(data.subjects || []);
+                // API có thể trả về null nếu có lỗi, cần kiểm tra
+                if (data && data.subjects) {
+                    setSubjects(data.subjects);
+                } else {
+                    // Trường hợp API trả về cấu trúc không mong muốn
+                    setSubjects([]);
+                }
             } catch (error) {
                 console.error("Failed to load subjects for dashboard:", error);
+                setError("Không thể tải dữ liệu cho dashboard. Vui lòng kiểm tra kết nối và thử lại.");
             } finally {
                 setLoading(false);
             }
@@ -96,21 +110,37 @@ const DashboardPage: React.FC = () => {
         fetchAllSubjects();
     }, []);
 
-    // Tính toán các số liệu thống kê bằng useMemo
     const stats = useMemo(() => {
         const total = subjects.length;
         const tracking = subjects.filter(s => s.status === 'Đang theo dõi').length;
         const paused = subjects.filter(s => s.status === 'Tạm dừng').length;
         const finished = subjects.filter(s => s.status === 'Đã hoàn thành').length;
+        
+        // Sắp xếp an toàn hơn, phòng trường hợp createdAt không hợp lệ
         const recent = [...subjects]
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+            .sort((a, b) => (new Date(b.createdAt).getTime() || 0) - (new Date(a.createdAt).getTime() || 0))
             .slice(0, 5);
 
         return { total, tracking, paused, finished, recent };
     }, [subjects]);
 
+    // Cải thiện UI cho trạng thái loading và error
     if (loading) {
-        return <DashboardContainer><h2>Loading dashboard...</h2></DashboardContainer>;
+        return (
+            <DashboardContainer style={{ textAlign: 'center', paddingTop: '5rem' }}>
+                <Spinner size={60} />
+                <p>Đang tải dữ liệu...</p>
+            </DashboardContainer>
+        );
+    }
+
+    if (error) {
+        return (
+            <DashboardContainer>
+                 <WelcomeMessage>Chào mừng trở lại!</WelcomeMessage>
+                 <Error>{error}</Error>
+            </DashboardContainer>
+        );
     }
 
     return (
@@ -118,22 +148,10 @@ const DashboardPage: React.FC = () => {
             <WelcomeMessage>Chào mừng trở lại!</WelcomeMessage>
 
             <StatsGrid>
-                <StatCard>
-                    <CardTitle>Tổng số Đối tượng</CardTitle>
-                    <CardValue>{stats.total}</CardValue>
-                </StatCard>
-                <StatCard>
-                    <CardTitle>Đang Theo dõi</CardTitle>
-                    <CardValue>{stats.tracking}</CardValue>
-                </StatCard>
-                 <StatCard>
-                    <CardTitle>Tạm dừng</CardTitle>
-                    <CardValue>{stats.paused}</CardValue>
-                </StatCard>
-                <StatCard>
-                    <CardTitle>Đã Hoàn thành</CardTitle>
-                    <CardValue>{stats.finished}</CardValue>
-                </StatCard>
+                <StatCard><CardTitle>Tổng số Đối tượng</CardTitle><CardValue>{stats.total}</CardValue></StatCard>
+                <StatCard><CardTitle>Đang Theo dõi</CardTitle><CardValue>{stats.tracking}</CardValue></StatCard>
+                 <StatCard><CardTitle>Tạm dừng</CardTitle><CardValue>{stats.paused}</CardValue></StatCard>
+                <StatCard><CardTitle>Đã Hoàn thành</CardTitle><CardValue>{stats.finished}</CardValue></StatCard>
             </StatsGrid>
 
             <RecentList>
@@ -143,7 +161,7 @@ const DashboardPage: React.FC = () => {
                         <span>{s.fullName}</span>
                         <span style={{opacity: 0.7}}>{s.identifier}</span>
                     </ListItem>
-                )) : <p>Chưa có đối tượng nào.</p>}
+                )) : <p>Chưa có đối tượng nào được thêm gần đây.</p>}
             </RecentList>
 
         </DashboardContainer>

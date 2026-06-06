@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { createSubject } from '../services/api';
+import Spinner from '../components/Spinner'; // Import Spinner
 
-// Các styled-components tương tự như LoginPage cho nhất quán
+// Styled Components (giữ nguyên, có thể tách ra file riêng nếu cần)
 const Container = styled.div`
     background: #fff;
     padding: 2rem;
@@ -58,10 +59,44 @@ const Button = styled.button`
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+
+    &:disabled {
+        background-color: #a0cff;
+        cursor: not-allowed;
+    }
+`;
+
+const ButtonContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+`;
+
+const CancelLink = styled(Link)`
+    display: inline-block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #6c757d; /* Màu xám */
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
     transition: background-color 0.2s;
 
     &:hover {
-        background-color: #0056b3;
+        background-color: #5a6268;
     }
 `;
 
@@ -78,7 +113,9 @@ const AddSubjectPage: React.FC = () => {
     const [status, setStatus] = useState('Đang theo dõi');
     const [notes, setNotes] = useState('');
     const [imageUrl, setImageUrl] = useState('');
+
     const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -90,20 +127,23 @@ const AddSubjectPage: React.FC = () => {
             return;
         }
 
+        setLoading(true);
         try {
             await createSubject({ 
                 fullName, 
-                dateOfBirth, 
+                dateOfBirth,
                 identifier, 
                 status, 
                 notes, 
                 imageUrl 
             });
-            alert('Thêm đối tượng thành công!');
-            navigate('/subjects'); // Chuyển về trang danh sách sau khi thêm
-        } catch (err) {
-            setError('Đã xảy ra lỗi khi thêm đối tượng. Vui lòng kiểm tra lại thông tin.');
-            console.error(err);
+            // Thay thế alert bằng việc lưu trạng thái vào location state để trang danh sách có thể hiển thị thông báo
+            navigate('/subjects', { state: { successMessage: `Đã thêm thành công đối tượng: ${fullName}` } });
+        } catch (err: any) {
+            const errorMessage = err.response?.data?.message || 'Đã xảy ra lỗi khi thêm đối tượng. Vui lòng thử lại.';
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -116,37 +156,47 @@ const AddSubjectPage: React.FC = () => {
                     placeholder="Họ và tên (*)"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
+                    disabled={loading}
                 />
                 <Input
                     type="text"
                     placeholder="Mã định danh (CCCD, ...) (*)"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
+                    disabled={loading}
                 />
-                 <Input
+                <Input
                     type="date"
                     placeholder="Ngày sinh"
                     value={dateOfBirth}
                     onChange={(e) => setDateOfBirth(e.target.value)}
+                    disabled={loading}
                 />
-                <Select value={status} onChange={(e) => setStatus(e.target.value)}>
+                <Select value={status} onChange={(e) => setStatus(e.target.value)} disabled={loading}>
                     <option value="Đang theo dõi">Đang theo dõi</option>
                     <option value="Tạm dừng">Tạm dừng</option>
                     <option value="Đã hoàn thành">Đã hoàn thành</option>
                 </Select>
-                 <Input
+                <Input
                     type="text"
                     placeholder="URL ảnh chân dung"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
+                    disabled={loading}
                 />
                 <TextArea
                     placeholder="Ghi chú thêm..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
+                    disabled={loading}
                 />
                 {error && <Error>{error}</Error>}
-                <Button type="submit">Thêm Đối tượng</Button>
+                <ButtonContainer>
+                    <CancelLink to="/subjects">Hủy</CancelLink>
+                    <Button type="submit" disabled={loading}>
+                        {loading ? <Spinner size={20} /> : 'Thêm Đối tượng'}
+                    </Button>
+                </ButtonContainer>
             </Form>
         </Container>
     );

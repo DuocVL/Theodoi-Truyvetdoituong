@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { getSubjectById, updateSubject } from '../services/api';
+import Spinner from '../components/Spinner';
 
-// Sử dụng lại các styled-components từ AddSubjectPage
+// Styled Components (giữ nguyên)
 const Container = styled.div`
     background: #fff;
     padding: 2rem;
@@ -12,6 +13,10 @@ const Container = styled.div`
     width: 100%;
     max-width: 600px;
     margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 `;
 
 const Title = styled.h2`
@@ -21,6 +26,7 @@ const Title = styled.h2`
 `;
 
 const Form = styled.form`
+    width: 100%;
     display: flex;
     flex-direction: column;
 `;
@@ -58,6 +64,46 @@ const Button = styled.button`
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+        background-color: #0056b3;
+    }
+
+    &:disabled {
+        background-color: #a0cff;
+        cursor: not-allowed;
+    }
+`;
+
+const ButtonContainer = styled.div`
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+`;
+
+const CancelLink = styled(Link)`
+    display: inline-block;
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #6c757d;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #5a6268;
+    }
 `;
 
 const Error = styled.p`
@@ -79,27 +125,30 @@ const EditSubjectPage: React.FC = () => {
         imageUrl: ''
     });
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(true); // Loading dữ liệu ban đầu
+    const [submitting, setSubmitting] = useState(false); // Loading khi submit form
 
     useEffect(() => {
-        if (!id) return;
+        if (!id) {
+            navigate('/subjects'); // Nếu không có ID, quay về trang danh sách
+            return;
+        }
 
         const fetchSubject = async () => {
+            setError(null);
             try {
                 const subject = await getSubjectById(id);
-                // Định dạng lại ngày sinh cho input type="date"
                 const formattedDate = subject.dateOfBirth ? new Date(subject.dateOfBirth).toISOString().split('T')[0] : '';
                 setFormData({ ...subject, dateOfBirth: formattedDate });
             } catch (err) {
-                setError('Không tìm thấy đối tượng.');
-                console.error(err);
+                setError('Không tìm thấy đối tượng hoặc đã có lỗi xảy ra.');
             } finally {
-                setLoading(false);
+                setInitialLoading(false);
             }
         };
 
         fetchSubject();
-    }, [id]);
+    }, [id, navigate]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -115,35 +164,63 @@ const EditSubjectPage: React.FC = () => {
             return;
         }
 
+        setSubmitting(true);
+        setError(null);
         try {
             await updateSubject(id, formData);
-            alert('Cập nhật đối tượng thành công!');
-            navigate('/subjects');
-        } catch (err) {
-            setError('Đã xảy ra lỗi khi cập nhật.');
-            console.error(err);
+            // Chuyển hướng và gửi thông báo thành công
+            navigate('/subjects', { state: { successMessage: `Đã cập nhật thành công đối tượng: ${formData.fullName}` } });
+        } catch (err: any) {
+            const errorMessage = err.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật. Vui lòng thử lại.';
+            setError(errorMessage);
+        } finally {
+            setSubmitting(false);
         }
     };
 
-    if (loading) return <Container><p>Loading...</p></Container>;
-    if (error && !loading) return <Container><Error>{error}</Error></Container>;
+    if (initialLoading) {
+        return (
+            <Container>
+                <Spinner size={50} />
+                <p>Đang tải dữ liệu...</p>
+            </Container>
+        );
+    }
+
+    // Nếu không tải được dữ liệu ban đầu, hiển thị lỗi
+    if (error && !formData.fullName) {
+         return (
+            <Container>
+                <Error>{error}</Error>
+                <CancelLink to="/subjects">Quay lại danh sách</CancelLink>
+            </Container>
+        );
+    }
 
     return (
         <Container>
             <Title>Chỉnh sửa Đối tượng</Title>
             <Form onSubmit={handleSubmit}>
-                <Input name="fullName" type="text" placeholder="Họ và tên (*)" value={formData.fullName} onChange={handleChange} />
-                <Input name="identifier" type="text" placeholder="Mã định danh (*)" value={formData.identifier} onChange={handleChange} />
-                <Input name="dateOfBirth" type="date" placeholder="Ngày sinh" value={formData.dateOfBirth} onChange={handleChange} />
-                <Select name="status" value={formData.status} onChange={handleChange}>
+                <Input name="fullName" type="text" placeholder="Họ và tên (*)" value={formData.fullName} onChange={handleChange} disabled={submitting} />
+                <Input name="identifier" type="text" placeholder="Mã định danh (*)" value={formData.identifier} onChange={handleChange} disabled={submitting} />
+                <Input name="dateOfBirth" type="date" placeholder="Ngày sinh" value={formData.dateOfBirth} onChange={handleChange} disabled={submitting} />
+                <Select name="status" value={formData.status} onChange={handleChange} disabled={submitting}>
                     <option value="Đang theo dõi">Đang theo dõi</option>
                     <option value="Tạm dừng">Tạm dừng</option>
                     <option value="Đã hoàn thành">Đã hoàn thành</option>
                 </Select>
-                <Input name="imageUrl" type="text" placeholder="URL ảnh chân dung" value={formData.imageUrl} onChange={handleChange} />
-                <TextArea name="notes" placeholder="Ghi chú thêm..." value={formData.notes} onChange={handleChange} />
+                <Input name="imageUrl" type="text" placeholder="URL ảnh chân dung" value={formData.imageUrl} onChange={handleChange} disabled={submitting} />
+                <TextArea name="notes" placeholder="Ghi chú thêm..." value={formData.notes} onChange={handleChange} disabled={submitting} />
+                
+                {/* Hiển thị lỗi submit form */}
                 {error && <Error>{error}</Error>}
-                <Button type="submit">Lưu thay đổi</Button>
+
+                <ButtonContainer>
+                    <CancelLink to="/subjects">Hủy</CancelLink>
+                    <Button type="submit" disabled={submitting}>
+                        {submitting ? <Spinner size={20} /> : 'Lưu Thay đổi'}
+                    </Button>
+                </ButtonContainer>
             </Form>
         </Container>
     );

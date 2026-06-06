@@ -3,20 +3,25 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import styled from 'styled-components';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { getSubjects, getTrackingDataBySubjectId } from '../services/api';
 
-// Fix cho vấn đề icon của Leaflet với Webpack
+// Import các kiểu dữ liệu từ service API đã được định nghĩa tập trung
+import { Subject, TrackingPoint, getSubjects, getTrackingDataBySubjectId } from '../services/api';
+
+// SỬA LỖI CRASH: Thay thế `require` bằng `import` cho môi trường Vite (ESM)
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
+import iconUrl from 'leaflet/dist/images/marker-icon.png';
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
+
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+    iconRetinaUrl: iconRetinaUrl,
+    iconUrl: iconUrl,
+    shadowUrl: shadowUrl,
 });
-
 
 const Container = styled.div`
   padding: 1rem;
-  height: calc(100vh - 60px); // Chiều cao trừ đi header
+  height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
 `;
@@ -48,17 +53,7 @@ const MapWrapper = styled.div`
   z-index: 1;
 `;
 
-interface Subject {
-  _id: string;
-  fullName: string;
-}
-
-interface TrackingPoint {
-    lat: number;
-    lng: number;
-    timestamp: string;
-    zone?: string; // Tên khu vực (nếu có)
-}
+// Không cần định nghĩa lại Subject và TrackingPoint ở đây nữa
 
 const MapPage: React.FC = () => {
     const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -66,20 +61,20 @@ const MapPage: React.FC = () => {
     const [trackingData, setTrackingData] = useState<TrackingPoint[]>([]);
     const [loading, setLoading] = useState(false);
     
-    // Tải danh sách đối tượng khi component được mount
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
-                const response = await getSubjects();
-                setSubjects(response.subjects || []);
+                // Vì api.ts đã được sửa, giờ đây getSubjects trả về mảng Subject trực tiếp
+                const subjectList = await getSubjects();
+                setSubjects(subjectList || []);
             } catch (error) {
                 console.error("Failed to fetch subjects:", error);
+                setSubjects([]); // Dọn dẹp state nếu có lỗi
             }
         };
         fetchSubjects();
     }, []);
 
-    // Tải dữ liệu truy vết khi người dùng chọn một đối tượng
     useEffect(() => {
         if (!selectedSubjectId) {
             setTrackingData([]);
@@ -89,9 +84,9 @@ const MapPage: React.FC = () => {
         const fetchTrackingData = async () => {
             setLoading(true);
             try {
-                const response = await getTrackingDataBySubjectId(selectedSubjectId);
-                // Giả định API trả về { trackingData: [...] }
-                setTrackingData(response.trackingData || []); 
+                // Tương tự, hàm này giờ trả về mảng TrackingPoint trực tiếp
+                const trackingHistory = await getTrackingDataBySubjectId(selectedSubjectId);
+                setTrackingData(trackingHistory || []); 
             } catch (error) {
                 console.error(`Failed to fetch tracking data for subject ${selectedSubjectId}:`, error);
                 setTrackingData([]);
@@ -109,8 +104,7 @@ const MapPage: React.FC = () => {
 
     const polylinePositions = trackingData.map(p => [p.lat, p.lng] as L.LatLngExpression);
 
-    // Xác định vị trí trung tâm của bản đồ
-    const mapCenter = trackingData.length > 0 ? [trackingData[0].lat, trackingData[0].lng] as L.LatLngExpression : [10.762622, 106.660172]; // Tọa độ mặc định (TP.HCM)
+    const mapCenter = trackingData.length > 0 ? [trackingData[0].lat, trackingData[0].lng] as L.LatLngExpression : [10.762622, 106.660172]; // Tọa độ mặc định
 
     return (
         <Container>

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import AuthService from '../services/AuthService';
 import { useNavigate, Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { register as registerApi } from '../services/api'; // Sử dụng trực tiếp API
+import Spinner from '../components/Spinner';
 
+// Sử dụng lại các styled-components từ LoginPage để nhất quán
 const Container = styled.div`
     background: #fff;
     padding: 2rem;
@@ -33,16 +35,25 @@ const Input = styled.input`
 
 const Button = styled.button`
     padding: 0.75rem;
-    background-color: #007bff;
+    background-color: #28a745; // Màu xanh lá cho hành động đăng ký
     color: #fff;
     border: none;
     border-radius: 4px;
     font-size: 1rem;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
     transition: background-color 0.2s;
 
-    &:hover {
-        background-color: #0056b3;
+    &:hover:not(:disabled) {
+        background-color: #218838;
+    }
+
+    &:disabled {
+        background-color: #a3d9b1;
+        cursor: not-allowed;
     }
 `;
 
@@ -52,42 +63,79 @@ const Error = styled.p`
     text-align: center;
 `;
 
+const Success = styled.p`
+    color: green;
+    margin-bottom: 1rem;
+    text-align: center;
+`;
+
 const StyledLink = styled(Link)`
     display: block;
     text-align: center;
     margin-top: 1rem;
+    color: #007bff;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 `;
 
-const RegisterPage = () => {
+const RegisterPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
-    const [fullname, setFullname] = useState('');
-    const [error, setError] = useState('');
+    const [fullName, setFullName] = useState(''); // Nhất quán với API
+    
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleRegister = async (e) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError(null);
+        setSuccess(null);
+
+        if (!username || !password || !email || !fullName) {
+            setError('Vui lòng điền đầy đủ thông tin.');
+            return;
+        }
+
+        setLoading(true);
         try {
-            await AuthService.register(username, password, email, fullname);
-            navigate('/login');
-        } catch (err) {
-            setError('Failed to register');
+            await registerApi({ username, password, email, fullName });
+            setSuccess('Đăng ký thành công! Bạn sẽ được chuyển đến trang đăng nhập sau giây lát...');
+            
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
+
+        } catch (err: any) {
+            const errorMessage = err.response?.data?.message || 'Đăng ký thất bại. Vui lòng thử lại.';
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <Container>
-            <Title>Register</Title>
+            <Title>Đăng Ký Tài Khoản</Title>
             <Form onSubmit={handleRegister}>
-                <Input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-                <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <Input type="text" placeholder="Full Name" value={fullname} onChange={(e) => setFullname(e.target.value)} />
+                <Input type="text" placeholder="Tên đăng nhập" value={username} onChange={(e) => setUsername(e.target.value)} disabled={loading} />
+                <Input type="password" placeholder="Mật khẩu" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
+                <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
+                <Input type="text" placeholder="Họ và Tên" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={loading} />
+                
                 {error && <Error>{error}</Error>}
-                <Button type="submit">Register</Button>
+                {success && <Success>{success}</Success>}
+
+                <Button type="submit" disabled={loading || !!success}>
+                    {loading ? <Spinner size={20} /> : 'Đăng Ký'}
+                </Button>
             </Form>
-            <StyledLink to="/login">Already have an account? Login</StyledLink>
+            <StyledLink to="/login">Đã có tài khoản? Đăng nhập</StyledLink>
         </Container>
     );
 };
