@@ -22,7 +22,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        // --- ADDED: BASE_URL for API ---
         buildConfigField("String", "BASE_URL", "\"https://api.yourdomain.com/\"")
     }
 
@@ -90,17 +89,30 @@ dependencies {
     // Accompanist Permissions for Jetpack Compose
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
+
+    // --- ADDED: Room for local database ---
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+
+    // --- ADDED: ML Kit and TensorFlow for Face Recognition ---
+    implementation("com.google.mlkit:face-detection:16.1.6")
+    implementation("org.tensorflow:tensorflow-lite-task-vision:0.4.3")
+    implementation("org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.3")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.9.0") // Or a version that matches your TFLite model
+
+    // --- ADDED: Location Services ---
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-compiler:2.48")
-    // Google Maps
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.maps.android:maps-compose:2.7.2")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
