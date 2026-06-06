@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 // TYPE DEFINITIONS
 // ==================================================================
 
-export type SubjectFormData = Omit<Subject, '_id' | 'createdAt' | 'updatedAt';
+export type SubjectFormData = Omit<Subject, '_id' | 'createdAt' | 'updatedAt'>;
 
 interface SubjectFormProps {
   initialData?: Partial<SubjectFormData>;
