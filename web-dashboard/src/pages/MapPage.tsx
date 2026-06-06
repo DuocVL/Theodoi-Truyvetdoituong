@@ -4,10 +4,9 @@ import styled from 'styled-components';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Import các kiểu dữ liệu từ service API đã được định nghĩa tập trung
-import { Subject, TrackingPoint, getSubjects, getTrackingDataBySubjectId } from '../services/api';
+import type { Subject, TrackingPoint } from '../services/api';
+import { getSubjects, getTrackingDataBySubjectId } from '../services/api';
 
-// SỬA LỖI CRASH: Thay thế `require` bằng `import` cho môi trường Vite (ESM)
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import shadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -53,8 +52,6 @@ const MapWrapper = styled.div`
   z-index: 1;
 `;
 
-// Không cần định nghĩa lại Subject và TrackingPoint ở đây nữa
-
 const MapPage: React.FC = () => {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [selectedSubjectId, setSelectedSubjectId] = useState<string>('');
@@ -64,12 +61,11 @@ const MapPage: React.FC = () => {
     useEffect(() => {
         const fetchSubjects = async () => {
             try {
-                // Vì api.ts đã được sửa, giờ đây getSubjects trả về mảng Subject trực tiếp
                 const subjectList = await getSubjects();
                 setSubjects(subjectList || []);
             } catch (error) {
                 console.error("Failed to fetch subjects:", error);
-                setSubjects([]); // Dọn dẹp state nếu có lỗi
+                setSubjects([]);
             }
         };
         fetchSubjects();
@@ -84,7 +80,6 @@ const MapPage: React.FC = () => {
         const fetchTrackingData = async () => {
             setLoading(true);
             try {
-                // Tương tự, hàm này giờ trả về mảng TrackingPoint trực tiếp
                 const trackingHistory = await getTrackingDataBySubjectId(selectedSubjectId);
                 setTrackingData(trackingHistory || []); 
             } catch (error) {
@@ -102,9 +97,12 @@ const MapPage: React.FC = () => {
         setSelectedSubjectId(e.target.value);
     };
 
-    const polylinePositions = trackingData.map(p => [p.lat, p.lng] as L.LatLngExpression);
+    // FIX: Khai báo tường minh kiểu dữ liệu cho biến để TypeScript hiểu đúng
+    const polylinePositions: L.LatLngExpression[] = trackingData.map(p => [p.lat, p.lng]);
 
-    const mapCenter = trackingData.length > 0 ? [trackingData[0].lat, trackingData[0].lng] as L.LatLngExpression : [10.762622, 106.660172]; // Tọa độ mặc định
+    const mapCenter: L.LatLngExpression = trackingData.length > 0 
+        ? [trackingData[0].lat, trackingData[0].lng] 
+        : [10.762622, 106.660172];
 
     return (
         <Container>

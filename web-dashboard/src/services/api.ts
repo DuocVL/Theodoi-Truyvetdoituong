@@ -11,6 +11,13 @@ export interface User {
   role: 'admin' | 'user';
 }
 
+export interface RegisterData {
+  username: string;
+  password: string;
+  email: string;
+  fullName: string;
+}
+
 export interface Subject {
   _id: string;
   fullName: string;
@@ -90,9 +97,19 @@ export const getMe = async (): Promise<User> => {
   return response.data.user;
 };
 
-// Thêm hàm forgotPassword
 export const forgotPassword = async (email: string): Promise<{ message: string }> => {
   const response = await apiClient.post('/auth/forgot-password', { email });
+  return response.data;
+};
+
+export const register = async (data: RegisterData): Promise<{ message: string }> => {
+  const response = await apiClient.post('/auth/register', data);
+  return response.data;
+};
+
+// Thêm hàm resetPassword
+export const resetPassword = async (token: string, password: string): Promise<{ message: string }> => {
+  const response = await apiClient.post('/auth/reset-password', { token, password });
   return response.data;
 };
 
