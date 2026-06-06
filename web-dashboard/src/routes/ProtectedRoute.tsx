@@ -1,29 +1,32 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Spinner from '../components/Spinner'; // Import Spinner
 
 interface ProtectedRouteProps {
   children: JSX.Element;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth();
-  const isAuthenticated = !!user;
+  // Sử dụng trực tiếp `isAuthenticated` và `loading` từ context
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
-  // While the auth state is loading, don't render anything
-  // Or you can render a loading spinner
+  // Trong khi context đang xác thực token ban đầu, hiển thị spinner
   if (loading) {
-    return null; // Or <LoadingSpinner />
+    return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <Spinner size={60} />
+        </div>
+    );
   }
 
-  // If the user is not authenticated, redirect to the login page
-  // and pass the current location in the state.
+  // Nếu không được xác thực, điều hướng đến trang login
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If authenticated, render the children components
+  // Nếu đã xác thực, hiển thị component con
   return children;
 };
 
