@@ -50,15 +50,10 @@
   }
 }
 
+/* === FIXED THIS SECTION === */
 #root {
   width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   box-sizing: border-box;
 }
 
