@@ -18,14 +18,20 @@ export interface RegisterData {
   full_name: string;
 }
 
+// UPDATED SUBJECT INTERFACE TO MATCH THE NEW SCHEMA
 export interface Subject {
   _id: string;
+  username: string;
+  email: string;
   fullName: string;
-  identifier: string;
-  dateOfBirth?: string;
+  dob?: string;
+  gender?: string;
+  idNumber?: string;
+  address?: string;
+  phone?: string;
+  monitoringStart?: string;
+  monitoringEnd?: string;
   status: string;
-  notes?: string;
-  imageUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -37,7 +43,6 @@ export interface TrackingPoint {
   zone?: string;
 }
 
-// SỬA LỖI: Cập nhật interface để khớp với response của API
 interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -77,7 +82,6 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
-        // Consider redirecting to login page here
     }
     return Promise.reject(error);
   }
@@ -131,7 +135,8 @@ export const getSubjectById = async (id: string): Promise<Subject> => {
   return response.data.subject;
 };
 
-export const createSubject = async (subjectData: Omit<Subject, '_id' | 'createdAt' | 'updatedAt'>): Promise<Subject> => {
+// The Omit type will now correctly work with the new Subject interface
+export const createSubject = async (subjectData: Omit<Subject, '_id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<Subject> => {
   const response = await apiClient.post<{ subject: Subject }>('/subjects', subjectData);
   return response.data.subject;
 };

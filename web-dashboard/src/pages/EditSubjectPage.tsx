@@ -1,238 +1,136 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { getSubjectById, updateSubject } from '../services/api';
+import { getSubjectById, updateSubject, type Subject } from '../services/api';
+import SubjectForm, { type SubjectFormData } from '../components/SubjectForm';
 import Spinner from '../components/Spinner';
 
-// Styled Components (giữ nguyên)
+// ==================================================================
+// STYLED COMPONENTS
+// ==================================================================
+
 const Container = styled.div`
-    background: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    margin: 2rem auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  background: #fff;
+  padding: 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 900px; /* Increased width for 2-column layout */
+  margin: 2rem auto;
 `;
 
-const Title = styled.h2`
-    margin-bottom: 1.5rem;
-    color: #333;
+const Title = styled.h1`
+  font-size: 1.75rem;
+  color: #1a202c;
+  margin: 0 0 2rem 0;
+  text-align: center;
+`;
+
+const LoadingContainer = styled.div`
     text-align: center;
+    padding: 4rem;
 `;
 
-const Form = styled.form`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+const ErrorContainer = styled.div`
+    text-align: center;
+    padding: 4rem;
+    color: #e53e3e;
 `;
 
-const Input = styled.input`
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-`;
-
-const Select = styled.select`
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-`;
-
-const TextArea = styled.textarea`
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    min-height: 100px;
-`;
-
-const Button = styled.button`
-    padding: 0.75rem;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.2s;
-
-    &:hover:not(:disabled) {
-        background-color: #0056b3;
-    }
-
-    &:disabled {
-        background-color: #a0cff;
-        cursor: not-allowed;
-    }
-`;
-
-const ButtonContainer = styled.div`
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-`;
-
-const CancelLink = styled(Link)`
+const BackLink = styled(Link)`
     display: inline-block;
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #6c757d;
-    color: #fff;
-    text-align: center;
+    margin-top: 1rem;
+    color: #3182ce;
     text-decoration: none;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover {
-        background-color: #5a6268;
-    }
+    &:hover { text-decoration: underline; }
 `;
 
-const Error = styled.p`
-    color: red;
-    margin-bottom: 1rem;
-    text-align: center;
-`;
+
+// ==================================================================
+// PAGE COMPONENT
+// ==================================================================
 
 const EditSubjectPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
-    
-    const [formData, setFormData] = useState({
-        fullName: '',
-        dateOfBirth: '',
-        identifier: '',
-        status: 'Đang theo dõi',
-        notes: '',
-        imageUrl: ''
-    });
-    const [error, setError] = useState<string | null>(null);
-    const [initialLoading, setInitialLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        if (!id) {
-            navigate('/subjects');
-            return;
-        }
+  const [subject, setSubject] = useState<Subject | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
-        const fetchSubject = async () => {
-            setError(null);
-            try {
-                const subject = await getSubjectById(id);
-                const formattedDate = subject.dateOfBirth ? new Date(subject.dateOfBirth).toISOString().split('T')[0] : '';
-                
-                // SỬA LỖI TẠI ĐÂY
-                // Xây dựng một object mới khớp chính xác với cấu trúc của formData
-                // và cung cấp giá trị mặc định cho các trường có thể là undefined.
-                setFormData({
-                    fullName: subject.fullName,
-                    identifier: subject.identifier,
-                    status: subject.status,
-                    dateOfBirth: formattedDate,
-                    notes: subject.notes ?? '',       // Sử dụng ?? để đảm bảo giá trị là string
-                    imageUrl: subject.imageUrl ?? '' // Sử dụng ?? để đảm bảo giá trị là string
-                });
-
-            } catch (err) {
-                setError('Không tìm thấy đối tượng hoặc đã có lỗi xảy ra.');
-            } finally {
-                setInitialLoading(false);
-            }
-        };
-
-        fetchSubject();
-    }, [id, navigate]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!id) return;
-
-        if (!formData.fullName || !formData.identifier) {
-            setError('Họ và tên và Mã định danh là bắt buộc.');
-            return;
-        }
-
-        setSubmitting(true);
-        setError(null);
-        try {
-            await updateSubject(id, formData);
-            navigate('/subjects', { state: { successMessage: `Đã cập nhật thành công đối tượng: ${formData.fullName}` } });
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật. Vui lòng thử lại.';
-            setError(errorMessage);
-        } finally {
-            setSubmitting(false);
-        }
-    };
-
-    if (initialLoading) {
-        return (
-            <Container>
-                <Spinner size={50} />
-                <p>Đang tải dữ liệu...</p>
-            </Container>
-        );
+  useEffect(() => {
+    if (!id) {
+      navigate('/subjects');
+      return;
     }
 
-    if (error && !formData.fullName) {
-         return (
-            <Container>
-                <Error>{error}</Error>
-                <CancelLink to="/subjects">Quay lại danh sách</CancelLink>
-            </Container>
-        );
-    }
+    const fetchSubject = async () => {
+      try {
+        const data = await getSubjectById(id);
+        setSubject(data);
+      } catch (err) {
+        setError('Không thể tải thông tin đối tượng hoặc đối tượng không tồn tại.');
+      } finally {
+        setInitialLoading(false);
+      }
+    };
 
+    fetchSubject();
+  }, [id, navigate]);
+
+  const handleSubmit = async (data: SubjectFormData) => {
+    if (!id) return;
+
+    setIsSaving(true);
+    setError(null);
+    try {
+      const updatedSubject = await updateSubject(id, data);
+      navigate('/subjects', { state: { successMessage: `Đã cập nhật thành công đối tượng: ${updatedSubject.fullName}` } });
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật. Vui lòng kiểm tra lại thông tin.';
+      setError(errorMessage);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (initialLoading) {
     return (
         <Container>
-            <Title>Chỉnh sửa Đối tượng</Title>
-            <Form onSubmit={handleSubmit}>
-                <Input name="fullName" type="text" placeholder="Họ và tên (*)" value={formData.fullName} onChange={handleChange} disabled={submitting} />
-                <Input name="identifier" type="text" placeholder="Mã định danh (*)" value={formData.identifier} onChange={handleChange} disabled={submitting} />
-                <Input name="dateOfBirth" type="date" placeholder="Ngày sinh" value={formData.dateOfBirth} onChange={handleChange} disabled={submitting} />
-                <Select name="status" value={formData.status} onChange={handleChange} disabled={submitting}>
-                    <option value="Đang theo dõi">Đang theo dõi</option>
-                    <option value="Tạm dừng">Tạm dừng</option>
-                    <option value="Đã hoàn thành">Đã hoàn thành</option>
-                </Select>
-                <Input name="imageUrl" type="text" placeholder="URL ảnh chân dung" value={formData.imageUrl} onChange={handleChange} disabled={submitting} />
-                <TextArea name="notes" placeholder="Ghi chú thêm..." value={formData.notes} onChange={handleChange} disabled={submitting} />
-                
-                {error && <Error>{error}</Error>}
-
-                <ButtonContainer>
-                    <CancelLink to="/subjects">Hủy</CancelLink>
-                    <Button type="submit" disabled={submitting}>
-                        {submitting ? <Spinner size={20} /> : 'Lưu Thay đổi'}
-                    </Button>
-                </ButtonContainer>
-            </Form>
+            <LoadingContainer>
+                <Spinner size={50} />
+                <p>Đang tải dữ liệu...</p>
+            </LoadingContainer>
         </Container>
     );
+  }
+
+  if (error && !subject) {
+    return (
+        <Container>
+            <ErrorContainer>
+                <p>{error}</p>
+                <BackLink to="/subjects">Quay lại danh sách</BackLink>
+            </ErrorContainer>
+        </Container>
+    );
+  }
+
+  return (
+    <Container>
+      <Title>Chỉnh sửa Đối tượng</Title>
+      {subject && (
+        <SubjectForm
+          initialData={subject}
+          onSubmit={handleSubmit}
+          isSaving={isSaving}
+          submitButtonText="Lưu Thay đổi"
+          error={error}
+        />
+      )}
+    </Container>
+  );
 };
 
 export default EditSubjectPage;

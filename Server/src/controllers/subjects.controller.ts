@@ -10,7 +10,7 @@ class SubjectController {
   public create = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const role = req.role?.toUpperCase();
-      if (role !== 'ADMIN') {
+      if (role !== 'ADMIN' && role !== 'USER') {
         res.status(403).json({ message: 'Forbidden' });
         return;
       }
