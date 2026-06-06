@@ -12,16 +12,19 @@ const SENSITIVE_FIELDS = new Set([
   'refreshToken',
 ]);
 
-const redactSensitiveData = (value: unknown): unknown => {
+const redactSensitiveData = (value: unknown, seen = new WeakSet()): unknown => {
   if (Array.isArray(value)) {
-    return value.map(redactSensitiveData);
+    return value.map(item => redactSensitiveData(item, seen));
   }
 
   if (value && typeof value === 'object' && !Buffer.isBuffer(value)) {
+    if (seen.has(value as object)) return '[Circular]';
+    seen.add(value as object);
+
     return Object.fromEntries(
       Object.entries(value as Record<string, unknown>).map(([key, item]) => [
         key,
-        SENSITIVE_FIELDS.has(key) ? '[REDACTED]' : redactSensitiveData(item),
+        SENSITIVE_FIELDS.has(key) ? '[REDACTED]' : redactSensitiveData(item, seen),
       ])
     );
   }

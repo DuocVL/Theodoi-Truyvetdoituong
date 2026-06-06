@@ -85,7 +85,7 @@ const RegisterPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
-    const [fullName, setFullName] = useState(''); // Nhất quán với API
+    const [full_name, setFullName] = useState(''); // Nhất quán với API
     
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -97,14 +97,14 @@ const RegisterPage: React.FC = () => {
         setError(null);
         setSuccess(null);
 
-        if (!username || !password || !email || !fullName) {
+        if (!username || !password || !email || !full_name) {
             setError('Vui lòng điền đầy đủ thông tin.');
             return;
         }
 
         setLoading(true);
         try {
-            await registerApi({ username, password, email, fullName });
+            await registerApi({ username, password, email, full_name });
             setSuccess('Đăng ký thành công! Bạn sẽ được chuyển đến trang đăng nhập sau giây lát...');
             
             setTimeout(() => {
@@ -126,7 +126,7 @@ const RegisterPage: React.FC = () => {
                 <Input type="text" placeholder="Tên đăng nhập" value={username} onChange={(e) => setUsername(e.target.value)} disabled={loading} />
                 <Input type="password" placeholder="Mật khẩu" value={password} onChange={(e) => setPassword(e.target.value)} disabled={loading} />
                 <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={loading} />
-                <Input type="text" placeholder="Họ và Tên" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={loading} />
+                <Input type="text" placeholder="Họ và Tên" value={full_name} onChange={(e) => setFullName(e.target.value)} disabled={loading} />
                 
                 {error && <Error>{error}</Error>}
                 {success && <Success>{success}</Success>}

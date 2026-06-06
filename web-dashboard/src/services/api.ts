@@ -15,7 +15,7 @@ export interface RegisterData {
   username: string;
   password: string;
   email: string;
-  fullName: string;
+  full_name: string;
 }
 
 export interface Subject {
@@ -47,7 +47,8 @@ interface AuthResponse {
 // API CLIENT CONFIGURATION
 // ==================================================================
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+console.log(API_URL);
 
 const apiClient = axios.create({
   baseURL: API_URL,

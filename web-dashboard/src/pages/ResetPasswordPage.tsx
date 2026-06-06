@@ -125,6 +125,11 @@ const ResetPasswordPage: React.FC = () => {
             return;
         }
 
+        if (password.length < 6) {
+            setError('Mật khẩu mới phải có ít nhất 6 ký tự.');
+            return;
+        }
+
         if (!token) { // Kiểm tra lại token trước khi gửi
             setError('Không thể thực hiện. Mã token không tồn tại.');
             return;
@@ -140,8 +145,12 @@ const ResetPasswordPage: React.FC = () => {
             setTimeout(() => {
                 navigate('/login');
             }, 3000);
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.message || 'Khôi phục mật khẩu thất bại. Token có thể đã hết hạn hoặc không hợp lệ.';
+        } catch (err: unknown) {
+            let errorMessage = 'Khôi phục mật khẩu thất bại. Token có thể đã hết hạn hoặc không hợp lệ.';
+            // Kiểm tra kiểu dữ liệu của error để an toàn hơn
+            if (err && typeof err === 'object' && 'response' in err) {
+                errorMessage = (err as any).response?.data?.message || errorMessage;
+            }
             setError(errorMessage);
         } finally {
             setLoading(false);

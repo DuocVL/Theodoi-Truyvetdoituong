@@ -14,7 +14,8 @@ import MapPage from '../pages/MapPage';
 import Spinner from '../components/Spinner'; // Import Spinner
 
 const AppRoutes: React.FC = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, loading } = useAuth();
+  const isAuthenticated = !!user;
 
   // Sử dụng Spinner cho trạng thái loading ban đầu
   if (loading) {

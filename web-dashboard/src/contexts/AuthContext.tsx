@@ -1,5 +1,5 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { login as apiLogin, getMe, User } from '../services/api';
+import { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
+import { login as apiLogin, getMe, type User } from '../services/api';
 import Spinner from '../components/Spinner';
 
 // Định nghĩa kiểu dữ liệu cho AuthContext

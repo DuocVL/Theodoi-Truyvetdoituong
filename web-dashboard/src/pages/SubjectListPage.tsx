@@ -129,7 +129,7 @@ const SubjectListPage: React.FC = () => {
     setError(null);
     try {
       const data = await getSubjects();
-      setSubjects(data.subjects || []);
+      setSubjects(Array.isArray(data) ? data : []);
     } catch (e) {
       setError('Không thể tải danh sách đối tượng. Vui lòng thử lại.');
     } finally {
