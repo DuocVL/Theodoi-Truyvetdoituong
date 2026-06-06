@@ -1,14 +1,14 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import Spinner from '../components/Spinner'; // Import Spinner
+import Spinner from '../components/Spinner';
+import Layout from '../components/Layout'; // Import Layout
 
 interface ProtectedRouteProps {
   children: JSX.Element;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // Sử dụng trực tiếp `isAuthenticated` và `loading` từ context
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
@@ -26,8 +26,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Nếu đã xác thực, hiển thị component con
-  return children;
+  // Nếu đã xác thực, hiển thị component con bên trong Layout
+  return <Layout>{children}</Layout>;
 };
 
 export default ProtectedRoute;
