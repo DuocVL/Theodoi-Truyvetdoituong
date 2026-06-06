@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.example.theodoi_truyvet.BuildConfig
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -37,7 +38,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @Composable
-fun CameraView( // It's better to name it based on its function
+fun CameraView(
     outputDirectory: File,
     executor: Executor,
     onImageCaptured: (File) -> Unit,
@@ -54,7 +55,6 @@ fun CameraView( // It's better to name it based on its function
         .requireLensFacing(lensFacing)
         .build()
 
-    // Hoist the camera provider to reuse
     LaunchedEffect(lensFacing) {
         val cameraProvider = context.getCameraProvider()
         cameraProvider.unbindAll()
@@ -73,7 +73,7 @@ fun CameraView( // It's better to name it based on its function
         IconButton(
             modifier = Modifier.padding(bottom = 20.dp),
             onClick = {
-                Log.d("CameraView", "Take photo button clicked")
+                // --- MODIFIED: Use the provided executor ---
                 takePhoto(imageCapture, outputDirectory, executor, onImageCaptured, onError)
             },
             content = {
@@ -94,7 +94,7 @@ fun CameraView( // It's better to name it based on its function
 private fun takePhoto(
     imageCapture: ImageCapture,
     outputDirectory: File,
-    executor: Executor,
+    executor: Executor, // This executor is now used for the takePicture call
     onImageCaptured: (File) -> Unit,
     onError: (ImageCaptureException) -> Unit
 ) {
@@ -105,6 +105,7 @@ private fun takePhoto(
 
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
+    // --- MODIFIED: The executor is passed to takePicture, moving I/O off the main thread ---
     imageCapture.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
         override fun onError(exc: ImageCaptureException) {
             Log.e("CameraView", "Photo capture failed: ${exc.message}", exc)
@@ -112,8 +113,10 @@ private fun takePhoto(
         }
 
         override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-            val savedUri = output.savedUri
-            Log.d("CameraView", "Photo capture succeeded: $savedUri")
+            // --- MODIFIED: Cleaned up logs for production ---
+            if (BuildConfig.DEBUG) {
+                Log.d("CameraView", "Photo capture succeeded: ${output.savedUri}")
+            }
             onImageCaptured(photoFile)
         }
     })
@@ -124,6 +127,6 @@ private suspend fun Context.getCameraProvider(): ProcessCameraProvider = suspend
         ProcessCameraProvider.getInstance(this).also { cameraProvider ->
             cameraProvider.addListener({
                 continuation.resume(cameraProvider.get())
-            }, ContextCompat.getMainExecutor(this))
+            }, ContextCompat.getMainExecutor(this)) // This is fine, it's for the listener, not the I/O
         }
 }

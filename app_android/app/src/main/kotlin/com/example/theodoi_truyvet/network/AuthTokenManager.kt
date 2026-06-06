@@ -1,16 +1,21 @@
-
 package com.example.theodoi_truyvet.network
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.theodoi_truyvet.App
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object AuthTokenManager {
-    private const val PREFS_NAME = "auth_prefs"
-    private const val TOKEN_KEY = "auth_token"
+// --- MODIFIED: Use Hilt for Dependency Injection ---
+@Singleton
+class AuthTokenManager @Inject constructor(@ApplicationContext context: Context) {
 
-    private val sharedPreferences: SharedPreferences by lazy {
-        App.appContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val sharedPreferences: SharedPreferences
+    private val PREFS_NAME = "auth_prefs"
+    private val TOKEN_KEY = "auth_token"
+
+    init {
+        sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
     fun saveToken(token: String) {

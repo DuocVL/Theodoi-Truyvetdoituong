@@ -1,34 +1,45 @@
 package com.example.theodoi_truyvet.ui
 
 import android.Manifest
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import android.content.Context
+import android.location.Location
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
-
-// ... (LoginScreen and ActivationScreen remain the same) ...
+import com.google.accompanist.permissions.*
+import com.google.android.gms.location.LocationServices
+import java.io.File
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
     val navItems = listOf(NavigationItem.CheckIn, NavigationItem.History, NavigationItem.Profile)
+    // --- ADDED: Create a single instance of the camera executor ---
+    val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
+
+    // --- ADDED: Handle cleanup of the executor ---
+    DisposableEffect(Unit) {
+        onDispose {
+            cameraExecutor.shutdown()
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -60,72 +71,87 @@ fun MainScreen() {
             startDestination = NavigationItem.CheckIn.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(NavigationItem.CheckIn.route) { CheckInScreen() }
+            composable(NavigationItem.CheckIn.route) { CheckInTabScreen(navController) }
             composable(NavigationItem.History.route) { HistoryScreen() }
             composable(NavigationItem.Profile.route) { ProfileScreen() }
+            
+            // --- ADDED: Camera screen route ---
+            composable("camera") {
+                val context = LocalContext.current
+                CameraView(
+                    outputDirectory = context.filesDir, // Example directory
+                    executor = cameraExecutor,
+                    onImageCaptured = {
+                        // TODO: Handle image captured, get location, and send to server
+                        Log.d("MainScreen", "Image captured: ${it.absolutePath}")
+                        navController.popBackStack()
+                    },
+                    onError = {
+                        Log.e("MainScreen", "Image capture error", it)
+                        navController.popBackStack()
+                    }
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CheckInScreen() {
-    val cameraPermissionState = rememberPermissionState(Manifest.permission.CAMERA)
+fun CheckInTabScreen(navController: NavHostController) {
+    // --- MODIFIED: Request both Camera and Location permissions ---
+    val permissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    )
 
-    if (cameraPermissionState.status.isGranted) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text("Quyền truy cập camera đã được cấp.", modifier = Modifier.padding(16.dp))
-            Button(onClick = { /* TODO: Navigate to Camera Screen */ }) {
-                Text("Mở Camera")
-            }
-        }
+    var launchPermissions by remember { mutableStateOf(false) }
+
+    if (permissionsState.allPermissionsGranted) {
+        // If permissions are granted, show a button to open the camera
+        GrantedPermissionScreen(navController)
     } else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val textToShow = if (cameraPermissionState.status.shouldShowRationale) {
-                // Nếu người dùng đã từ chối trước đó, hiển thị giải thích tại sao cần quyền.
-                "Để check-in bằng khuôn mặt, bạn cần cấp quyền sử dụng camera. Hãy nhấn nút và cho phép ứng dụng khi được hỏi."
-            } else {
-                // Lần đầu tiên yêu cầu quyền.
-                "Chức năng này cần quyền truy cập camera để hoạt động."
-            }
+        // If permissions are not granted, show rationale and a button to request them
+        RationalePermissionScreen(permissionsState, navController)
+    }
+}
 
-            Text(text = textToShow, modifier = Modifier.padding(16.dp))
-            Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                Text("Yêu cầu quyền")
-            }
+@Composable
+fun GrantedPermissionScreen(navController: NavHostController) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Permissions granted! Ready to check-in.", modifier = Modifier.padding(16.dp))
+        Button(onClick = { navController.navigate("camera") }) {
+            Text("Open Camera")
         }
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun HistoryScreen() {
+fun RationalePermissionScreen(permissionsState: MultiplePermissionsState, navController: NavHostController) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "History Screen", style = MaterialTheme.typography.headlineMedium)
+        val textToShow = if (permissionsState.shouldShowRationale) {
+            "This app needs access to your camera and location to allow face check-ins. Please grant the permissions."
+        } else {
+            "Please grant camera and location permissions to use this feature."
+        }
+
+        Text(text = textToShow, modifier = Modifier.padding(16.dp))
+        Button(onClick = { permissionsState.launchMultiplePermissionRequest() }) {
+            Text("Request Permissions")
+        }
     }
 }
 
-@Composable
-fun ProfileScreen() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Profile Screen", style = MaterialTheme.typography.headlineMedium)
-    }
-}
-
-
-// ... (The rest of the file remains the same) ...
+// ... (HistoryScreen and ProfileScreen remain the same) ...

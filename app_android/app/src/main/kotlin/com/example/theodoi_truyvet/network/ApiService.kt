@@ -1,50 +1,30 @@
-
 package com.example.theodoi_truyvet.network
 
-import com.example.theodoi_truyvet.models.* // We will create these models later
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
+import com.example.theodoi_truyvet.models.ActivationRequest
+import com.example.theodoi_truyvet.models.CheckIn
+import com.example.theodoi_truyvet.models.CheckInRequest
+import com.example.theodoi_truyvet.models.LoginRequest
+import com.example.theodoi_truyvet.models.LoginResponse
+import com.example.theodoi_truyvet.models.MessageResponse
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
 
 interface ApiService {
 
-    // --- AUTH --- //
+    // --- MODIFIED: More RESTful endpoints ---
 
-    @POST("/api/v1/subjects/activate")
-    suspend fun activateAccount(@Body activationRequest: ActivationRequest): Response<GenericResponse>
+    @POST("auth/login")
+    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
-    @POST("/api/v1/auth/login")
-    suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
+    @POST("auth/activate")
+    suspend fun activateAccount(@Body request: ActivationRequest): Response<MessageResponse>
 
-    // --- PROFILE & FACE --- //
-    
-    @GET("/api/v1/auth/me")
-    suspend fun getMyProfile(): Response<SubjectProfileResponse> // Assuming the /me route returns subject details
+    @POST("check-ins")
+    suspend fun createCheckIn(@Body request: CheckInRequest): Response<CheckIn>
 
-    @Multipart
-    @POST("/api/v1/face/register") // Assuming this is the endpoint
-    suspend fun registerFace(
-        @Part files: List<MultipartBody.Part>
-    ): Response<GenericResponse>
+    @GET("check-ins")
+    suspend fun getCheckInHistory(): Response<List<CheckIn>>
 
-
-    // --- CHECK-IN --- //
-
-    @Multipart
-    @POST("/api/v1/face/check-in")
-    suspend fun checkIn(
-        @Part("latitude") latitude: RequestBody,
-        @Part("longitude") longitude: RequestBody,
-        @Part files: MultipartBody.Part
-    ): Response<CheckInResponse>
-
-
-    // --- HISTORY --- //
-    
-    @GET("/api/v1/subjects/{id}") // We get history from the subject details endpoint
-    suspend fun getSubjectDetails(@Path("id") subjectId: String): Response<SubjectProfileResponse>
 }
-
-// A generic response for simple success messages
-data class GenericResponse(val message: String)
