@@ -26,6 +26,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const refreshTokenData: RefreshTokenDto = req.body;
+        console.log(refreshTokenData.refreshToken);
         const result = await authService.refreshToken(refreshTokenData);
         res.json(result);
     } catch (error) {

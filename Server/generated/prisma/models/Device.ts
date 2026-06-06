@@ -222,7 +222,7 @@ export type DeviceWhereInput = {
   is_trusted?: Prisma.BoolFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Device"> | Date | string
-  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+  account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
 }
 
 export type DeviceOrderByWithRelationInput = {
@@ -254,7 +254,7 @@ export type DeviceWhereUniqueInput = Prisma.AtLeast<{
   is_trusted?: Prisma.BoolFilter<"Device"> | boolean
   last_seen_at?: Prisma.DateTimeNullableFilter<"Device"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"Device"> | Date | string
-  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
+  account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
 }, "id" | "account_id_device_uuid">
 
 export type DeviceOrderByWithAggregationInput = {
@@ -299,7 +299,7 @@ export type DeviceCreateInput = {
   is_trusted?: boolean
   last_seen_at?: Date | string | null
   created_at?: Date | string
-  account?: Prisma.AccountCreateNestedOneWithoutDevicesInput
+  account: Prisma.AccountCreateNestedOneWithoutDevicesInput
 }
 
 export type DeviceUncheckedCreateInput = {
@@ -325,7 +325,7 @@ export type DeviceUpdateInput = {
   is_trusted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   last_seen_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  account?: Prisma.AccountUpdateOneWithoutDevicesNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutDevicesNestedInput
 }
 
 export type DeviceUncheckedUpdateInput = {
@@ -602,7 +602,7 @@ export type DeviceSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
+  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
 export type DeviceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -616,7 +616,7 @@ export type DeviceSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
+  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
 export type DeviceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -630,7 +630,7 @@ export type DeviceSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   is_trusted?: boolean
   last_seen_at?: boolean
   created_at?: boolean
-  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
+  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["device"]>
 
 export type DeviceSelectScalar = {
@@ -648,19 +648,19 @@ export type DeviceSelectScalar = {
 
 export type DeviceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "device_token" | "device_uuid" | "platform" | "app_version" | "is_active" | "is_trusted" | "last_seen_at" | "created_at", ExtArgs["result"]["device"]>
 export type DeviceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
+  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }
 export type DeviceIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
+  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }
 export type DeviceIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  account?: boolean | Prisma.Device$accountArgs<ExtArgs>
+  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
 }
 
 export type $DevicePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Device"
   objects: {
-    account: Prisma.$AccountPayload<ExtArgs> | null
+    account: Prisma.$AccountPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1067,7 +1067,7 @@ readonly fields: DeviceFieldRefs;
  */
 export interface Prisma__DeviceClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  account<T extends Prisma.Device$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Device$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  account<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1505,25 +1505,6 @@ export type DeviceDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Devices to delete.
    */
   limit?: number
-}
-
-/**
- * Device.account
- */
-export type Device$accountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Account
-   */
-  select?: Prisma.AccountSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Account
-   */
-  omit?: Prisma.AccountOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.AccountInclude<ExtArgs> | null
-  where?: Prisma.AccountWhereInput
 }
 
 /**

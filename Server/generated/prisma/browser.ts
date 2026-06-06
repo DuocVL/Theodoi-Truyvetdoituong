@@ -117,3 +117,8 @@ export type AuthImage = Prisma.AuthImageModel
  * 
  */
 export type Image = Prisma.ImageModel
+/**
+ * Model spatial_ref_sys
+ * This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+ */
+export type spatial_ref_sys = Prisma.spatial_ref_sysModel

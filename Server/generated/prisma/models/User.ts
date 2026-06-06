@@ -198,13 +198,13 @@ export type UserWhereInput = {
   avatar_id?: Prisma.StringNullableFilter<"User"> | string | null
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   update_at?: Prisma.DateTimeFilter<"User"> | Date | string
-  avatar?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
-  account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   alerts?: Prisma.AlertListRelationFilter
   subject?: Prisma.SubjectListRelationFilter
   auditLogs?: Prisma.SystemLogListRelationFilter
-  zone?: Prisma.ZoneListRelationFilter
   userRole?: Prisma.UserRoleListRelationFilter
+  account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
+  avatar?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
+  zone?: Prisma.ZoneListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -215,13 +215,13 @@ export type UserOrderByWithRelationInput = {
   avatar_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
-  avatar?: Prisma.ImageOrderByWithRelationInput
-  account?: Prisma.AccountOrderByWithRelationInput
   alerts?: Prisma.AlertOrderByRelationAggregateInput
   subject?: Prisma.SubjectOrderByRelationAggregateInput
   auditLogs?: Prisma.SystemLogOrderByRelationAggregateInput
-  zone?: Prisma.ZoneOrderByRelationAggregateInput
   userRole?: Prisma.UserRoleOrderByRelationAggregateInput
+  account?: Prisma.AccountOrderByWithRelationInput
+  avatar?: Prisma.ImageOrderByWithRelationInput
+  zone?: Prisma.ZoneOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -235,13 +235,13 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.BoolFilter<"User"> | boolean
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   update_at?: Prisma.DateTimeFilter<"User"> | Date | string
-  avatar?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
-  account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   alerts?: Prisma.AlertListRelationFilter
   subject?: Prisma.SubjectListRelationFilter
   auditLogs?: Prisma.SystemLogListRelationFilter
-  zone?: Prisma.ZoneListRelationFilter
   userRole?: Prisma.UserRoleListRelationFilter
+  account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
+  avatar?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
+  zone?: Prisma.ZoneListRelationFilter
 }, "id" | "account_id" | "avatar_id">
 
 export type UserOrderByWithAggregationInput = {
@@ -276,13 +276,13 @@ export type UserCreateInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
-  account: Prisma.AccountCreateNestedOneWithoutUserInput
   alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  account: Prisma.AccountCreateNestedOneWithoutUserInput
+  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
+  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -296,8 +296,8 @@ export type UserUncheckedCreateInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type UserUpdateInput = {
@@ -306,13 +306,13 @@ export type UserUpdateInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
+  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
+  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -326,8 +326,8 @@ export type UserUncheckedUpdateInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -540,12 +540,12 @@ export type UserCreateWithoutAccountInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
   alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
+  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
 }
 
 export type UserUncheckedCreateWithoutAccountInput = {
@@ -558,8 +558,8 @@ export type UserUncheckedCreateWithoutAccountInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type UserCreateOrConnectWithoutAccountInput = {
@@ -584,12 +584,12 @@ export type UserUpdateWithoutAccountInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
+  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountInput = {
@@ -602,8 +602,8 @@ export type UserUncheckedUpdateWithoutAccountInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserCreateWithoutUserRoleInput = {
@@ -612,11 +612,11 @@ export type UserCreateWithoutUserRoleInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
-  account: Prisma.AccountCreateNestedOneWithoutUserInput
   alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
+  account: Prisma.AccountCreateNestedOneWithoutUserInput
+  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
   zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
 }
 
@@ -656,11 +656,11 @@ export type UserUpdateWithoutUserRoleInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
+  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
   zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
 }
 
@@ -684,12 +684,12 @@ export type UserCreateWithoutSubjectInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
-  account: Prisma.AccountCreateNestedOneWithoutUserInput
   alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  account: Prisma.AccountCreateNestedOneWithoutUserInput
+  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
+  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
 }
 
 export type UserUncheckedCreateWithoutSubjectInput = {
@@ -702,8 +702,8 @@ export type UserUncheckedCreateWithoutSubjectInput = {
   update_at?: Date | string
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type UserCreateOrConnectWithoutSubjectInput = {
@@ -728,12 +728,12 @@ export type UserUpdateWithoutSubjectInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
+  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
+  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubjectInput = {
@@ -746,8 +746,8 @@ export type UserUncheckedUpdateWithoutSubjectInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserCreateWithoutZoneInput = {
@@ -756,12 +756,12 @@ export type UserCreateWithoutZoneInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
-  account: Prisma.AccountCreateNestedOneWithoutUserInput
   alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
   userRole?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  account: Prisma.AccountCreateNestedOneWithoutUserInput
+  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
 }
 
 export type UserUncheckedCreateWithoutZoneInput = {
@@ -800,12 +800,12 @@ export type UserUpdateWithoutZoneInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
   userRole?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
+  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
 }
 
 export type UserUncheckedUpdateWithoutZoneInput = {
@@ -828,12 +828,12 @@ export type UserCreateWithoutAlertsInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
-  account: Prisma.AccountCreateNestedOneWithoutUserInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  account: Prisma.AccountCreateNestedOneWithoutUserInput
+  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
+  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
 }
 
 export type UserUncheckedCreateWithoutAlertsInput = {
@@ -846,8 +846,8 @@ export type UserUncheckedCreateWithoutAlertsInput = {
   update_at?: Date | string
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type UserCreateOrConnectWithoutAlertsInput = {
@@ -872,12 +872,12 @@ export type UserUpdateWithoutAlertsInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
+  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
+  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAlertsInput = {
@@ -890,8 +890,8 @@ export type UserUncheckedUpdateWithoutAlertsInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -900,12 +900,12 @@ export type UserCreateWithoutAuditLogsInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
-  account: Prisma.AccountCreateNestedOneWithoutUserInput
   alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
-  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  account: Prisma.AccountCreateNestedOneWithoutUserInput
+  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
+  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -918,8 +918,8 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   update_at?: Date | string
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
-  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -944,12 +944,12 @@ export type UserUpdateWithoutAuditLogsInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
-  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
+  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
+  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -962,8 +962,8 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
-  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserCreateWithoutAvatarInput = {
@@ -972,12 +972,12 @@ export type UserCreateWithoutAvatarInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  account: Prisma.AccountCreateNestedOneWithoutUserInput
   alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleCreateNestedManyWithoutUserInput
+  account: Prisma.AccountCreateNestedOneWithoutUserInput
+  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
 }
 
 export type UserUncheckedCreateWithoutAvatarInput = {
@@ -990,8 +990,8 @@ export type UserUncheckedCreateWithoutAvatarInput = {
   alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
   userRole?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
+  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
 }
 
 export type UserCreateOrConnectWithoutAvatarInput = {
@@ -1016,12 +1016,12 @@ export type UserUpdateWithoutAvatarInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
+  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAvatarInput = {
@@ -1034,8 +1034,8 @@ export type UserUncheckedUpdateWithoutAvatarInput = {
   alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
   userRole?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
+  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 
@@ -1047,16 +1047,16 @@ export type UserCountOutputType = {
   alerts: number
   subject: number
   auditLogs: number
-  zone: number
   userRole: number
+  zone: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   alerts?: boolean | UserCountOutputTypeCountAlertsArgs
   subject?: boolean | UserCountOutputTypeCountSubjectArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
-  zone?: boolean | UserCountOutputTypeCountZoneArgs
   userRole?: boolean | UserCountOutputTypeCountUserRoleArgs
+  zone?: boolean | UserCountOutputTypeCountZoneArgs
 }
 
 /**
@@ -1093,15 +1093,15 @@ export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountZoneArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ZoneWhereInput
+export type UserCountOutputTypeCountUserRoleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserRoleWhereInput
 }
 
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountUserRoleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.UserRoleWhereInput
+export type UserCountOutputTypeCountZoneArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ZoneWhereInput
 }
 
 
@@ -1113,13 +1113,13 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   avatar_id?: boolean
   created_at?: boolean
   update_at?: boolean
-  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
-  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   alerts?: boolean | Prisma.User$alertsArgs<ExtArgs>
   subject?: boolean | Prisma.User$subjectArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
-  zone?: boolean | Prisma.User$zoneArgs<ExtArgs>
   userRole?: boolean | Prisma.User$userRoleArgs<ExtArgs>
+  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
+  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
+  zone?: boolean | Prisma.User$zoneArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1131,8 +1131,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   avatar_id?: boolean
   created_at?: boolean
   update_at?: boolean
-  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
+  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1143,8 +1143,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   avatar_id?: boolean
   created_at?: boolean
   update_at?: boolean
-  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
+  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1159,34 +1159,34 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "full_name" | "status" | "avatar_id" | "created_at" | "update_at", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
-  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   alerts?: boolean | Prisma.User$alertsArgs<ExtArgs>
   subject?: boolean | Prisma.User$subjectArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
-  zone?: boolean | Prisma.User$zoneArgs<ExtArgs>
   userRole?: boolean | Prisma.User$userRoleArgs<ExtArgs>
+  account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
+  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
+  zone?: boolean | Prisma.User$zoneArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
+  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
 }
 export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
+  avatar?: boolean | Prisma.User$avatarArgs<ExtArgs>
 }
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    avatar: Prisma.$ImagePayload<ExtArgs> | null
-    account: Prisma.$AccountPayload<ExtArgs>
     alerts: Prisma.$AlertPayload<ExtArgs>[]
     subject: Prisma.$SubjectPayload<ExtArgs>[]
     auditLogs: Prisma.$SystemLogPayload<ExtArgs>[]
-    zone: Prisma.$ZonePayload<ExtArgs>[]
     userRole: Prisma.$UserRolePayload<ExtArgs>[]
+    account: Prisma.$AccountPayload<ExtArgs>
+    avatar: Prisma.$ImagePayload<ExtArgs> | null
+    zone: Prisma.$ZonePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1590,13 +1590,13 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  avatar<T extends Prisma.User$avatarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$avatarArgs<ExtArgs>>): Prisma.Prisma__ImageClient<runtime.Types.Result.GetResult<Prisma.$ImagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  account<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   alerts<T extends Prisma.User$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   subject<T extends Prisma.User$subjectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$subjectArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SystemLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  zone<T extends Prisma.User$zoneArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$zoneArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   userRole<T extends Prisma.User$userRoleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$userRoleArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  account<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  avatar<T extends Prisma.User$avatarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$avatarArgs<ExtArgs>>): Prisma.Prisma__ImageClient<runtime.Types.Result.GetResult<Prisma.$ImagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  zone<T extends Prisma.User$zoneArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$zoneArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2034,25 +2034,6 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.avatar
- */
-export type User$avatarArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Image
-   */
-  select?: Prisma.ImageSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Image
-   */
-  omit?: Prisma.ImageOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ImageInclude<ExtArgs> | null
-  where?: Prisma.ImageWhereInput
-}
-
-/**
  * User.alerts
  */
 export type User$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2125,30 +2106,6 @@ export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.zone
- */
-export type User$zoneArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Zone
-   */
-  select?: Prisma.ZoneSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Zone
-   */
-  omit?: Prisma.ZoneOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.ZoneInclude<ExtArgs> | null
-  where?: Prisma.ZoneWhereInput
-  orderBy?: Prisma.ZoneOrderByWithRelationInput | Prisma.ZoneOrderByWithRelationInput[]
-  cursor?: Prisma.ZoneWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.ZoneScalarFieldEnum | Prisma.ZoneScalarFieldEnum[]
-}
-
-/**
  * User.userRole
  */
 export type User$userRoleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2170,6 +2127,49 @@ export type User$userRoleArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.UserRoleScalarFieldEnum | Prisma.UserRoleScalarFieldEnum[]
+}
+
+/**
+ * User.avatar
+ */
+export type User$avatarArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Image
+   */
+  select?: Prisma.ImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Image
+   */
+  omit?: Prisma.ImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImageInclude<ExtArgs> | null
+  where?: Prisma.ImageWhereInput
+}
+
+/**
+ * User.zone
+ */
+export type User$zoneArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Zone
+   */
+  select?: Prisma.ZoneSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Zone
+   */
+  omit?: Prisma.ZoneOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ZoneInclude<ExtArgs> | null
+  where?: Prisma.ZoneWhereInput
+  orderBy?: Prisma.ZoneOrderByWithRelationInput | Prisma.ZoneOrderByWithRelationInput[]
+  cursor?: Prisma.ZoneWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ZoneScalarFieldEnum | Prisma.ZoneScalarFieldEnum[]
 }
 
 /**

@@ -113,6 +113,7 @@ export const activateAccount = async (data: { token: string }) => {
 
 export const refreshToken = async (data: RefreshTokenDto) => {
     const { refreshToken: oldRefreshToken } = data;
+    console.log(oldRefreshToken);
     
     // 1. Verify and decode the old refresh token
     let decoded: AccountPayload;
