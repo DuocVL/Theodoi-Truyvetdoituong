@@ -40,9 +40,12 @@ export type RegisterDto = z.infer<typeof registerSchema>['body'];
 
 // Schema for account activation
 export const activateAccountSchema = z.object({
-  token: z.string().uuid("Invalid token format"),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
+    body: z.object({
+        token: z.string().length(64, "Invalid token format"), // Token is a 64-character hex string
+    })
 });
+
+export type ActivateAccountDto = z.infer<typeof activateAccountSchema>['body'];
 
 
 // Schema for the logout request body

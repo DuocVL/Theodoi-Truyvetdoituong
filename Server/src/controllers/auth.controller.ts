@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/auth.service';
-import { LoginDto, RegisterDto, RefreshTokenDto, ForgotPasswordDto, ResetPasswordDto } from '../dtos/auth.dto';
+import { ActivateAccountDto, LoginDto, RegisterDto, RefreshTokenDto, ForgotPasswordDto, ResetPasswordDto } from '../dtos/auth.dto';
 import { RequestWithUser } from '../types/data';
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,6 +17,16 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     try {
         const registerData: RegisterDto = req.body;
         const result = await authService.register(registerData);
+        res.status(201).json(result);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const activateAccount = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const activationData: ActivateAccountDto = req.body;
+        const result = await authService.activateAccount(activationData);
         res.json(result);
     } catch (error) {
         next(error);
@@ -26,7 +36,6 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const refreshTokenData: RefreshTokenDto = req.body;
-        console.log(refreshTokenData.refreshToken);
         const result = await authService.refreshToken(refreshTokenData);
         res.json(result);
     } catch (error) {
@@ -48,7 +57,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     try {
         const forgotPasswordData: ForgotPasswordDto = req.body;
         await authService.forgotPassword(forgotPasswordData);
-        res.status(204).send();
+        res.status(200).json({ message: "Password reset link sent to your email." });
     } catch (error) {
         next(error);
     }
@@ -58,7 +67,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     try {
         const resetPasswordData: ResetPasswordDto = req.body;
         await authService.resetPassword(resetPasswordData);
-        res.status(204).send();
+        res.status(200).json({ message: "Password has been reset successfully." });
     } catch (error) {
         next(error);
     }
@@ -69,7 +78,7 @@ export const getMe = async (req: RequestWithUser, res: Response, next: NextFunct
         const accountId = req.account?.id;
         if (!accountId) return res.status(401).json({ message: 'Unauthorized' });
         const result = await authService.getMe(accountId);
-        res.json({ data: result });
+        res.json({ user: result });
     } catch (error) {
         next(error);
     }
