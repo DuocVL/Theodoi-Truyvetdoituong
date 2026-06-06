@@ -2,7 +2,7 @@ import React, { type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTachometerAlt, FaUsers, FaMapMarkedAlt, FaSignOutAlt, FaAddressBook } from 'react-icons/fa';
+import { FaTachometerAlt, FaMapMarkedAlt, FaSignOutAlt, FaAddressBook } from 'react-icons/fa';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -108,10 +108,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <StyledNavLink to="/subjects">
             <FaAddressBook />
             <span>Đối tượng</span>
-          </StyledNavLink>
-          <StyledNavLink to="/users">
-            <FaUsers />
-            <span>Người dùng</span>
           </StyledNavLink>
           <StyledNavLink to="/map">
             <FaMapMarkedAlt />

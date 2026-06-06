@@ -1,86 +1,162 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getSubjects, deleteSubject } from '../services/api';
+import { getSubjects, deleteSubject, type Subject } from '../services/api';
 import styled, { keyframes } from 'styled-components';
-import Spinner from '../components/Spinner'; // Import Spinner
+import Spinner from '../components/Spinner';
+import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 
-// Styled components (giữ nguyên, thêm một số cho thông báo)
-const Container = styled.div`
-  padding: 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  color: #fff;
-  max-width: 1200px;
-  margin: auto;
+// ==================================================================
+// STYLED COMPONENTS
+// ==================================================================
+
+const Card = styled.div`
+  background: #fff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 `;
 
-const Header = styled.div`
+const PageHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
 `;
 
-const Title = styled.h2`
-  color: #fff;
+const PageTitle = styled.h1`
+  font-size: 1.75rem;
+  color: #1a202c;
+  margin: 0;
 `;
 
 const AddButton = styled.button`
-    padding: 0.6rem 1.2rem;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #3182ce;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
 
-    &:hover { background-color: #0056b3; }
+  &:hover { 
+    background-color: #2b6cb0;
+  }
 `;
 
-const ActionButton = styled.button`
-    padding: 0.3rem 0.6rem;
-    margin-right: 0.5rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-
-    &:disabled { cursor: not-allowed; opacity: 0.7; }
+const SearchContainer = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  margin-bottom: 1.5rem;
 `;
 
-const EditButton = styled(ActionButton)`
-    background-color: #28a745;
-    &:hover:not(:disabled) { background-color: #218838; }
+const SearchInput = styled.input`
+  padding: 0.75rem 1rem 0.75rem 2.5rem; // Make space for icon
+  font-size: 1rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  background: #fff;
+  color: #2d3748;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::placeholder { color: #a0aec0; }
+  &:focus {
+      outline: none;
+      border-color: #4299e1;
+      box-shadow: 0 0 0 1px #4299e1;
+  }
 `;
 
-const DeleteButton = styled(ActionButton)`
-    background-color: #dc3545;
-    &:hover:not(:disabled) { background-color: #c82333; }
+const SearchIcon = styled(FaSearch)`
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a0aec0;
 `;
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  th, td { padding: 0.75rem; text-align: left; }
-  th { background: rgba(0,0,0,0.2); }
-  tr:nth-child(even) { background: rgba(255,255,255,0.05); }
 `;
 
-const SearchInput = styled.input`
-    padding: 0.6rem;
-    font-size: 1rem;
-    border: 1px solid #555;
-    border-radius: 4px;
-    background: rgba(255,255,255,0.2);
-    color: #fff;
-    width: 300px;
+const TableHead = styled.thead`
+  th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 0.8rem;
+    color: #718096;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+`;
 
-    &::placeholder { color: #ccc; }
+const TableRow = styled.tr`
+  &:hover {
+    background-color: #f7fafc;
+  }
+`;
+
+const TableCell = styled.td`
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #2d3748;
+  vertical-align: middle;
+`;
+
+const ActionButtons = styled.div`
+    display: flex;
+    gap: 0.75rem;
+`;
+
+const IconButton = styled.button`
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #718096;
+    transition: color 0.2s;
+
+    &:hover { color: #2d3748; }
+    &:disabled { color: #cbd5e0; cursor: not-allowed; }
+`;
+
+const StatusBadge = styled.span<{ status: string }>`
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    color: ${props => {
+        switch (props.status) {
+            case 'Đang theo dõi': return '#2b6cb0';
+            case 'Tạm dừng': return '#b7791f';
+            case 'Đã hoàn thành': return '#2f855a';
+            default: return '#4a5568';
+        }
+    }};
+    background-color: ${props => {
+         switch (props.status) {
+            case 'Đang theo dõi': return '#bee3f8';
+            case 'Tạm dừng': return '#f6e05e';
+            case 'Đã hoàn thành': return '#c6f6d5';
+            default: return '#e2e8f0';
+        }
+    }};
+`;
+
+const CenteredMessage = styled.div`
+  text-align: center;
+  padding: 3rem;
+  color: #718096;
 `;
 
 const fadeOut = keyframes`
@@ -91,66 +167,48 @@ const fadeOut = keyframes`
 const Notification = styled.div`
     padding: 1rem;
     margin-bottom: 1rem;
-    border-radius: 5px;
-    color: #fff;
-    background-color: #28a745; // Màu xanh cho thành công
+    border-radius: 6px;
+    color: #155724;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
     animation: ${fadeOut} 0.5s ease-out 4.5s forwards;
 `;
 
-const Error = styled.p`
-    color: #f8d7da;
-    background-color: #721c24;
-    padding: 1rem;
-    border-radius: 5px;
-    text-align: center;
-`;
-
-interface Subject {
-  _id: string; 
-  fullName: string;
-  status: string;
-  identifier: string;
-}
+// ==================================================================
+// PAGE COMPONENT
+// ==================================================================
 
 const SubjectListPage: React.FC = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null); // State để biết đang xoá item nào
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
 
-  // State cho thông báo thành công
   const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || null);
 
-  const fetchSubjects = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getSubjects();
-      setSubjects(Array.isArray(data) ? data : []);
-    } catch (e) {
-      setError('Không thể tải danh sách đối tượng. Vui lòng thử lại.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchSubjects = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await getSubjects();
+            setSubjects(Array.isArray(data) ? data : []);
+        } catch (e) {
+            setError('Không thể tải danh sách đối tượng.');
+        } finally {
+            setLoading(false);
+        }
+    };
     fetchSubjects();
   }, []);
 
-  // Xử lý ẩn thông báo thành công sau một thời gian
   useEffect(() => {
     if (successMessage) {
-        // Xóa message khỏi location state để không hiển thị lại khi refresh
-        window.history.replaceState({}, document.title)
-        
-        const timer = setTimeout(() => {
-            setSuccessMessage(null);
-        }, 5000); // Tự động ẩn sau 5 giây
-
+        window.history.replaceState({}, document.title);
+        const timer = setTimeout(() => setSuccessMessage(null), 5000);
         return () => clearTimeout(timer);
     }
   }, [successMessage]);
@@ -158,19 +216,14 @@ const SubjectListPage: React.FC = () => {
   const filteredSubjects = useMemo(() => 
     subjects.filter(s => 
       s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.identifier.toLowerCase().includes(searchTerm.toLowerCase())
+      (s.identifier && s.identifier.toLowerCase().includes(searchTerm.toLowerCase()))
     ), [subjects, searchTerm]);
-
-  const handleEdit = (id: string) => {
-    navigate(`/subjects/edit/${id}`);
-  };
 
   const handleDelete = async (id: string) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa đối tượng này? Hành động này không thể hoàn tác.')) {
       setDeletingId(id);
       try {
         await deleteSubject(id);
-        // Thay vì alert, cập nhật trực tiếp state để UI phản hồi ngay lập tức
         setSubjects(prev => prev.filter(s => s._id !== id));
       } catch (err) {
         alert('Xóa đối tượng thất bại. Vui lòng thử lại.');
@@ -181,61 +234,71 @@ const SubjectListPage: React.FC = () => {
   };
 
   return (
-    <Container>
+    <>
         {successMessage && <Notification>{successMessage}</Notification>}
 
-        <Header>
-            <Title>Danh sách Đối tượng</Title>
-            <AddButton onClick={() => navigate('/subjects/add')}>Thêm Mới</AddButton>
-        </Header>
+        <PageHeader>
+            <PageTitle>Quản lý Đối tượng</PageTitle>
+            <AddButton onClick={() => navigate('/subjects/add')}>
+                <FaPlus />
+                <span>Thêm Mới</span>
+            </AddButton>
+        </PageHeader>
 
-        <div style={{ marginBottom: '1rem' }}>
-            <SearchInput
-            type="text"
-            placeholder="Tìm kiếm theo tên hoặc mã định danh..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            />
-        </div>
+        <Card>
+            <SearchContainer>
+                <SearchIcon />
+                <SearchInput
+                    type="text"
+                    placeholder="Tìm kiếm theo tên hoặc mã định danh..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </SearchContainer>
 
-        {loading ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}><Spinner size={50} /></div>
-        ) : error ? (
-            <Error>{error}</Error>
-        ) : (
-            <Table>
-                <thead>
-                    <tr>
-                        <th>Họ tên</th>
-                        <th>Mã định danh</th>
-                        <th>Trạng thái</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredSubjects.length > 0 ? filteredSubjects.map(s => (
-                        <tr key={s._id}>
-                            <td>{s.fullName}</td>
-                            <td>{s.identifier}</td>
-                            <td>{s.status}</td>
-                            <td>
-                                <EditButton onClick={() => handleEdit(s._id)} disabled={deletingId === s._id}>
-                                    Sửa
-                                </EditButton>
-                                <DeleteButton onClick={() => handleDelete(s._id)} disabled={deletingId === s._id}>
-                                    {deletingId === s._id ? <Spinner size={16} /> : 'Xóa'}
-                                </DeleteButton>
-                            </td>
-                        </tr>
-                    )) : (
+            {loading ? (
+                <CenteredMessage><Spinner size={50} /></CenteredMessage>
+            ) : error ? (
+                <CenteredMessage style={{ color: 'red' }}>{error}</CenteredMessage>
+            ) : (
+                <Table>
+                    <TableHead>
                         <tr>
-                            <td colSpan={4} style={{ textAlign: 'center' }}>Không có đối tượng nào phù hợp.</td>
+                            <th>Họ tên</th>
+                            <th>Mã định danh</th>
+                            <th>Trạng thái</th>
+                            <th style={{textAlign: 'right'}}>Hành động</th>
                         </tr>
-                    )}
-                </tbody>
-            </Table>
-        )}
-    </Container>
+                    </TableHead>
+                    <tbody>
+                        {filteredSubjects.length > 0 ? filteredSubjects.map(s => (
+                            <TableRow key={s._id}>
+                                <TableCell>{s.fullName}</TableCell>
+                                <TableCell>{s.identifier}</TableCell>
+                                <TableCell><StatusBadge status={s.status}>{s.status}</StatusBadge></TableCell>
+                                <TableCell style={{textAlign: 'right'}}>
+                                    <ActionButtons>
+                                        <IconButton onClick={() => navigate(`/subjects/edit/${s._id}`)} disabled={deletingId === s._id} title="Sửa">
+                                            <FaEdit />
+                                        </IconButton>
+                                        <IconButton onClick={() => handleDelete(s._id)} disabled={deletingId === s._id} title="Xóa">
+                                            {deletingId === s._id ? <Spinner size={18} /> : <FaTrash />}
+                                        </IconButton>
+                                    </ActionButtons>
+                                </TableCell>
+                            </TableRow>
+                        )) : (
+                            <tr>
+                                <td colSpan={4}>
+                                    <CenteredMessage>Không có đối tượng nào.</CenteredMessage>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+            )}
+        </Card>
+    </>
   );
 };
 
