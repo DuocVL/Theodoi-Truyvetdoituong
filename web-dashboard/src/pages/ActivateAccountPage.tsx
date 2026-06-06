@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { activateAccount } from '../services/api';
 import styled from 'styled-components';
@@ -49,6 +49,7 @@ const ActivateAccountPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
     const [message, setMessage] = useState('Đang kích hoạt tài khoản của bạn, vui lòng chờ...');
+    const hasRun = useRef(false); // Cờ để chặn chạy 2 lần trong StrictMode
 
     useEffect(() => {
         const token = searchParams.get('token');
@@ -58,6 +59,10 @@ const ActivateAccountPage: React.FC = () => {
             setMessage('Đường dẫn không hợp lệ hoặc thiếu mã kích hoạt.');
             return;
         }
+
+        // Nếu đã chạy rồi thì không chạy lại nữa
+        if (hasRun.current) return;
+        hasRun.current = true;
 
         const processActivation = async () => {
             try {
