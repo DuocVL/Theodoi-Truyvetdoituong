@@ -1,12 +1,18 @@
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import AppRoutes from './routes/AppRoutes';
 import GlobalStyles from './styles/GlobalStyles';
-import MapPage from './pages/MapPage';
 
 const App: React.FC = () => {
     return (
         <>
             <GlobalStyles />
-            <MapPage />
+            <Router>
+                <AuthProvider>
+                    <AppRoutes />
+                </AuthProvider>
+            </Router>
         </>
     );
 };
