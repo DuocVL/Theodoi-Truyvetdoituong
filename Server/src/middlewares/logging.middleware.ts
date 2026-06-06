@@ -165,7 +165,6 @@ export const loggingMiddleware = async (
         user_agent: userAgent,
         // 📱 device_id dùng để track request từ device nào (mobile/web/etc)
         device_id: req.account?.device_id || null,
-        request_body: sanitizedBody,
         response_body: responseBody, // Already parsed to JSON
       });
     } catch (dbError) {
