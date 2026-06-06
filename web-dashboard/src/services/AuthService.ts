@@ -1,54 +1,33 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:3000/api/v1/auth';
-
-const login = async (username, password, device_id) => {
-    const response = await axios.post(`${API_URL}/login`, {
-        username,
-        password,
-        device_id
-    });
-    return response.data;
+// We can define more specific types later
+type User = any;
+type AuthResponse = {
+  token: string;
+  refreshToken: string;
+  user: User;
 };
 
-const register = async (username, password, email, fullname) => {
-    const response = await axios.post(`${API_URL}/register`, {
-        username,
-        password,
-        email,
-        fullname
-    });
-    return response.data;
+const login = async (username: string, password: string, device_id: string): Promise<AuthResponse> => {
+  const response = await api.post('/auth/login', {
+    username,
+    password,
+    device_id,
+  });
+  return response.data;
 };
 
-const forgotPassword = async (email) => {
-    const response = await axios.post(`${API_URL}/forgot-password`, {
-        email,
-    });
+const getMe = async (): Promise<{user: User}> => {
+    const response = await api.get('/auth/me');
     return response.data;
-};
+}
 
-const resetPassword = async (token, password) => {
-    const response = await axios.post(`${API_URL}/reset-password`, {
-        token,
-        password,
-    });
-    return response.data;
-};
-
-const refreshToken = async (token) => {
-    const response = await axios.post(`${API_URL}/refresh-token`, {
-        token,
-    });
-    return response.data;
-};
+// We might not need refreshToken logic on the client-side for now, 
+// can be handled by interceptors later.
 
 const AuthService = {
-    login,
-    register,
-    forgotPassword,
-    resetPassword,
-    refreshToken,
+  login,
+  getMe,
 };
 
 export default AuthService;

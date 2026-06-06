@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -64,6 +64,10 @@ const LoginPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const { login } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Get the 'from' location, default to the dashboard
+    const from = location.state?.from?.pathname || '/dashboard';
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -76,7 +80,8 @@ const LoginPage: React.FC = () => {
 
         try {
             await login(username, password);
-            navigate('/dashboard');
+            // Redirect to the stored 'from' location
+            navigate(from, { replace: true });
         } catch (err) {
             setError('Invalid username or password.');
         }
