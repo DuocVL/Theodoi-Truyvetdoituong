@@ -92,13 +92,17 @@ const DashboardPage: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                const data = await getSubjects();
-                // API có thể trả về null nếu có lỗi, cần kiểm tra
-                if (data && data.subjects) {
-                    setSubjects(data.subjects);
+                // SỬA LỖI TẠI ĐÂY
+                // getSubjects() trả về trực tiếp một mảng Subject[]
+                const subjectsArray = await getSubjects();
+                
+                // Kiểm tra xem kết quả có phải là một mảng hợp lệ không
+                if (Array.isArray(subjectsArray)) {
+                    setSubjects(subjectsArray);
                 } else {
-                    // Trường hợp API trả về cấu trúc không mong muốn
+                    // Xử lý trường hợp API trả về dữ liệu không mong muốn
                     setSubjects([]);
+                    console.warn('API did not return a valid array for subjects.');
                 }
             } catch (error) {
                 console.error("Failed to load subjects for dashboard:", error);
@@ -116,7 +120,6 @@ const DashboardPage: React.FC = () => {
         const paused = subjects.filter(s => s.status === 'Tạm dừng').length;
         const finished = subjects.filter(s => s.status === 'Đã hoàn thành').length;
         
-        // Sắp xếp an toàn hơn, phòng trường hợp createdAt không hợp lệ
         const recent = [...subjects]
             .sort((a, b) => (new Date(b.createdAt).getTime() || 0) - (new Date(a.createdAt).getTime() || 0))
             .slice(0, 5);
@@ -124,7 +127,6 @@ const DashboardPage: React.FC = () => {
         return { total, tracking, paused, finished, recent };
     }, [subjects]);
 
-    // Cải thiện UI cho trạng thái loading và error
     if (loading) {
         return (
             <DashboardContainer style={{ textAlign: 'center', paddingTop: '5rem' }}>

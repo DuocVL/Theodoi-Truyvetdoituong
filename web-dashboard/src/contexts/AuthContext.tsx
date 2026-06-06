@@ -1,97 +1,79 @@
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-// Bỏ AuthService, import trực tiếp từ api với alias để tránh trùng tên
-import { login as apiLogin, getMe as apiGetMe } from '../services/api';
-import { v4 as uuidv4 } from 'uuid';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { login as apiLogin, getMe, User } from '../services/api';
+import Spinner from '../components/Spinner';
 
-// Định nghĩa một kiểu User cụ thể
-interface User {
-  id: string;
-  username: string;
-  fullName: string;
-  role: 'admin' | 'user';
-}
-
+// Định nghĩa kiểu dữ liệu cho AuthContext
 interface AuthContextType {
-  isAuthenticated: boolean;
-  user: User | null;
-  loading: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+    user: User | null;
+    // SỬA LỖI: Thêm deviceId vào định nghĩa hàm login
+    login: (username: string, password: string, deviceId: string) => Promise<void>; 
+    logout: () => void;
+    loading: boolean;
 }
 
+// Tạo Context với giá trị mặc định
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Logic tạo device_id chỉ chạy 1 lần, đảm bảo tính nhất quán
-const initializeDeviceId = () => {
-  let deviceId = localStorage.getItem('device_id');
-  if (!deviceId) {
-    deviceId = uuidv4();
-    localStorage.setItem('device_id', deviceId);
-  }
-  return deviceId;
+// Hook tùy chỉnh để sử dụng AuthContext dễ dàng hơn
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };
-const deviceId = initializeDeviceId();
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+// Component Provider
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
 
-  // Định nghĩa logout ở đây để có thể dùng trong useEffect và cả value của Provider
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    setUser(null);
-  };
+    useEffect(() => {
+        const verifyToken = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const currentUser = await getMe();
+                    setUser(currentUser);
+                } catch (error) {
+                    console.error("Auth verification failed", error);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('refreshToken');
+                }
+            }
+            setLoading(false);
+        };
+        verifyToken();
+    }, []);
 
-  useEffect(() => {
-    const verifyAuth = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          // Sử dụng apiGetMe trực tiếp
-          // Giả định getMe sẽ được sửa để trả về user object trực tiếp
-          const userData = await apiGetMe();
-          setUser(userData);
-        } catch (error) {
-          console.error('Authentication failed, logging out.', error);
-          // Khi xác thực thất bại, gọi logout để dọn dẹp state nhất quán
-          logout();
-        }
-      }
-      setLoading(false);
+    // SỬA LỖI: Cập nhật hàm login để chấp nhận và sử dụng deviceId
+    const login = async (username: string, password: string, deviceId: string) => {
+        const { token, refreshToken, user: loggedInUser } = await apiLogin(username, password, deviceId);
+        localStorage.setItem('token', token);
+        localStorage.setItem('refreshToken', refreshToken);
+        setUser(loggedInUser);
     };
 
-    verifyAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Chỉ chạy 1 lần khi mount
+    const logout = () => {
+        setUser(null);
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+    };
 
-  const login = async (username: string, password: string) => {
-    setLoading(true); // Báo cho UI biết đang có thao tác bất đồng bộ
-    try {
-      // Sử dụng apiLogin trực tiếp, truyền vào deviceId đã được khởi tạo
-      const data = await apiLogin(username, password, deviceId);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      setUser(data.user);
-    } catch (error) {
-      console.error('Login failed', error);
-      throw error; // Ném lỗi ra để component UI (LoginPage) có thể bắt và hiển thị
-    } finally {
-      setLoading(false); // Dù thành công hay thất bại cũng phải dừng loading
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Spinner size={60} />
+            </div>
+        );
     }
-  };
 
-  return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, user, loading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
+    const value = { user, login, logout, loading: false };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

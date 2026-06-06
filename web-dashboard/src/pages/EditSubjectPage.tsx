@@ -125,12 +125,12 @@ const EditSubjectPage: React.FC = () => {
         imageUrl: ''
     });
     const [error, setError] = useState<string | null>(null);
-    const [initialLoading, setInitialLoading] = useState(true); // Loading dữ liệu ban đầu
-    const [submitting, setSubmitting] = useState(false); // Loading khi submit form
+    const [initialLoading, setInitialLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         if (!id) {
-            navigate('/subjects'); // Nếu không có ID, quay về trang danh sách
+            navigate('/subjects');
             return;
         }
 
@@ -139,7 +139,19 @@ const EditSubjectPage: React.FC = () => {
             try {
                 const subject = await getSubjectById(id);
                 const formattedDate = subject.dateOfBirth ? new Date(subject.dateOfBirth).toISOString().split('T')[0] : '';
-                setFormData({ ...subject, dateOfBirth: formattedDate });
+                
+                // SỬA LỖI TẠI ĐÂY
+                // Xây dựng một object mới khớp chính xác với cấu trúc của formData
+                // và cung cấp giá trị mặc định cho các trường có thể là undefined.
+                setFormData({
+                    fullName: subject.fullName,
+                    identifier: subject.identifier,
+                    status: subject.status,
+                    dateOfBirth: formattedDate,
+                    notes: subject.notes ?? '',       // Sử dụng ?? để đảm bảo giá trị là string
+                    imageUrl: subject.imageUrl ?? '' // Sử dụng ?? để đảm bảo giá trị là string
+                });
+
             } catch (err) {
                 setError('Không tìm thấy đối tượng hoặc đã có lỗi xảy ra.');
             } finally {
@@ -168,7 +180,6 @@ const EditSubjectPage: React.FC = () => {
         setError(null);
         try {
             await updateSubject(id, formData);
-            // Chuyển hướng và gửi thông báo thành công
             navigate('/subjects', { state: { successMessage: `Đã cập nhật thành công đối tượng: ${formData.fullName}` } });
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật. Vui lòng thử lại.';
@@ -187,7 +198,6 @@ const EditSubjectPage: React.FC = () => {
         );
     }
 
-    // Nếu không tải được dữ liệu ban đầu, hiển thị lỗi
     if (error && !formData.fullName) {
          return (
             <Container>
@@ -212,7 +222,6 @@ const EditSubjectPage: React.FC = () => {
                 <Input name="imageUrl" type="text" placeholder="URL ảnh chân dung" value={formData.imageUrl} onChange={handleChange} disabled={submitting} />
                 <TextArea name="notes" placeholder="Ghi chú thêm..." value={formData.notes} onChange={handleChange} disabled={submitting} />
                 
-                {/* Hiển thị lỗi submit form */}
                 {error && <Error>{error}</Error>}
 
                 <ButtonContainer>
