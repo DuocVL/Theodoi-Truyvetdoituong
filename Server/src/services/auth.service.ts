@@ -81,11 +81,18 @@ export const register = async (data: RegisterDto) => {
 
     const hashedPassword = await hashData(data.password);
 
+    // SỬA LỖI: Tạo Account và User trong cùng một transaction
     const newAccount = await accountRepository.create({
         username: data.username,
         password: hashedPassword,
         email: data.email,
-        type: "USER"
+        type: "USER",
+        user: { // Sử dụng nested write của Prisma
+            create: {
+                full_name: data.full_name,
+                // email và các trường khác có thể được thêm ở đây nếu cần
+            },
+        },
     });
 
     try {
@@ -98,6 +105,7 @@ export const register = async (data: RegisterDto) => {
 
     return { message: "Registration successful. Please check your email to activate your account." };
 };
+
 
 // data được định nghĩa lại inline nếu DTO bị thiếu
 export const activateAccount = async (data: { token: string }) => {
@@ -197,7 +205,7 @@ export const resetPassword = async (data: ResetPasswordDto) => {
 };
 
 export const getMe = async (accountId: string) => {
-    const account = await accountRepository.findByIdWithRelations(accountId);
+    const account = await accountRepository.findByIdWithUserProfile(accountId);
     if (!account) {
         throw new HttpException(404, "Account not found");
     }
@@ -205,7 +213,8 @@ export const getMe = async (accountId: string) => {
     if (account.type === 'SUBJECT') {
         if (!account.subject) {
             console.error(`Data inconsistency: Account ${accountId} is SUBJECT but has no subject record.`);
-            throw new HttpException(500, "Internal Server Error: Data inconsistency");
+            // Sửa lỗi: Thay vì 500, trả về 404 để client có thể xử lý (vd: logout)
+            throw new HttpException(404, "Associated subject data not found for this account.");
         }
         return {
             id: account.subject.id,
@@ -227,7 +236,8 @@ export const getMe = async (accountId: string) => {
     } else if (account.type === 'USER') {
         if (!account.user) {
             console.error(`Data inconsistency: Account ${accountId} is USER but has no user record.`);
-            throw new HttpException(500, "Internal Server Error: Data inconsistency");
+            // Sửa lỗi: Thay vì 500, trả về 404 để client có thể xử lý (vd: logout)
+            throw new HttpException(404, "Associated user data not found for this account.");
         }
         return account.user;
     }
