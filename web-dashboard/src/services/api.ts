@@ -37,10 +37,10 @@ export interface TrackingPoint {
   zone?: string;
 }
 
+// SỬA LỖI: Cập nhật interface để khớp với response của API
 interface AuthResponse {
-  token: string;
+  accessToken: string;
   refreshToken: string;
-  user: User;
 }
 
 // ==================================================================
@@ -105,8 +105,8 @@ export const activateAccount = async (token: string): Promise<{ message: string 
 };
 
 export const getMe = async (): Promise<User> => {
-  const response = await apiClient.get<{ user: User }>('/auth/me');
-  return response.data.user;
+  const response = await apiClient.get<User>('/auth/me');
+  return response.data;
 };
 
 export const forgotPassword = async (email: string): Promise<{ message: string }> => {

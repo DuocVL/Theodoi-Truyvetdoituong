@@ -3,7 +3,7 @@ import { login as apiLogin, getMe, type User } from '../services/api';
 import Spinner from '../components/Spinner';
 
 interface AuthContextType {
-    isAuthenticated: boolean; // Thêm trạng thái xác thực rõ ràng
+    isAuthenticated: boolean;
     user: User | null;
     login: (username: string, password: string, deviceId: string) => Promise<void>; 
     logout: () => void;
@@ -22,7 +22,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false); // State mới
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -31,13 +31,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (token) {
                 try {
                     const currentUser = await getMe();
-                    setUser(currentUser);
-                    setIsAuthenticated(true); // Cập nhật trạng thái
+                    setUser(currentUser); // SỬA LỖI: set trực tiếp đối tượng user
+                    setIsAuthenticated(true);
                 } catch (error) {
                     console.error("Auth verification failed", error);
                     localStorage.removeItem('token');
                     localStorage.removeItem('refreshToken');
-                    setIsAuthenticated(false); // Cập nhật trạng thái
+                    setIsAuthenticated(false);
                 }
             }
             setLoading(false);
@@ -46,32 +46,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (username: string, password: string, deviceId: string) => {
-        // 1. Gọi API login để lấy token
-        const { token, refreshToken } = await apiLogin(username, password, deviceId);
+        const { accessToken, refreshToken } = await apiLogin(username, password, deviceId);
         
-        // 2. Lưu token vào localStorage
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
 
-        // 3. Gọi getMe() để lấy thông tin người dùng
         try {
             const currentUser = await getMe();
-            setUser(currentUser);
-            setIsAuthenticated(true); // 4. Cập nhật trạng thái
+            setUser(currentUser); // SỬA LỖI: set trực tiếp đối tượng user
+            setIsAuthenticated(true);
         } catch (error) {
-            // Nếu getMe thất bại, xóa token và báo lỗi
             console.error("Failed to fetch user after login", error);
             localStorage.removeItem('token');
             localStorage.removeItem('refreshToken');
             setIsAuthenticated(false);
-            // Ném lỗi ra ngoài để LoginPage có thể bắt và hiển thị
             throw new Error("Failed to retrieve user details after login.");
         }
     };
 
     const logout = () => {
         setUser(null);
-        setIsAuthenticated(false); // Cập nhật trạng thái
+        setIsAuthenticated(false);
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';
