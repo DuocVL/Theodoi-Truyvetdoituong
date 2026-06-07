@@ -34,7 +34,7 @@ export type SubjectMinAggregateOutputType = {
   id_number: string | null
   address: string | null
   phone: string | null
-  status: string | null
+  status: $Enums.SubjectStatus | null
   monitoring_start: Date | null
   monitoring_end: Date | null
   avatar_id: string | null
@@ -54,7 +54,7 @@ export type SubjectMaxAggregateOutputType = {
   id_number: string | null
   address: string | null
   phone: string | null
-  status: string | null
+  status: $Enums.SubjectStatus | null
   monitoring_start: Date | null
   monitoring_end: Date | null
   avatar_id: string | null
@@ -229,7 +229,7 @@ export type SubjectGroupByOutputType = {
   id_number: string | null
   address: string | null
   phone: string | null
-  status: string
+  status: $Enums.SubjectStatus
   monitoring_start: Date | null
   monitoring_end: Date | null
   avatar_id: string | null
@@ -270,7 +270,7 @@ export type SubjectWhereInput = {
   id_number?: Prisma.StringNullableFilter<"Subject"> | string | null
   address?: Prisma.StringNullableFilter<"Subject"> | string | null
   phone?: Prisma.StringNullableFilter<"Subject"> | string | null
-  status?: Prisma.StringFilter<"Subject"> | string
+  status?: Prisma.EnumSubjectStatusFilter<"Subject"> | $Enums.SubjectStatus
   monitoring_start?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   monitoring_end?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   avatar_id?: Prisma.StringNullableFilter<"Subject"> | string | null
@@ -330,7 +330,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   id_number?: Prisma.StringNullableFilter<"Subject"> | string | null
   address?: Prisma.StringNullableFilter<"Subject"> | string | null
   phone?: Prisma.StringNullableFilter<"Subject"> | string | null
-  status?: Prisma.StringFilter<"Subject"> | string
+  status?: Prisma.EnumSubjectStatusFilter<"Subject"> | $Enums.SubjectStatus
   monitoring_start?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   monitoring_end?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   created_by?: Prisma.StringFilter<"Subject"> | string
@@ -383,7 +383,7 @@ export type SubjectScalarWhereWithAggregatesInput = {
   id_number?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
-  status?: Prisma.StringWithAggregatesFilter<"Subject"> | string
+  status?: Prisma.EnumSubjectStatusWithAggregatesFilter<"Subject"> | $Enums.SubjectStatus
   monitoring_start?: Prisma.DateTimeNullableWithAggregatesFilter<"Subject"> | Date | string | null
   monitoring_end?: Prisma.DateTimeNullableWithAggregatesFilter<"Subject"> | Date | string | null
   avatar_id?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
@@ -402,7 +402,7 @@ export type SubjectCreateInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -428,7 +428,7 @@ export type SubjectUncheckedCreateInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -452,7 +452,7 @@ export type SubjectUpdateInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -478,7 +478,7 @@ export type SubjectUncheckedUpdateInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -503,7 +503,7 @@ export type SubjectCreateManyInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -522,7 +522,7 @@ export type SubjectUpdateManyMutationInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -540,7 +540,7 @@ export type SubjectUncheckedUpdateManyInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -708,6 +708,10 @@ export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
 }
 
+export type EnumSubjectStatusFieldUpdateOperationsInput = {
+  set?: $Enums.SubjectStatus
+}
+
 export type SubjectUpdateOneRequiredWithoutFaceDataNestedInput = {
   create?: Prisma.XOR<Prisma.SubjectCreateWithoutFaceDataInput, Prisma.SubjectUncheckedCreateWithoutFaceDataInput>
   connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutFaceDataInput
@@ -807,7 +811,7 @@ export type SubjectCreateWithoutAccountInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -831,7 +835,7 @@ export type SubjectUncheckedCreateWithoutAccountInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -871,7 +875,7 @@ export type SubjectUpdateWithoutAccountInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -895,7 +899,7 @@ export type SubjectUncheckedUpdateWithoutAccountInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -919,7 +923,7 @@ export type SubjectCreateWithoutCreatorInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -944,7 +948,7 @@ export type SubjectUncheckedCreateWithoutCreatorInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -997,7 +1001,7 @@ export type SubjectScalarWhereInput = {
   id_number?: Prisma.StringNullableFilter<"Subject"> | string | null
   address?: Prisma.StringNullableFilter<"Subject"> | string | null
   phone?: Prisma.StringNullableFilter<"Subject"> | string | null
-  status?: Prisma.StringFilter<"Subject"> | string
+  status?: Prisma.EnumSubjectStatusFilter<"Subject"> | $Enums.SubjectStatus
   monitoring_start?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   monitoring_end?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   avatar_id?: Prisma.StringNullableFilter<"Subject"> | string | null
@@ -1016,7 +1020,7 @@ export type SubjectCreateWithoutFaceDataInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -1041,7 +1045,7 @@ export type SubjectUncheckedCreateWithoutFaceDataInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -1080,7 +1084,7 @@ export type SubjectUpdateWithoutFaceDataInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1105,7 +1109,7 @@ export type SubjectUncheckedUpdateWithoutFaceDataInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1128,7 +1132,7 @@ export type SubjectCreateWithoutSubjectZoneInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -1153,7 +1157,7 @@ export type SubjectUncheckedCreateWithoutSubjectZoneInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -1192,7 +1196,7 @@ export type SubjectUpdateWithoutSubjectZoneInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1217,7 +1221,7 @@ export type SubjectUncheckedUpdateWithoutSubjectZoneInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1240,7 +1244,7 @@ export type SubjectCreateWithoutCheckinInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -1265,7 +1269,7 @@ export type SubjectUncheckedCreateWithoutCheckinInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -1304,7 +1308,7 @@ export type SubjectUpdateWithoutCheckinInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1329,7 +1333,7 @@ export type SubjectUncheckedUpdateWithoutCheckinInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1352,7 +1356,7 @@ export type SubjectCreateWithoutAlertInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -1377,7 +1381,7 @@ export type SubjectUncheckedCreateWithoutAlertInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -1416,7 +1420,7 @@ export type SubjectUpdateWithoutAlertInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1441,7 +1445,7 @@ export type SubjectUncheckedUpdateWithoutAlertInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1464,7 +1468,7 @@ export type SubjectCreateWithoutEventsInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -1489,7 +1493,7 @@ export type SubjectUncheckedCreateWithoutEventsInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -1528,7 +1532,7 @@ export type SubjectUpdateWithoutEventsInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1553,7 +1557,7 @@ export type SubjectUncheckedUpdateWithoutEventsInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1576,7 +1580,7 @@ export type SubjectCreateWithoutAvatarInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_at?: Date | string
@@ -1601,7 +1605,7 @@ export type SubjectUncheckedCreateWithoutAvatarInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   created_by: string
@@ -1640,7 +1644,7 @@ export type SubjectUpdateWithoutAvatarInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1665,7 +1669,7 @@ export type SubjectUncheckedUpdateWithoutAvatarInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1689,7 +1693,7 @@ export type SubjectCreateManyCreatorInput = {
   id_number?: string | null
   address?: string | null
   phone?: string | null
-  status?: string
+  status?: $Enums.SubjectStatus
   monitoring_start?: Date | string | null
   monitoring_end?: Date | string | null
   avatar_id?: string | null
@@ -1707,7 +1711,7 @@ export type SubjectUpdateWithoutCreatorInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1732,7 +1736,7 @@ export type SubjectUncheckedUpdateWithoutCreatorInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1756,7 +1760,7 @@ export type SubjectUncheckedUpdateManyWithoutCreatorInput = {
   id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
   monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1972,7 +1976,7 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     id_number: string | null
     address: string | null
     phone: string | null
-    status: string
+    status: $Enums.SubjectStatus
     monitoring_start: Date | null
     monitoring_end: Date | null
     avatar_id: string | null
@@ -2420,7 +2424,7 @@ export interface SubjectFieldRefs {
   readonly id_number: Prisma.FieldRef<"Subject", 'String'>
   readonly address: Prisma.FieldRef<"Subject", 'String'>
   readonly phone: Prisma.FieldRef<"Subject", 'String'>
-  readonly status: Prisma.FieldRef<"Subject", 'String'>
+  readonly status: Prisma.FieldRef<"Subject", 'SubjectStatus'>
   readonly monitoring_start: Prisma.FieldRef<"Subject", 'DateTime'>
   readonly monitoring_end: Prisma.FieldRef<"Subject", 'DateTime'>
   readonly avatar_id: Prisma.FieldRef<"Subject", 'String'>

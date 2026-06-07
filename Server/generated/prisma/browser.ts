@@ -33,16 +33,6 @@ export type ActivationToken = Prisma.ActivationTokenModel
  */
 export type User = Prisma.UserModel
 /**
- * Model Role
- * 
- */
-export type Role = Prisma.RoleModel
-/**
- * Model UserRole
- * 
- */
-export type UserRole = Prisma.UserRoleModel
-/**
  * Model Subject
  * 
  */
@@ -102,16 +92,6 @@ export type SystemLog = Prisma.SystemLogModel
  * 
  */
 export type RequestLog = Prisma.RequestLogModel
-/**
- * Model AuthLog
- * 
- */
-export type AuthLog = Prisma.AuthLogModel
-/**
- * Model AuthImage
- * 
- */
-export type AuthImage = Prisma.AuthImageModel
 /**
  * Model Image
  * 

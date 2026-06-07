@@ -18,7 +18,6 @@ model Account {
   status              AccountStatus        @default(PENDING_ACTIVATION)
   created_at          DateTime             @default(now())
   activationTokens    ActivationToken[]
-  auditLogs           AuthImage[]
   devices             Device[]
   passwordResetTokens PasswordResetToken[]
   refreshToken        RefreshToken[]
@@ -43,6 +42,7 @@ model User {
   id         String      @id @default(uuid())
   account_id String      @unique
   full_name  String
+  role       UserAccountRole @default(OPERATOR)
   status     Boolean     @default(true)
   avatar_id  String?     @unique
   created_at DateTime    @default(now())
@@ -50,31 +50,11 @@ model User {
   alerts     Alert[]     @relation("ResolvedAlerts")
   subject    Subject[]   @relation("UserToSubject")
   auditLogs  SystemLog[] @relation("UserToSystemLog")
-  userRole   UserRole[]  @relation("UserToUserRole")
   account    Account     @relation(fields: [account_id], references: [id])
   avatar     Image?      @relation("UserToAvatar", fields: [avatar_id], references: [id])
   zone       Zone[]      @relation("UserToZone")
 
   @@map("users")
-}
-
-model Role {
-  id          Int        @id @default(autoincrement())
-  name        String     @unique
-  description String?
-  userRole    UserRole[] @relation("RoleToUserRole")
-
-  @@map("roles")
-}
-
-model UserRole {
-  user_id String
-  role_id Int
-  role    Role   @relation("RoleToUserRole", fields: [role_id], references: [id], onDelete: Cascade)
-  user    User   @relation("UserToUserRole", fields: [user_id], references: [id], onDelete: Cascade)
-
-  @@id([user_id, role_id])
-  @@map("user_roles")
 }
 
 model Subject {
@@ -87,7 +67,7 @@ model Subject {
   id_number        String?
   address          String?
   phone            String?
-  status           String        @default("ACTIVE")
+  status           SubjectStatus @default(ACTIVE)
   monitoring_start DateTime?
   monitoring_end   DateTime?
   avatar_id        String?       @unique
@@ -281,30 +261,6 @@ model RequestLog {
   @@map("request_log")
 }
 
-model AuthLog {
-  id         String   @id @default(uuid())
-  account_id String
-  action     String
-  status     String
-  ip_address String?
-  user_agent String?
-  device_id  String?
-  created_at DateTime @default(now())
-
-  @@index([account_id])
-  @@map("auth_log")
-}
-
-model AuthImage {
-  id         String   @id @default(uuid())
-  account_id String
-  image_url  String
-  created_at DateTime @default(now())
-  account    Account  @relation(fields: [account_id], references: [id], onDelete: Cascade)
-
-  @@map("auth_images")
-}
-
 model Image {
   id            String   @id @default(uuid())
   url           String
@@ -336,4 +292,16 @@ enum AccountStatus {
   PENDING_ACTIVATION
   ACTIVE
   SUSPENDED
+}
+
+enum UserAccountRole {
+  ADMIN
+  MANAGER
+  OPERATOR
+}
+
+enum SubjectStatus {
+  ACTIVE
+  INACTIVE
+  COMPLETED
 }

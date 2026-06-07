@@ -387,8 +387,6 @@ export const ModelName = {
   Account: 'Account',
   ActivationToken: 'ActivationToken',
   User: 'User',
-  Role: 'Role',
-  UserRole: 'UserRole',
   Subject: 'Subject',
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
@@ -401,8 +399,6 @@ export const ModelName = {
   EventLog: 'EventLog',
   SystemLog: 'SystemLog',
   RequestLog: 'RequestLog',
-  AuthLog: 'AuthLog',
-  AuthImage: 'AuthImage',
   Image: 'Image',
   spatial_ref_sys: 'spatial_ref_sys'
 } as const
@@ -420,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "activationToken" | "user" | "role" | "userRole" | "subject" | "refreshToken" | "passwordResetToken" | "device" | "faceData" | "zone" | "subjectZone" | "checkin" | "alert" | "eventLog" | "systemLog" | "requestLog" | "authLog" | "authImage" | "image" | "spatial_ref_sys"
+    modelProps: "account" | "activationToken" | "user" | "subject" | "refreshToken" | "passwordResetToken" | "device" | "faceData" | "zone" | "subjectZone" | "checkin" | "alert" | "eventLog" | "systemLog" | "requestLog" | "image" | "spatial_ref_sys"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -643,154 +639,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
-        }
-      }
-    }
-    Role: {
-      payload: Prisma.$RolePayload<ExtArgs>
-      fields: Prisma.RoleFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.RoleFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.RoleFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
-        }
-        findFirst: {
-          args: Prisma.RoleFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.RoleFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
-        }
-        findMany: {
-          args: Prisma.RoleFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>[]
-        }
-        create: {
-          args: Prisma.RoleCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
-        }
-        createMany: {
-          args: Prisma.RoleCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.RoleCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>[]
-        }
-        delete: {
-          args: Prisma.RoleDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
-        }
-        update: {
-          args: Prisma.RoleUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
-        }
-        deleteMany: {
-          args: Prisma.RoleDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.RoleUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.RoleUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>[]
-        }
-        upsert: {
-          args: Prisma.RoleUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$RolePayload>
-        }
-        aggregate: {
-          args: Prisma.RoleAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateRole>
-        }
-        groupBy: {
-          args: Prisma.RoleGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.RoleGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.RoleCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.RoleCountAggregateOutputType> | number
-        }
-      }
-    }
-    UserRole: {
-      payload: Prisma.$UserRolePayload<ExtArgs>
-      fields: Prisma.UserRoleFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.UserRoleFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.UserRoleFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>
-        }
-        findFirst: {
-          args: Prisma.UserRoleFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.UserRoleFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>
-        }
-        findMany: {
-          args: Prisma.UserRoleFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>[]
-        }
-        create: {
-          args: Prisma.UserRoleCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>
-        }
-        createMany: {
-          args: Prisma.UserRoleCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.UserRoleCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>[]
-        }
-        delete: {
-          args: Prisma.UserRoleDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>
-        }
-        update: {
-          args: Prisma.UserRoleUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>
-        }
-        deleteMany: {
-          args: Prisma.UserRoleDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.UserRoleUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.UserRoleUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>[]
-        }
-        upsert: {
-          args: Prisma.UserRoleUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserRolePayload>
-        }
-        aggregate: {
-          args: Prisma.UserRoleAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateUserRole>
-        }
-        groupBy: {
-          args: Prisma.UserRoleGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.UserRoleGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.UserRoleCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.UserRoleCountAggregateOutputType> | number
         }
       }
     }
@@ -1634,154 +1482,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    AuthLog: {
-      payload: Prisma.$AuthLogPayload<ExtArgs>
-      fields: Prisma.AuthLogFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AuthLogFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AuthLogFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>
-        }
-        findFirst: {
-          args: Prisma.AuthLogFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AuthLogFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>
-        }
-        findMany: {
-          args: Prisma.AuthLogFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>[]
-        }
-        create: {
-          args: Prisma.AuthLogCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>
-        }
-        createMany: {
-          args: Prisma.AuthLogCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AuthLogCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>[]
-        }
-        delete: {
-          args: Prisma.AuthLogDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>
-        }
-        update: {
-          args: Prisma.AuthLogUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>
-        }
-        deleteMany: {
-          args: Prisma.AuthLogDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AuthLogUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AuthLogUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>[]
-        }
-        upsert: {
-          args: Prisma.AuthLogUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthLogPayload>
-        }
-        aggregate: {
-          args: Prisma.AuthLogAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAuthLog>
-        }
-        groupBy: {
-          args: Prisma.AuthLogGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AuthLogGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AuthLogCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AuthLogCountAggregateOutputType> | number
-        }
-      }
-    }
-    AuthImage: {
-      payload: Prisma.$AuthImagePayload<ExtArgs>
-      fields: Prisma.AuthImageFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.AuthImageFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.AuthImageFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>
-        }
-        findFirst: {
-          args: Prisma.AuthImageFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.AuthImageFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>
-        }
-        findMany: {
-          args: Prisma.AuthImageFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>[]
-        }
-        create: {
-          args: Prisma.AuthImageCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>
-        }
-        createMany: {
-          args: Prisma.AuthImageCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.AuthImageCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>[]
-        }
-        delete: {
-          args: Prisma.AuthImageDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>
-        }
-        update: {
-          args: Prisma.AuthImageUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>
-        }
-        deleteMany: {
-          args: Prisma.AuthImageDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.AuthImageUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.AuthImageUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>[]
-        }
-        upsert: {
-          args: Prisma.AuthImageUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$AuthImagePayload>
-        }
-        aggregate: {
-          args: Prisma.AuthImageAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateAuthImage>
-        }
-        groupBy: {
-          args: Prisma.AuthImageGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AuthImageGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.AuthImageCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AuthImageCountAggregateOutputType> | number
-        }
-      }
-    }
     Image: {
       payload: Prisma.$ImagePayload<ExtArgs>
       fields: Prisma.ImageFieldRefs
@@ -1997,6 +1697,7 @@ export const UserScalarFieldEnum = {
   id: 'id',
   account_id: 'account_id',
   full_name: 'full_name',
+  role: 'role',
   status: 'status',
   avatar_id: 'avatar_id',
   created_at: 'created_at',
@@ -2004,23 +1705,6 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-export const RoleScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description'
-} as const
-
-export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
-
-
-export const UserRoleScalarFieldEnum = {
-  user_id: 'user_id',
-  role_id: 'role_id'
-} as const
-
-export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
 export const SubjectScalarFieldEnum = {
@@ -2198,30 +1882,6 @@ export const RequestLogScalarFieldEnum = {
 export type RequestLogScalarFieldEnum = (typeof RequestLogScalarFieldEnum)[keyof typeof RequestLogScalarFieldEnum]
 
 
-export const AuthLogScalarFieldEnum = {
-  id: 'id',
-  account_id: 'account_id',
-  action: 'action',
-  status: 'status',
-  ip_address: 'ip_address',
-  user_agent: 'user_agent',
-  device_id: 'device_id',
-  created_at: 'created_at'
-} as const
-
-export type AuthLogScalarFieldEnum = (typeof AuthLogScalarFieldEnum)[keyof typeof AuthLogScalarFieldEnum]
-
-
-export const AuthImageScalarFieldEnum = {
-  id: 'id',
-  account_id: 'account_id',
-  image_url: 'image_url',
-  created_at: 'created_at'
-} as const
-
-export type AuthImageScalarFieldEnum = (typeof AuthImageScalarFieldEnum)[keyof typeof AuthImageScalarFieldEnum]
-
-
 export const ImageScalarFieldEnum = {
   id: 'id',
   url: 'url',
@@ -2348,9 +2008,37 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'UserAccountRole'
+ */
+export type EnumUserAccountRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserAccountRole'>
+    
+
+
+/**
+ * Reference to a field of type 'UserAccountRole[]'
+ */
+export type ListEnumUserAccountRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserAccountRole[]'>
+    
+
+
+/**
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'SubjectStatus'
+ */
+export type EnumSubjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubjectStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'SubjectStatus[]'
+ */
+export type ListEnumSubjectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubjectStatus[]'>
     
 
 
@@ -2522,8 +2210,6 @@ export type GlobalOmitConfig = {
   account?: Prisma.AccountOmit
   activationToken?: Prisma.ActivationTokenOmit
   user?: Prisma.UserOmit
-  role?: Prisma.RoleOmit
-  userRole?: Prisma.UserRoleOmit
   subject?: Prisma.SubjectOmit
   refreshToken?: Prisma.RefreshTokenOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
@@ -2536,8 +2222,6 @@ export type GlobalOmitConfig = {
   eventLog?: Prisma.EventLogOmit
   systemLog?: Prisma.SystemLogOmit
   requestLog?: Prisma.RequestLogOmit
-  authLog?: Prisma.AuthLogOmit
-  authImage?: Prisma.AuthImageOmit
   image?: Prisma.ImageOmit
   spatial_ref_sys?: Prisma.spatial_ref_sysOmit
 }

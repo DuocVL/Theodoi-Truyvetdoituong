@@ -8,12 +8,6 @@ export async function createRequestLog(data: Prisma.RequestLogCreateInput) {
     });
 }
 
-export async function createAuthLog(data: Prisma.AuthLogCreateInput) {
-    return await prisma.authLog.create({
-        data
-    });
-}
-
 export async function createSystemLog(data: Prisma.SystemLogCreateInput) {
     return await prisma.systemLog.create({
         data
@@ -33,28 +27,6 @@ export async function getRequestLogs(options: { page: number, limit: number }) {
             }
         }),
         prisma.requestLog.count()
-    ]);
-    return { logs, total, page, limit };
-}
-
-export async function getAuthLogs(options: { page: number, limit: number, accountId?: string }) {
-    const { page, limit, accountId } = options;
-    const skip = (page - 1) * limit;
-    const where: Prisma.AuthLogWhereInput = {};
-    if (accountId) {
-        where.account_id = accountId;
-    }
-
-    const [logs, total] = await Promise.all([
-        prisma.authLog.findMany({
-            where,
-            skip,
-            take: limit,
-            orderBy: {
-                created_at: 'desc'
-            }
-        }),
-        prisma.authLog.count({ where })
     ]);
     return { logs, total, page, limit };
 }

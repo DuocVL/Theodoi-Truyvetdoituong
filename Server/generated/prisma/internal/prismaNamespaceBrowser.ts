@@ -54,8 +54,6 @@ export const ModelName = {
   Account: 'Account',
   ActivationToken: 'ActivationToken',
   User: 'User',
-  Role: 'Role',
-  UserRole: 'UserRole',
   Subject: 'Subject',
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
@@ -68,8 +66,6 @@ export const ModelName = {
   EventLog: 'EventLog',
   SystemLog: 'SystemLog',
   RequestLog: 'RequestLog',
-  AuthLog: 'AuthLog',
-  AuthImage: 'AuthImage',
   Image: 'Image',
   spatial_ref_sys: 'spatial_ref_sys'
 } as const
@@ -118,6 +114,7 @@ export const UserScalarFieldEnum = {
   id: 'id',
   account_id: 'account_id',
   full_name: 'full_name',
+  role: 'role',
   status: 'status',
   avatar_id: 'avatar_id',
   created_at: 'created_at',
@@ -125,23 +122,6 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-export const RoleScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  description: 'description'
-} as const
-
-export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
-
-
-export const UserRoleScalarFieldEnum = {
-  user_id: 'user_id',
-  role_id: 'role_id'
-} as const
-
-export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
 
 
 export const SubjectScalarFieldEnum = {
@@ -317,30 +297,6 @@ export const RequestLogScalarFieldEnum = {
 } as const
 
 export type RequestLogScalarFieldEnum = (typeof RequestLogScalarFieldEnum)[keyof typeof RequestLogScalarFieldEnum]
-
-
-export const AuthLogScalarFieldEnum = {
-  id: 'id',
-  account_id: 'account_id',
-  action: 'action',
-  status: 'status',
-  ip_address: 'ip_address',
-  user_agent: 'user_agent',
-  device_id: 'device_id',
-  created_at: 'created_at'
-} as const
-
-export type AuthLogScalarFieldEnum = (typeof AuthLogScalarFieldEnum)[keyof typeof AuthLogScalarFieldEnum]
-
-
-export const AuthImageScalarFieldEnum = {
-  id: 'id',
-  account_id: 'account_id',
-  image_url: 'image_url',
-  created_at: 'created_at'
-} as const
-
-export type AuthImageScalarFieldEnum = (typeof AuthImageScalarFieldEnum)[keyof typeof AuthImageScalarFieldEnum]
 
 
 export const ImageScalarFieldEnum = {

@@ -24,3 +24,21 @@ export const AccountStatus = {
 } as const
 
 export type AccountStatus = (typeof AccountStatus)[keyof typeof AccountStatus]
+
+
+export const UserAccountRole = {
+  ADMIN: 'ADMIN',
+  MANAGER: 'MANAGER',
+  OPERATOR: 'OPERATOR'
+} as const
+
+export type UserAccountRole = (typeof UserAccountRole)[keyof typeof UserAccountRole]
+
+
+export const SubjectStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type SubjectStatus = (typeof SubjectStatus)[keyof typeof SubjectStatus]
