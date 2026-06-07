@@ -1,8 +1,8 @@
-
 import { Router } from 'express';
 import FaceController from '../../controllers/face.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-// No Routes interface – removed
+import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
+import { UserAccountRole } from '../../../generated/prisma'; // Import the Role enum
 
 class FaceRoute {
   public path = '/face';
@@ -15,25 +15,26 @@ class FaceRoute {
 
   private initializeRoutes() {
     /**
-     * Route đăng ký khuôn mặt mới:
-     * 1. authMiddleware: Kiểm tra quyền truy cập.
-     * 2. uploadMiddleware: Xử lý file ảnh được gửi lên từ client (thường dùng multer).
-     * 3. register: Trích xuất vector khuôn mặt và lưu vào DB.
+     * Route to register a new face.
+     * Requires authentication and ADMIN or MANAGER role.
      */
     this.router.post(
       '/register',
       authMiddleware,
-      this.faceController.uploadMiddleware,
-      this.faceController.register
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER]),
+      this.faceController.uploadMiddleware, // Handles file upload
+      this.faceController.register // Extracts and saves face vector
     );
 
     /**
-     * Route điểm danh bằng khuôn mặt:
-     * So sánh ảnh gửi lên với dữ liệu sinh trắc học đã lưu để xác nhận danh tính/vị trí.
+     * Route for face-based check-in.
+     * Requires authentication and any user role (ADMIN, MANAGER, or OPERATOR).
+     * Compares uploaded image with stored biometric data.
      */
     this.router.post(
       '/check-in',
       authMiddleware,
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER, UserAccountRole.OPERATOR]),
       this.faceController.uploadMiddleware,
       this.faceController.checkIn
     );

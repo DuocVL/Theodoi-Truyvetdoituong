@@ -1,18 +1,21 @@
 import { Router } from 'express';
 import * as logController from '../../controllers/log.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { authorize } from '../../middlewares/role.middleware';
+import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
+import { UserAccountRole } from '../../../generated/prisma'; // Import the Role enum
 
 const router = Router();
 
-// Chặn truy cập: Chỉ những tài khoản có quyền ADMIN mới được phép xem nhật ký hệ thống
-router.use(authMiddleware, authorize(['ADMIN']));
+// Protect all log routes, only ADMINs can access them.
+router.use(authMiddleware, checkRole([UserAccountRole.ADMIN]));
 
-// Lấy nhật ký các yêu cầu API (Ai gọi API nào, lúc nào, thành công hay không)
+// Route to get API request logs
 router.get('/request', logController.getRequestLogs);
-// Lấy nhật ký các sự kiện đăng nhập, thay đổi mật khẩu
+
+// Route to get authentication-related logs (login, password changes, etc.)
 router.get('/auth', logController.getAuthLogs);
-// Lấy nhật ký các sự kiện hoặc lỗi phát sinh từ hệ thống (Server, Database, Worker)
+
+// Route to get system-level event or error logs
 router.get('/system', logController.getSystemLogs);
 
 export default router;

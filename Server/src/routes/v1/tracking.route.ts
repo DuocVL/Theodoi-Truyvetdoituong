@@ -1,20 +1,25 @@
-
 import { Router } from 'express';
 import trackingController from '../../controllers/tracking.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
+import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
+import { UserAccountRole } from '../../../generated/prisma'; // Import the Role enum
 
 const router = Router();
 
-// Đảm bảo người dùng phải đăng nhập mới có thể truy cập dữ liệu truy vết
-router.use(authMiddleware);
+// All tracking routes require authentication and a specific user role.
+router.use(authMiddleware, checkRole([
+  UserAccountRole.ADMIN,
+  UserAccountRole.MANAGER,
+  UserAccountRole.OPERATOR
+]));
 
-// Lấy dữ liệu truy vết tổng hợp của tất cả đối tượng (dùng cho bản đồ trung tâm)
+// Get aggregated tracking data for all subjects (for the main map)
 router.get('/', trackingController.getAll);
 
-// Truy xuất lịch sử di chuyển/điểm danh của một đối tượng nhất định
+// Get the check-in/movement history for a specific subject
 router.get('/history/:subjectId', trackingController.getCheckinHistory);
 
-// Lấy vị trí ghi nhận mới nhất của đối tượng (Real-time monitor)
+// Get the last known location of a subject for real-time monitoring
 router.get('/last-location/:subjectId', trackingController.getLastLocation);
 
 export default router;

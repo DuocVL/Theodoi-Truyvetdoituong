@@ -1,9 +1,8 @@
-
 import { Router } from 'express';
 import UserController from '../../controllers/users.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { authorize, roleMiddleware } from '../../middlewares/role.middleware';
-
+import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
+import { UserAccountRole } from '../../../generated/prisma'; // Import the Role enum
 
 class UserRoute {
   public path = '/users';
@@ -15,17 +14,42 @@ class UserRoute {
   }
 
   private initializeRoutes() {
-    // All user routes are protected and require ADMIN privileges
-    this.router.use(authMiddleware, roleMiddleware, authorize(['ADMIN']));
+    // All user-related routes require authentication first.
+    this.router.use(authMiddleware);
 
-    // Lấy danh sách toàn bộ cán bộ quản lý trong hệ thống
-    this.router.get('/', this.userController.getAll);
-    // Lấy thông tin cá nhân của một cán bộ cụ thể
-    this.router.get('/:id', this.userController.getById);
-    // Cập nhật thông tin hoặc phân lại quyền cho cán bộ
-    this.router.put('/:id', this.userController.update);
-    // Xóa cán bộ khỏi hệ thống quản lý
-    this.router.delete('/:id', this.userController.delete);
+    // GET routes: View all users or a specific one.
+    // Allowed for ADMIN and MANAGER roles.
+    this.router.get(
+      '/',
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER]),
+      this.userController.getAll
+    );
+    this.router.get(
+      '/:id',
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER]),
+      this.userController.getById
+    );
+
+    // POST route: Create a new user.
+    // We will assume that user creation happens via the /auth/register endpoint for now.
+    // If there's a need for an admin to create a user, we would add a POST route here.
+    // this.router.post('/', checkRole([UserAccountRole.ADMIN]), this.userController.create);
+
+    // PUT route: Update an existing user.
+    // Restricted to ADMIN role.
+    this.router.put(
+      '/:id',
+      checkRole([UserAccountRole.ADMIN]),
+      this.userController.update
+    );
+
+    // DELETE route: Delete a user.
+    // Restricted to ADMIN role.
+    this.router.delete(
+      '/:id',
+      checkRole([UserAccountRole.ADMIN]),
+      this.userController.delete
+    );
   }
 }
 

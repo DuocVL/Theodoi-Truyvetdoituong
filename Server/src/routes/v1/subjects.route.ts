@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import SubjectController from '../../controllers/subjects.controller';
-import { authMiddleware } from '../../middlewares/auth.middleware'; // Assuming you have this
-import { roleMiddleware } from '../../middlewares/role.middleware';
+import { authMiddleware } from '../../middlewares/auth.middleware';
+import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
+import { UserAccountRole } from '../../../generated/prisma'; // Import the Role enum
 
 class SubjectRoute {
   public path = '/subjects';
@@ -13,28 +14,48 @@ class SubjectRoute {
   }
 
   private initializeRoutes() {
-    // Route kích hoạt dành cho đối tượng: Cho phép đối tượng tự kích hoạt bằng mã được cấp
+    // Route for subjects to activate themselves, does not require auth
     this.router.post('/activate', this.subjectController.activate);
 
-    // Áp dụng kiểm tra đăng nhập và phân quyền cho toàn bộ các thao tác quản lý bên dưới
+    // All subsequent routes require a user to be authenticated.
     this.router.use(authMiddleware);
-    this.router.use(roleMiddleware);
 
-    // Lấy danh sách tất cả các đối tượng thuộc diện quản lý
-    this.router.get('/', this.subjectController.getAll);
-    
-    // Lấy thông tin chi tiết (hồ sơ, trạng thái) của một đối tượng cụ thể
-    this.router.get('/:id', this.subjectController.getById);
+    // GET routes: View all subjects or a specific one.
+    // Allowed for all user roles (ADMIN, MANAGER, OPERATOR).
+    this.router.get(
+      '/',
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER, UserAccountRole.OPERATOR]),
+      this.subjectController.getAll
+    );
+    this.router.get(
+      '/:id',
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER, UserAccountRole.OPERATOR]),
+      this.subjectController.getById
+    );
 
-    // Tạo mới một hồ sơ đối tượng cần theo dõi
-    this.router.post('/', this.subjectController.create);
+    // POST route: Create a new subject.
+    // Restricted to ADMIN and MANAGER roles.
+    this.router.post(
+      '/',
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER]),
+      this.subjectController.create
+    );
 
-    // Cập nhật thông tin hồ sơ đối tượng
-    this.router.put('/:id', this.subjectController.update);
+    // PUT route: Update an existing subject.
+    // Restricted to ADMIN and MANAGER roles.
+    this.router.put(
+      '/:id',
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER]),
+      this.subjectController.update
+    );
 
-    // Xóa hồ sơ đối tượng (thường là xóa mềm hoặc thu hồi quyền quản lý)
-    this.router.delete('/:id', this.subjectController.delete);
-
+    // DELETE route: Delete a subject.
+    // Restricted to ADMIN role only for safety.
+    this.router.delete(
+      '/:id',
+      checkRole([UserAccountRole.ADMIN]),
+      this.subjectController.delete
+    );
   }
 }
 
