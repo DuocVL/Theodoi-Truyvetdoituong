@@ -1,36 +1,59 @@
+/**
+ * @file index.css
+ * @description
+ * File này chứa các định nghĩa CSS toàn cục và các biến (CSS variables) cho toàn bộ ứng dụng.
+ * Nó thiết lập giao diện nền tảng, bao gồm font chữ, màu sắc, và các quy tắc cho cả hai chế độ Sáng (Light) và Tối (Dark).
+ */
+
+/* 
+ * Định nghĩa các biến CSS trong pseudo-class :root. 
+ * Các biến này có thể được sử dụng lại trên toàn bộ ứng dụng, 
+ * giúp dễ dàng thay đổi theme và duy trì sự nhất quán.
+ */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
+  /* -- Biến màu sắc cho chế độ Sáng (Light Mode) -- */
+  --text: #6b6375;      /* Màu chữ chính */
+  --text-h: #08060d;    /* Màu chữ cho tiêu đề */
+  --bg: #fff;           /* Màu nền chính */
+  --border: #e5e4e7;    /* Màu viền */
+  --code-bg: #f4f3ec;   /* Màu nền cho khối code */
+  --accent: #aa3bff;    /* Màu nhấn chính (ví dụ: link, button) */
+  --accent-bg: rgba(170, 59, 255, 0.1); /* Màu nền nhẹ của màu nhấn */
+  --accent-border: rgba(170, 59, 255, 0.5); /* Màu viền của màu nhấn */
+  --social-bg: rgba(244, 243, 236, 0.5); /* Màu nền cho các yếu tố social */
+  --shadow:             /* Hiệu ứng đổ bóng */
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* -- Biến font chữ -- */
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif; /* Font không chân, ưu tiên font hệ thống */
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif; /* Font cho tiêu đề */
+  --mono: ui-monospace, Consolas, monospace;        /* Font đơn cách, cho code */
 
+  /* -- Thiết lập font và màu sắc cơ bản -- */
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
+  color-scheme: light dark; /* Báo cho trình duyệt biết trang web hỗ trợ cả 2 chế độ màu */
   color: var(--text);
   background: var(--bg);
+
+  /* -- Cải thiện hiển thị font chữ -- */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  /* -- Responsive font size -- */
   @media (max-width: 1024px) {
     font-size: 16px;
   }
 }
 
+/* 
+ * Sử dụng media query `prefers-color-scheme` để tự động thay đổi theme 
+ * dựa trên cài đặt của hệ điều hành người dùng.
+ */
 @media (prefers-color-scheme: dark) {
+  /* Ghi đè các biến màu cho chế độ Tối (Dark Mode) */
   :root {
     --text: #9ca3af;
     --text-h: #f3f4f6;
@@ -46,22 +69,30 @@
   }
 
   #social .button-icon {
-    filter: invert(1) brightness(2);
+    filter: invert(1) brightness(2); /* Đảo màu icon trong chế độ tối */
   }
 }
 
-/* === FIXED THIS SECTION === */
+/** 
+ * === CÁC QUY TẮC CSS TOÀN CỤC ===
+ * Các style áp dụng cho các thẻ HTML cụ thể (body, h1, p, ...)
+ * để đảm bảo sự nhất quán trên toàn trang.
+ */
+
+/* Thiết lập cho div root của React */
 #root {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100vh; /* Đảm bảo ứng dụng chiếm ít nhất toàn bộ chiều cao màn hình */
   box-sizing: border-box;
 }
 
+/* Reset margin mặc định của trình duyệt và đặt màu nền chung */
 body {
   margin: 0;
-  background-color: #f0f2f5;
+  background-color: #f0f2f5; /* Một màu nền xám nhạt cho không gian bên ngoài các card */
 }
 
+/* Style cho các thẻ tiêu đề */
 h1,
 h2 {
   font-family: var(--heading);
@@ -87,10 +118,12 @@ h2 {
     font-size: 20px;
   }
 }
+
 p {
-  margin: 0;
+  margin: 0; /* Reset margin cho thẻ p */
 }
 
+/* Style cho các khối code và các yếu tố tương tự */
 code,
 .counter {
   font-family: var(--mono);

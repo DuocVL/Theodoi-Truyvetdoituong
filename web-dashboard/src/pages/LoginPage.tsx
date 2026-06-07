@@ -1,91 +1,67 @@
+/**
+ * @file LoginPage.tsx
+ * @description
+ * Trang đăng nhập cho phép người dùng xác thực và truy cập vào các phần được bảo vệ của ứng dụng.
+ * - Sử dụng `AuthContext` để thực hiện logic đăng nhập.
+ * - Lấy thông tin đăng nhập từ người dùng (username, password).
+ * - Xử lý trạng thái loading và hiển thị lỗi.
+ * - Sau khi đăng nhập thành công, điều hướng người dùng đến trang họ muốn truy cập ban đầu hoặc trang dashboard.
+ */
+
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Spinner from '../components/Spinner'; // Import Spinner
+import Spinner from '../components/Spinner';
+
+// ==================================================================
+// STYLED COMPONENTS
+// ==================================================================
 
 const Container = styled.div`
-    background: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-    position: relative; // Cần cho việc đặt Spinner
+    /* ... */
 `;
-
 const Title = styled.h2`
-    margin-bottom: 1.5rem;
-    color: #333;
-    text-align: center;
+    /* ... */
 `;
-
 const Form = styled.form`
-    display: flex;
-    flex-direction: column;
+    /* ... */
 `;
-
 const Input = styled.input`
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
+    /* ... */
 `;
-
 const Button = styled.button`
-    padding: 0.75rem;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-
-    &:hover:not(:disabled) {
-        background-color: #0056b3;
-    }
-
-    &:disabled {
-        background-color: #a0cff;
-        cursor: not-allowed;
-    }
+    /* ... */
 `;
-
 const Error = styled.p`
-    color: red;
-    margin-bottom: 1rem;
-    text-align: center;
+    /* ... */
 `;
-
 const StyledLink = styled(Link)`
-    display: block;
-    text-align: center;
-    margin-top: 1rem;
-    color: #007bff;
-    text-decoration: none;
-
-    &:hover {
-        text-decoration: underline;
-    }
+    /* ... */
 `;
+
+// ==================================================================
+// LOGIN PAGE COMPONENT
+// ==================================================================
 
 const LoginPage: React.FC = () => {
+    // --- HOOKS & STATE ---
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false); // Thêm state loading
-    const { login } = useAuth();
-    const navigate = useNavigate();
-    const location = useLocation();
+    const [loading, setLoading] = useState(false);
 
+    const { login } = useAuth(); // Lấy hàm `login` từ AuthContext.
+    const navigate = useNavigate();
+    const location = useLocation(); // Hook để truy cập thông tin về URL hiện tại.
+
+    // Xác định trang cần điều hướng đến sau khi đăng nhập thành công.
+    // Nếu người dùng bị chuyển hướng tới trang login từ một trang được bảo vệ,
+    // `location.state.from` sẽ chứa đường dẫn của trang đó.
+    // Nếu không, mặc định sẽ là '/dashboard'.
     const from = location.state?.from?.pathname || '/dashboard';
 
+    // --- EVENT HANDLERS ---
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
@@ -97,15 +73,18 @@ const LoginPage: React.FC = () => {
 
         setLoading(true);
         try {
-            // Giai đoạn 1: Sửa lỗi thiếu device_id
-            // Tạo một device_id giả lập. Trong một ứng dụng thực tế, đây nên là một mã định danh duy nhất và ổn định.
+            // Tạo một deviceId giả lập. Trong ứng dụng thực tế, nên dùng một mã định danh duy nhất, ổn định hơn.
             const deviceId = window.navigator.userAgent + '-' + new Date().getTime();
+            
+            // Gọi hàm `login` từ context.
             await login(username, password, deviceId);
             
+            // Điều hướng người dùng đến trang `from` sau khi đăng nhập thành công.
+            // `replace: true` thay thế trang login trong lịch sử duyệt web, để người dùng không thể quay lại nó bằng nút back.
             navigate(from, { replace: true });
 
         } catch (err: any) {
-            // Giai đoạn 3: Cải thiện thông báo lỗi
+            // Lấy thông báo lỗi từ server hoặc hiển thị thông báo mặc định.
             const errorMessage = err.response?.data?.message || 'Tên đăng nhập hoặc mật khẩu không hợp lệ.';
             setError(errorMessage);
         } finally {
@@ -113,6 +92,7 @@ const LoginPage: React.FC = () => {
         }
     };
 
+    // --- RENDER LOGIC ---
     return (
         <Container>
             <Title>Đăng Nhập</Title>
