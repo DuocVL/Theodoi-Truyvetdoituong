@@ -5,16 +5,16 @@ import { authMiddleware } from '../../middlewares/auth.middleware';
 
 const router = Router();
 
-// Middleware to protect all tracking routes
+// Đảm bảo người dùng phải đăng nhập mới có thể truy cập dữ liệu truy vết
 router.use(authMiddleware);
 
-// Route to get all tracking logs for the main dashboard view
+// Lấy dữ liệu truy vết tổng hợp của tất cả đối tượng (dùng cho bản đồ trung tâm)
 router.get('/', trackingController.getAll);
 
-// Get check-in history for a specific subject within a time range
+// Truy xuất lịch sử di chuyển/điểm danh của một đối tượng nhất định
 router.get('/history/:subjectId', trackingController.getCheckinHistory);
 
-// Get the last known location of a specific subject
+// Lấy vị trí ghi nhận mới nhất của đối tượng (Real-time monitor)
 router.get('/last-location/:subjectId', trackingController.getLastLocation);
 
 export default router;

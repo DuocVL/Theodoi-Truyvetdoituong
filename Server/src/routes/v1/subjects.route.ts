@@ -13,25 +13,26 @@ class SubjectRoute {
   }
 
   private initializeRoutes() {
-    // Public activation route. The activation token is the credential.
+    // Route kích hoạt dành cho đối tượng: Cho phép đối tượng tự kích hoạt bằng mã được cấp
     this.router.post('/activate', this.subjectController.activate);
 
+    // Áp dụng kiểm tra đăng nhập và phân quyền cho toàn bộ các thao tác quản lý bên dưới
     this.router.use(authMiddleware);
     this.router.use(roleMiddleware);
 
-    // GET /api/v1/subjects - Get all subjects
+    // Lấy danh sách tất cả các đối tượng thuộc diện quản lý
     this.router.get('/', this.subjectController.getAll);
     
-    // GET /api/v1/subjects/:id - Get a single subject by ID
+    // Lấy thông tin chi tiết (hồ sơ, trạng thái) của một đối tượng cụ thể
     this.router.get('/:id', this.subjectController.getById);
 
-    // POST /api/v1/subjects - Create a new subject profile
+    // Tạo mới một hồ sơ đối tượng cần theo dõi
     this.router.post('/', this.subjectController.create);
 
-    // PUT /api/v1/subjects/:id - Update a subject
+    // Cập nhật thông tin hồ sơ đối tượng
     this.router.put('/:id', this.subjectController.update);
 
-    // DELETE /api/v1/subjects/:id - Delete a subject
+    // Xóa hồ sơ đối tượng (thường là xóa mềm hoặc thu hồi quyền quản lý)
     this.router.delete('/:id', this.subjectController.delete);
 
   }

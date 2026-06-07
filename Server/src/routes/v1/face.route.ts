@@ -14,7 +14,12 @@ class FaceRoute {
   }
 
   private initializeRoutes() {
-    // Route for registering a new face. Applies auth middleware and then multer middleware.
+    /**
+     * Route đăng ký khuôn mặt mới:
+     * 1. authMiddleware: Kiểm tra quyền truy cập.
+     * 2. uploadMiddleware: Xử lý file ảnh được gửi lên từ client (thường dùng multer).
+     * 3. register: Trích xuất vector khuôn mặt và lưu vào DB.
+     */
     this.router.post(
       '/register',
       authMiddleware,
@@ -22,7 +27,10 @@ class FaceRoute {
       this.faceController.register
     );
 
-    // Route for performing a check-in. Also protected by auth and uses multer.
+    /**
+     * Route điểm danh bằng khuôn mặt:
+     * So sánh ảnh gửi lên với dữ liệu sinh trắc học đã lưu để xác nhận danh tính/vị trí.
+     */
     this.router.post(
       '/check-in',
       authMiddleware,
