@@ -29,3 +29,18 @@ export const findByToken = async (token_hash: string): Promise<RefreshToken | nu
 export const deleteByToken = async (token_hash: string): Promise<RefreshToken> => {
     return await prisma.refreshToken.delete({ where: { token_hash } });
 };
+
+/**
+ * Deletes all refresh tokens for a specific account and device.
+ * This is used to invalidate old sessions when a user logs in again on the same device.
+ * @param accountId - The ID of the account.
+ * @param deviceId - The ID of the device.
+ */
+export const deleteByAccountIdAndDeviceId = async (accountId: string, deviceId: string): Promise<void> => {
+    await prisma.refreshToken.deleteMany({
+        where: {
+            account_id: accountId,
+            device_id: deviceId,
+        },
+    });
+};

@@ -38,6 +38,11 @@ export const login = async (data: LoginDto) => {
         throw new HttpException(401, "Invalid username or password");
     }
 
+    // FIX: Invalidate old refresh token for the same device.
+    // This ensures that a new login invalidates any previous session on the same device,
+    // preventing the accumulation of unused refresh tokens.
+    await refreshTokenRepository.deleteByAccountIdAndDeviceId(account.id, data.device_id);
+
     const payload: AccountPayload = {
         id: account.id,
         type: account.type,
