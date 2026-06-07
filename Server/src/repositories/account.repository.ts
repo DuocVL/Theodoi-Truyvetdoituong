@@ -67,10 +67,13 @@ export const update = async (id: string, data: Prisma.AccountUpdateInput): Promi
     });
 };
 
+// This function is used by the 'getMe' service.
+// It needs to fetch the user profile for 'USER' accounts and the subject profile for 'SUBJECT' accounts.
 export const findByIdWithUserProfile = async (id: string): Promise<any> => {
     return await prisma.account.findUnique({
         where: { id },
         include: {
+            // Include the user object for 'USER' type accounts
             user: {
                 select: {
                     id: true,
@@ -79,23 +82,16 @@ export const findByIdWithUserProfile = async (id: string): Promise<any> => {
                     avatar_id: true,
                     created_at: true,
                     update_at: true,
-                    userRole: {
-                        include: {
-                            role: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    description: true
-                                }
-                            }
-                        }
-                    },
-                    subject: {
-                        select: {
-                            id: true,
-                            full_name: true,
-                            status: true
-                        }
+                    // FIX: Replace the old 'userRole' with the new 'role' field
+                    role: true, 
+                }
+            },
+            // Include the subject object for 'SUBJECT' type accounts
+            subject: {
+                include: {
+                    checkin: { // Also include recent check-ins for the subject's profile
+                        orderBy: { checkin_time: 'desc' },
+                        take: 5
                     }
                 }
             }
