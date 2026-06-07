@@ -45,7 +45,7 @@ export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
         // Đảm bảo rằng component sử dụng hook này phải là con của AuthProvider.
-        throw new Error('useAuth must be used within an AuthProvider';
+        throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
 };

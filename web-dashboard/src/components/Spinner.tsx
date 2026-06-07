@@ -26,12 +26,6 @@ const spin = keyframes`
 // Styled component cho hình ảnh spinner.
 // Đây là một div được style để trông giống một vòng tròn xoay.
 const SpinnerContainer = styled.div<{ size: number }>`
-  /* 
-   * Tạo viền mờ xung quanh và một đoạn viền đậm hơn để tạo hiệu ứng xoay.
-   * Độ dày của viền được tính toán dựa trên kích thước của spinner, 
-   * đảm bảo nó trông cân đối ở mọi kích thước.
-   * `Math.max(2, ...)` đảm bảo viền có độ dày tối thiểu là 2px.
-   */
   border: ${({ size }) => `${Math.max(2, Math.floor(size / 8))}px`} solid rgba(0, 0, 0, 0.1);
   border-left-color: #3498db; /* Màu của phần đang xoay, tạo điểm nhấn. */
   border-radius: 50%; /* Biến div thành hình tròn. */
