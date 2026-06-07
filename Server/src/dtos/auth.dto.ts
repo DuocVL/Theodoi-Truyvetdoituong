@@ -65,7 +65,7 @@ export const ChangePasswordDto = z.object({
 
 export const forgotPasswordSchema = z.object({
     body: z.object({
-        email: z.string().email(),
+        email: z.email(),
     })
 });
 
@@ -74,7 +74,7 @@ export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>['body'];
 export const resetPasswordSchema = z.object({
     body: z.object({
         token: z.string(),
-        newPassword: z.string().min(8, "Mật khẩu mới phải có ít nhất 8 kí tự"),
+        newPassword: z.string(),
     })
 });
 

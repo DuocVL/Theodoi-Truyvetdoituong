@@ -66,6 +66,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const resetPasswordData: ResetPasswordDto = req.body;
+        console.log(resetPasswordData);
         await authService.resetPassword(resetPasswordData);
         res.status(200).json({ message: "Password has been reset successfully." });
     } catch (error) {

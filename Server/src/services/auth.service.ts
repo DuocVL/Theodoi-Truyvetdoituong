@@ -183,6 +183,7 @@ export const logout = async (refreshToken: string) => {
 
 export const forgotPassword = async (data: ForgotPasswordDto) => {
     const account = await accountRepository.findByEmail(data.email);
+    console.log(account);
     if (!account) {
         console.warn(`Password reset requested for non-existent email: ${data.email}`);
         return;
