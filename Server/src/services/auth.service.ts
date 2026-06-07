@@ -126,49 +126,50 @@ export const activateAccount = async (data: { token: string }) => {
 
 export const refreshToken = async (data: RefreshTokenDto) => {
     const { refreshToken: oldRefreshToken } = data;
-    console.log(oldRefreshToken);
-    
-    // 1. Verify and decode the old refresh token
-    let decoded: AccountPayload;
-    try {
-        decoded = jwt.verify(oldRefreshToken, env.JWT_REFRESH_SECRET) as AccountPayload;
-    } catch {
-        throw new HttpException(401, "Invalid refresh token");
-    }
 
+    // 1. Hash the incoming plain-text token to match the one in the database
     const hashedOldToken = crypto.createHash('sha256').update(oldRefreshToken).digest('hex');
 
     // 2. Find the token in the database
     const tokenFromDb = await refreshTokenRepository.findByToken(hashedOldToken);
 
-    if (!tokenFromDb) {
-        // SECURITY: If the token is not in the DB, it might have been stolen and used.
-        // Invalidate all tokens for this user as a precaution.
-        // await refreshTokenRepository.deleteAllByAccountId(decoded.id);
-        throw new HttpException(401, "Invalid refresh token");
+    // If the token doesn't exist or has expired, it's invalid
+    if (!tokenFromDb || tokenFromDb.expires_at < new Date()) {
+        throw new HttpException(401, "Invalid or expired refresh token");
     }
 
-    // 3. (Important) Delete the used refresh token
+    // 3. (Security) The token is valid. Now, immediately delete it to prevent reuse (part of token rotation)
     await refreshTokenRepository.deleteByToken(hashedOldToken);
 
-    // 4. Generate a new access token AND a new refresh token (Token Rotation)
-    const newPayload: AccountPayload = { id: decoded.id, type: decoded.type, device_id: decoded.device_id };
+    // 4. Get the associated account to create the payload for the new access token
+    const account = await accountRepository.findById(tokenFromDb.account_id);
+    if (!account) {
+        // This would be a data integrity issue. The account linked to the token is gone.
+        throw new HttpException(401, "Invalid refresh token: Associated account not found.");
+    }
+    
+    // 5. Create a new pair of access and refresh tokens
+    const newPayload: AccountPayload = { 
+        id: account.id, 
+        type: account.type, 
+        device_id: tokenFromDb.device_id // Carry over the device ID from the original token
+    };
     const newAccessToken = generateAccessToken(newPayload);
     const { plainToken: newRefreshToken, hashedToken: newHashedRefreshToken } = generateRefreshToken();
 
-    // 5. Save the new refresh token to the database
+    // 6. Save the new refresh token to the database
+    const newExpiresAt = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000); // 60 days from now
     const newTokenData: Prisma.RefreshTokenCreateInput = {
         token_hash: newHashedRefreshToken,
-        device_id: decoded.device_id,
-        expires_at: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+        device_id: tokenFromDb.device_id,
+        expires_at: newExpiresAt,
         account: {
-            connect: { id: decoded.id }
+            connect: { id: account.id }
         }
     };
-
     await refreshTokenRepository.create(newTokenData);
 
-    // 6. Return both new tokens to the client
+    // 7. Return the new tokens to the client
     return { 
         accessToken: newAccessToken,
         refreshToken: newRefreshToken
