@@ -5,7 +5,7 @@ import DashboardPage from '../pages/DashboardPage';
 import RegisterPage from '../pages/RegisterPage';
 import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import ResetPasswordPage from '../pages/ResetPasswordPage';
-import ActivateAccountPage from '../pages/ActivateAccountPage'; // Import the new page
+import ActivateAccountPage from '../pages/ActivateAccountPage';
 import SubjectListPage from '../pages/SubjectListPage';
 import AddSubjectPage from '../pages/AddSubjectPage';
 import EditSubjectPage from '../pages/EditSubjectPage';
@@ -29,21 +29,33 @@ const AppRoutes: React.FC = () => {
 
   return (
       <Routes>
-        {/* Public Routes */}
+        {/* ============================================= */}
+        {/* Public Routes - Accessible without login      */}
+        {/* ============================================= */}
         <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" />} />
         <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPasswordPage /> : <Navigate to="/dashboard" />} />
         <Route path="/reset-password" element={!isAuthenticated ? <ResetPasswordPage /> : <Navigate to="/dashboard" />} />
-        <Route path="/activate-account" element={<ActivateAccountPage />} /> {/* Add activation route */}
+        
+        {/* Activation routes for both User and Subject */}
+        <Route path="/activate-account" element={<ActivateAccountPage />} />
+        <Route path="/activate-account/subjects" element={<ActivateAccountPage />} />
 
-        {/* Protected Routes */}
+
+        {/* ============================================= */}
+        {/* Protected Routes - Require login            */}
+        {/* ============================================= */}
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/subjects" element={<ProtectedRoute><SubjectListPage /></ProtectedRoute>} />
         <Route path="/subjects/add" element={<ProtectedRoute><AddSubjectPage /></ProtectedRoute>} />
         <Route path="/subjects/edit/:id" element={<ProtectedRoute><EditSubjectPage /></ProtectedRoute>} />
         <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
 
-        {/* Default Redirect */}
+
+        {/* ============================================= */}
+        {/* Default Redirect                            */}
+        {/* ============================================= */}
+        {/* If the URL does not match any route, redirect based on auth status */}
         <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
       </Routes>
   );
