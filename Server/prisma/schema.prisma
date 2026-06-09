@@ -67,7 +67,7 @@ model Subject {
   id_number        String?
   address          String?
   phone            String?
-  status           SubjectStatus @default(ACTIVE)
+  status           SubjectStatus @default(INACTIVE)
   monitoring_start DateTime?
   monitoring_end   DateTime?
   avatar_id        String?       @unique
