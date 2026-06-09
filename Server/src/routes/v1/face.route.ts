@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import FaceController from '../../controllers/face.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
-import { UserAccountRole } from '../../../generated/prisma'; // Import the Role enum
+import { checkRole } from '../../middlewares/rbac.middleware';
+import { UserAccountRole } from '../../../generated/prisma';
 
 class FaceRoute {
   public path = '/face';
@@ -14,27 +14,22 @@ class FaceRoute {
   }
 
   private initializeRoutes() {
-    /**
-     * Route to register a new face.
-     * Requires authentication and ADMIN or MANAGER role.
-     */
+    this.router.use(authMiddleware);
+
+    // Route to register a new face.
+    // Accessible by ADMIN and USER roles.
     this.router.post(
       '/register',
-      authMiddleware,
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER]),
-      this.faceController.uploadMiddleware, // Handles file upload
-      this.faceController.register // Extracts and saves face vector
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.USER]),
+      this.faceController.uploadMiddleware,
+      this.faceController.register
     );
 
-    /**
-     * Route for face-based check-in.
-     * Requires authentication and any user role (ADMIN, MANAGER, or OPERATOR).
-     * Compares uploaded image with stored biometric data.
-     */
+    // Route for face-based check-in.
+    // Accessible by ADMIN and USER roles.
     this.router.post(
       '/check-in',
-      authMiddleware,
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER, UserAccountRole.OPERATOR]),
+      checkRole([UserAccountRole.ADMIN, UserAccountRole.USER]),
       this.faceController.uploadMiddleware,
       this.faceController.checkIn
     );
