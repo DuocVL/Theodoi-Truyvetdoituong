@@ -3,8 +3,7 @@ import { z } from 'zod';
 
 // Schema for creating a new subject
 export const createSubjectSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters long"),
-  email: z.string().email("Invalid email address"),
+  email: z.email("Invalid email address"),
   fullName: z.string().min(1, "Full name is required"),
   dob: z.string().optional(),
   gender: z.string().optional(),
