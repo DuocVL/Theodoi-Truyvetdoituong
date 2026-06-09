@@ -48,17 +48,21 @@ const AddSubjectPage: React.FC = () => {
    * Hàm được gọi khi người dùng submit form trong component `SubjectForm`.
    * @param {SubjectFormData} data - Dữ liệu từ form đã được `SubjectForm` thu thập.
    */
-  const handleSubmit = async (data: SubjectFormData) => {
+  const handleSubmit = async (data: Partial<SubjectFormData>) => {
     setError(null); // Reset lỗi trước mỗi lần submit.
     setIsSaving(true); // Bắt đầu quá trình lưu.
     try {
       // Gọi API `createSubject` với dữ liệu từ form.
-      const newSubject = await createSubject(data);
+      // API trả về một object có dạng { message: string, data: Subject }
+      const response = await createSubject(data);
       
+      // Lấy thông báo từ phản hồi của API để đảm bảo tính nhất quán
+      const successMessage = response.message || `Đã thêm thành công đối tượng: ${response.data.full_name}`;
+
       // Điều hướng người dùng về trang danh sách đối tượng sau khi tạo thành công.
       // `navigate` cho phép truyền một `state` object. Ở đây, ta truyền một thông báo thành công
       // để trang danh sách có thể hiển thị nó.
-      navigate('/subjects', { state: { successMessage: `Đã thêm thành công đối tượng: ${newSubject.fullName}` } });
+      navigate('/subjects', { state: { successMessage } });
 
     } catch (err: any) {
       // Xử lý lỗi từ API.
