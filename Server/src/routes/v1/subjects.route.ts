@@ -14,6 +14,9 @@ class SubjectRoute {
   }
 
   private initializeRoutes() {
+    // Route kích hoạt tài khoản là công khai (không cần token Bearer)
+    this.router.post('/activate', this.subjectController.activate);
+
     // All subject routes require authentication first.
     this.router.use(authMiddleware);
 
@@ -21,7 +24,7 @@ class SubjectRoute {
     // Accessible by both ADMIN and USER roles.
     this.router.post(
       '/',
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.USER]),
+      authMiddleware,
       this.subjectController.create
     );
     this.router.put(

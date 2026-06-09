@@ -24,17 +24,6 @@ class UserService {
               id: true,
               full_name: true,
               status: true,
-              userRole: {
-                include: {
-                  role: {
-                    select: {
-                      id: true,
-                      name: true,
-                      description: true
-                    }
-                  }
-                }
-              }
             }
           }
         }

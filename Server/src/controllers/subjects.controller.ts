@@ -16,8 +16,12 @@ class SubjectController {
       }
       const subjectData = createSubjectSchema.parse(req.body);
       const createdByUserId = req.account?.id || '';
+      if (!createdByUserId) {
+        res.status(401).json({ message: 'Unauthorized: Account ID not found' });
+        return;
+      }
       const result = await this.subjectService.createSubjectAndInvite(subjectData, createdByUserId);
-      res.status(201).json({ message: 'Subject created and invitation sent successfully.', data: result.subject });
+      res.status(201).json({ message: 'Hồ sơ đối tượng đã được tạo. Email mời kích hoạt đã được gửi.', data: result.subject });
     } catch (error) {
       next(error);
     }
@@ -27,7 +31,7 @@ class SubjectController {
     try {
       const activationData = activateAccountSchema.parse(req.body);
       await this.subjectService.activateAccount(activationData);
-      res.status(200).json({ message: 'Account activated successfully. You can now log in.' });
+      res.status(200).json({ message: 'Tài khoản đã được kích hoạt thành công. Bạn có thể đăng nhập ngay bây giờ.' });
     } catch (error) {
       next(error);
     }

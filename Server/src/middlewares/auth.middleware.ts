@@ -79,6 +79,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
          */
         req.account = decoded;
 
+        req.role=account.type;
+
         // ✔️ Cho phép request tiếp tục tới controller
         next();
 

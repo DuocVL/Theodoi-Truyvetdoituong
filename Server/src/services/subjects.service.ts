@@ -17,18 +17,18 @@ class SubjectService {
   public async createSubjectAndInvite(subjectData: CreateSubjectData, createdByUserId: string): Promise<any> {
     const existingAccount = await prisma.account.findFirst({
       where: {
-        OR: [{ username: subjectData.username }, { email: subjectData.email }],
+        OR: [{ email: subjectData.email }],
       },
     });
 
     if (existingAccount) {
-      throw new HttpException(409, `Account with this username or email already exists.`);
+      throw new HttpException(409, `Tài khoản với email này đã tồn tại trong hệ thống.`);
     }
 
     return prisma.$transaction(async (tx) => {
       const account = await tx.account.create({
         data: {
-          username: subjectData.username,
+          username: subjectData.email, // Sử dụng email làm username mặc định
           email: subjectData.email,
           type: 'SUBJECT',
         },
@@ -65,7 +65,7 @@ class SubjectService {
       }
 
       // Use the correct frontend URL from env config
-      const activationLink = `${env.FRONTEND_URL}/auth/activate?token=${token}`;
+      const activationLink = `${env.FRONTEND_URL}/subjects/activate?token=${token}`;
       // Call the singleton service directly
       await emailService.sendActivationEmail(account.email, subject.full_name, activationLink);
 
@@ -81,16 +81,28 @@ class SubjectService {
         });
 
         if (!activationToken || !activationToken.account) {
-            throw new HttpException(404, 'Invalid or expired activation token.');
+            throw new HttpException(404, 'Mã kích hoạt không hợp lệ hoặc không tồn tại.');
         }
 
         if (new Date() > activationToken.expires_at) {
             await tx.activationToken.delete({ where: { id: activationToken.id }});
-            throw new HttpException(410, 'Token has expired.');
+            throw new HttpException(410, 'Mã kích hoạt đã hết hạn.');
         }
 
         if (activationToken.account.status === 'ACTIVE') {
-            throw new HttpException(400, 'Account is already active.');
+            throw new HttpException(400, 'Tài khoản này đã được kích hoạt trước đó.');
+        }
+
+        // Kiểm tra xem username Subject chọn đã có ai sử dụng chưa
+        const existingUsername = await tx.account.findFirst({
+          where: {
+            username: data.username,
+            NOT: { id: activationToken.account_id }
+          }
+        });
+
+        if (existingUsername) {
+          throw new HttpException(409, 'Tên đăng nhập này đã tồn tại. Vui lòng chọn tên khác.');
         }
 
         const hashedPassword = await hashData(data.password);
@@ -98,6 +110,7 @@ class SubjectService {
         await tx.account.update({
             where: { id: activationToken.account_id },
             data: {
+                username: data.username, // Cập nhật tên đăng nhập do Subject tự chọn
                 password: hashedPassword,
                 status: 'ACTIVE',
             },
