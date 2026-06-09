@@ -53,13 +53,10 @@ interface AuthResponse {
   refreshToken: string;
 }
 
-// Định nghĩa một kiểu dữ liệu chung cho các phản hồi thành công từ API
-// có chứa đối tượng dữ liệu chính và một tin nhắn.
 export interface ApiResponse<T> {
   message: string;
   data: T;
 }
-
 
 // ==================================================================
 // API CLIENT CONFIGURATION
@@ -71,9 +68,12 @@ const apiClient = axios.create({
   baseURL: API_URL,
 });
 
+// --- Interceptors ---
+
+// 1. Request Interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken'); // Đổi tên để rõ ràng hơn
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -82,20 +82,85 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Biến để quản lý trạng thái làm mới token
+let isRefreshing = false;
+// Hàng đợi để lưu các yêu cầu bị lỗi trong khi chờ token mới
+let failedQueue: ((token: string) => void)[] = [];
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom(Promise.reject(error));
+    } else {
+      prom(token!);
+    }
+  });
+  failedQueue = [];
+};
+
+// 2. Response Interceptor
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    console.error('API Error:',
-      {
-        message: error.message,
-        url: error.config.url,
-        status: error.response?.status,
-        data: error.response?.data,
-      });
-    if (error.response?.status === 401) {
-        localStorage.removeItem('token');
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Nếu lỗi là 401 và có thông điệp token hết hạn, và chưa có yêu cầu refresh nào đang chạy
+    if (error.response?.status === 401 && error.response.data?.message === "Unauthorized: Token has expired" && !originalRequest._retry) {
+      if (isRefreshing) {
+        // Nếu đang có một yêu cầu refresh khác chạy, thêm yêu cầu hiện tại vào hàng đợi
+        return new Promise(function(resolve, reject) {
+          failedQueue.push((token: string) => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            resolve(apiClient(originalRequest));
+          });
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        // Nếu không có refresh token, không thể làm gì, đăng xuất người dùng
+        isRefreshing = false;
+        // TODO: Có thể gọi hàm logout ở đây để dọn dẹp triệt để hơn
+        localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        window.location.href = '/login'; 
+        return Promise.reject(error);
+      }
+
+      try {
+        console.log('Access token expired. Refreshing token...');
+        const response = await apiClient.post<AuthResponse>('/auth/refresh-token', { refreshToken });
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
+
+        // Lưu token mới
+        localStorage.setItem('accessToken', newAccessToken);
+        localStorage.setItem('refreshToken', newRefreshToken);
+
+        // Cập nhật header cho axios instance và thực hiện lại yêu cầu ban đầu
+        apiClient.defaults.headers.common['Authorization'] = 'Bearer ' + newAccessToken;
+        originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
+        
+        // Thực hiện lại các yêu cầu trong hàng đợi với token mới
+        processQueue(null, newAccessToken);
+
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        // Nếu refresh token cũng thất bại, đăng xuất người dùng
+        console.error('Refresh token failed', refreshError);
+        processQueue(refreshError, null);
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
+
+    // Nếu không phải lỗi 401 do token hết hạn, chỉ trả về lỗi đó
     return Promise.reject(error);
   }
 );
@@ -103,8 +168,6 @@ apiClient.interceptors.response.use(
 // ==================================================================
 // API FUNCTIONS
 // ==================================================================
-
-// --- AUTHENTICATION --- //
 
 export const login = async (username: string, password: string, device_id: string): Promise<AuthResponse> => {
   const response = await apiClient.post<AuthResponse>('/auth/login', { username, password, device_id });
@@ -141,8 +204,6 @@ export const resetPassword = async (token: string, password: string): Promise<{ 
   return response.data;
 };
 
-// --- SUBJECTS (Đối tượng) --- //
-
 export const getSubjects = async (): Promise<Subject[]> => {
   const response = await apiClient.get<{ subjects: Subject[] }>('/subjects');
   return response.data.subjects;
@@ -153,27 +214,22 @@ export const getSubjectById = async (id: string): Promise<Subject> => {
   return response.data.subject;
 };
 
-/** Tạo một đối tượng mới */
 export const createSubject = async (subjectData: Partial<Omit<Subject, '_id' | 'createdAt' | 'updatedAt' | 'status'>>): Promise<ApiResponse<Subject>> => {
   const response = await apiClient.post<ApiResponse<Subject>>('/subjects', subjectData);
-  return response.data; // Trả về toàn bộ object { message, data }
+  return response.data;
 };
 
-/** Cập nhật thông tin một đối tượng */
 export const updateSubject = async (id: string, subjectData: Partial<Omit<Subject, '_id'>>): Promise<Subject> => {
   const response = await apiClient.put<{ subject: Subject }>(`/subjects/${id}`, subjectData);
   return response.data.subject;
 };
 
-/** Xóa một đối tượng */
 export const deleteSubject = async (id: string): Promise<{ message: string }> => {
   const response = await apiClient.delete(`/subjects/${id}`);
   return response.data;
 };
 
-// --- TRACKING (Theo dõi vị trí) --- //
-
 export const getTrackingDataBySubjectId = async (subjectId: string): Promise<TrackingPoint[]> => {
-    const response = await apiClient.get<{ trackingData: TrackingPoint[] }>(`/tracking/${subjectId}`);
-    return response.data.trackingData;
+  const response = await apiClient.get<{ trackingData: TrackingPoint[] }>(`/tracking/${subjectId}`);
+  return response.data.trackingData;
 };
