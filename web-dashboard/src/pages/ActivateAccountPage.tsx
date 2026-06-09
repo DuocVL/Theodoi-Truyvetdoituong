@@ -39,7 +39,7 @@ const Title = styled.h2`
     color: #333;
 `;
 
-const Message = styled.p<{ status: 'loading' | 'success' | 'error' }>`
+const Message = styled.p<{ status: 'idle' | 'loading' | 'success' | 'error' }>`
     font-size: 1.1rem;
     color: ${props => (props.status === 'success' ? '#28a745' : props.status === 'error' ? '#dc3545' : '#6c757d')};
     margin: 1.5rem 0;
