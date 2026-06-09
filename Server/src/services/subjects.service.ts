@@ -75,145 +75,153 @@ class SubjectService {
 
   public async activateAccount(data: ActivateAccountData): Promise<void> {
     return prisma.$transaction(async (tx) => {
-        const activationToken = await tx.activationToken.findUnique({
-            where: { token: data.token },
-            include: { account: true },
-        });
+      const activationToken = await tx.activationToken.findUnique({
+        where: { token: data.token },
+        include: { account: true },
+      });
 
-        if (!activationToken || !activationToken.account) {
-            throw new HttpException(404, 'Mã kích hoạt không hợp lệ hoặc không tồn tại.');
+      if (!activationToken || !activationToken.account) {
+        throw new HttpException(404, 'Mã kích hoạt không hợp lệ hoặc không tồn tại.');
+      }
+
+      if (new Date() > activationToken.expires_at) {
+        await tx.activationToken.delete({ where: { id: activationToken.id } });
+        throw new HttpException(410, 'Mã kích hoạt đã hết hạn.');
+      }
+
+      if (activationToken.account.status === 'ACTIVE') {
+        throw new HttpException(400, 'Tài khoản này đã được kích hoạt trước đó.');
+      }
+
+      // Kiểm tra xem username Subject chọn đã có ai sử dụng chưa
+      const existingUsername = await tx.account.findFirst({
+        where: {
+          username: data.username,
+          NOT: { id: activationToken.account_id }
         }
+      });
 
-        if (new Date() > activationToken.expires_at) {
-            await tx.activationToken.delete({ where: { id: activationToken.id }});
-            throw new HttpException(410, 'Mã kích hoạt đã hết hạn.');
-        }
+      if (existingUsername) {
+        throw new HttpException(409, 'Tên đăng nhập này đã tồn tại. Vui lòng chọn tên khác.');
+      }
 
-        if (activationToken.account.status === 'ACTIVE') {
-            throw new HttpException(400, 'Tài khoản này đã được kích hoạt trước đó.');
-        }
+      const hashedPassword = await hashData(data.password);
 
-        // Kiểm tra xem username Subject chọn đã có ai sử dụng chưa
-        const existingUsername = await tx.account.findFirst({
-          where: {
-            username: data.username,
-            NOT: { id: activationToken.account_id }
-          }
-        });
+      await tx.account.update({
+        where: { id: activationToken.account_id },
+        data: {
+          username: data.username, // Cập nhật tên đăng nhập do Subject tự chọn
+          password: hashedPassword,
+          status: 'ACTIVE',
+        },
+      });
 
-        if (existingUsername) {
-          throw new HttpException(409, 'Tên đăng nhập này đã tồn tại. Vui lòng chọn tên khác.');
-        }
+      // Cập nhật trạng thái của hồ sơ Subject tương ứng thành ACTIVE
+      await tx.subject.update({
+        where: { account_id: activationToken.account_id },
+        data: {
+          status: 'ACTIVE',
+        },
+      });
 
-        const hashedPassword = await hashData(data.password);
-
-        await tx.account.update({
-            where: { id: activationToken.account_id },
-            data: {
-                username: data.username, // Cập nhật tên đăng nhập do Subject tự chọn
-                password: hashedPassword,
-                status: 'ACTIVE',
-            },
-        });
-
-        await tx.activationToken.delete({ where: { id: activationToken.id }});
+      await tx.activationToken.delete({ where: { id: activationToken.id } });
     });
   }
 
   public async findAllSubjects(): Promise<any[]> {
     const subjects = await prisma.subject.findMany({
-        include: {
+      include: {
+        account: {
+          select: {
+            username: true,
+            email: true,
+            status: true
+          }
+        },
+        creator: {
+          select: {
+            id: true,
+            full_name: true,
             account: {
-                select: {
-                    username: true,
-                    email: true,
-                    status: true
-                }
-            },
-            creator: {
-                select: {
-                  id: true,
-                  full_name: true,
-                  account: {
-                    select: {
-                      username: true,
-                      email: true
-                    }
-                  }
-                }
+              select: {
+                username: true,
+                email: true
+              }
             }
+          }
         }
+      }
     });
     return subjects;
   }
 
   public async findSubjectById(subjectId: string): Promise<any> {
-      const subject = await prisma.subject.findUnique({
-          where: { id: subjectId },
-          include: {
-              account: true, 
-              checkin: { 
-                  orderBy: {
-                      checkin_time: 'desc'
-                  },
-                  take: 10
-              },
-              creator: {
-                  select: {
-                      id: true,
-                      full_name: true,
-                      account: {
-                        select: {
-                          username: true,
-                          email: true
-                        }
-                      }
-                  }
+    const subject = await prisma.subject.findUnique({
+      where: { id: subjectId },
+      include: {
+        account: true,
+        checkin: {
+          orderBy: {
+            checkin_time: 'desc'
+          },
+          take: 10
+        },
+        creator: {
+          select: {
+            id: true,
+            full_name: true,
+            account: {
+              select: {
+                username: true,
+                email: true
               }
+            }
           }
-      });
-
-      if (!subject) {
-          throw new HttpException(404, 'Subject not found');
+        }
       }
+    });
 
-      return subject;
+    if (!subject) {
+      throw new HttpException(404, 'Subject not found');
+    }
+
+    return subject;
   }
 
   public async updateSubject(subjectId: string, subjectData: UpdateSubjectData): Promise<any> {
-      const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
-      if (!subject) {
-          throw new HttpException(404, 'Subject not found');
+    const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
+    if (!subject) {
+      throw new HttpException(404, 'Subject not found');
+    }
+
+    const updatedSubject = await prisma.subject.update({
+      where: { id: subjectId },
+      data: {
+        full_name: subjectData.fullName,
+        dob: subjectData.dob ? new Date(subjectData.dob) : undefined,
+        gender: subjectData.gender,
+        id_number: subjectData.idNumber,
+        address: subjectData.address,
+        phone: subjectData.phone,
+        monitoring_start: subjectData.monitoringStart ? new Date(subjectData.monitoringStart) : undefined,
+        monitoring_end: subjectData.monitoringEnd ? new Date(subjectData.monitoringEnd) : undefined,
       }
+    });
 
-      const updatedSubject = await prisma.subject.update({
-          where: { id: subjectId },
-          data: {
-            full_name: subjectData.fullName,
-            dob: subjectData.dob ? new Date(subjectData.dob) : undefined,
-            gender: subjectData.gender,
-            id_number: subjectData.idNumber,
-            address: subjectData.address,
-            phone: subjectData.phone,
-            monitoring_start: subjectData.monitoringStart ? new Date(subjectData.monitoringStart) : undefined,
-            monitoring_end: subjectData.monitoringEnd ? new Date(subjectData.monitoringEnd) : undefined,
-          }
-      });
-
-      return updatedSubject;
+    return updatedSubject;
   }
 
   public async deleteSubject(subjectId: string): Promise<any> {
-      return prisma.$transaction(async (tx) => {
-          const subject = await tx.subject.findUnique({ where: { id: subjectId } });
-          if (!subject) {
-              throw new HttpException(404, 'Subject not found');
-          }
+    return prisma.$transaction(async (tx) => {
+      const subject = await tx.subject.findUnique({ where: { id: subjectId } });
+      if (!subject) {
+        throw new HttpException(404, 'Subject not found');
+      }
 
-          await tx.account.delete({ where: { id: subject.account_id } });
+      await tx.account.delete({ where: { id: subject.account_id } });
 
-          return { message: "Subject and associated account deleted successfully." };
-      });
+      return { message: "Subject and associated account deleted successfully." };
+    });
   }
 
 }
