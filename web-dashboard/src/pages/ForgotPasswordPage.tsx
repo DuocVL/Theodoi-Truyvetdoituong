@@ -2,8 +2,6 @@
  * @file ForgotPasswordPage.tsx
  * @description
  * Trang này cho phép người dùng yêu cầu khôi phục mật khẩu.
- * Người dùng nhập địa chỉ email của họ, và nếu email tồn tại trong hệ thống,
- * một email chứa liên kết để đặt lại mật khẩu sẽ được gửi đến họ.
  */
 
 import React, { useState } from 'react';
@@ -13,70 +11,114 @@ import Spinner from '../components/Spinner';
 import { Link } from 'react-router-dom';
 
 // ==================================================================
-// STYLED COMPONENTS
+// STYLED COMPONENTS (Reusing styles from LoginPage for consistency)
 // ==================================================================
 
 const PageContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    height: 100vh;
     background-color: #f0f2f5;
 `;
 
-const Container = styled.div`
+const Box = styled.div`
     background: #fff;
-    padding: 2rem 2.5rem;
+    padding: 2.5rem;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 420px;
+    max-width: 400px;
+    text-align: center;
 `;
 
 const Title = styled.h2`
-    margin-bottom: 1.5rem;
-    color: #333;
-    text-align: center;
-    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: #2d3748;
+    font-size: 1.75rem;
 `;
 
 const Form = styled.form`
+    width: 100%;
     display: flex;
     flex-direction: column;
+    gap: 1.25rem;
 `;
 
 const Input = styled.input`
-    /* ... */
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+
+    &:focus {
+        outline: none;
+        border-color: #4299e1;
+        box-shadow: 0 0 0 1px #4299e1;
+    }
+
+    &:disabled {
+        background-color: #e2e8f0;
+    }
 `;
 
 const Button = styled.button`
-    /* ... */
+    width: 100%;
+    padding: 0.85rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #3182ce;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+        background-color: #2b6cb0;
+    }
+
+    &:disabled {
+        background-color: #a0aec0;
+        cursor: not-allowed;
+    }
 `;
 
-// Component để hiển thị thông báo thành công (đã gửi email).
 const Message = styled.p`
-    color: #28a745;
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 6px;
     text-align: center;
+    font-size: 0.9rem;
+    margin: 0;
 `;
 
-// Component để hiển thị thông báo lỗi.
-const Error = styled.p`
-    color: #721c24;
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-    text-align: center;
+const Error = styled(Message)`
+    color: #e53e3e;
+    background-color: #fed7d7;
+`;
+
+const Success = styled(Message)`
+    color: #2f855a;
+    background-color: #c6f6d5;
+`;
+
+const BackLinkContainer = styled.div`
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
 `;
 
 const BackLink = styled(Link)`
-    /* ... */
+    color: #3182ce;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
 `;
 
 // ==================================================================
@@ -86,38 +128,29 @@ const BackLink = styled(Link)`
 const ForgotPasswordPage: React.FC = () => {
     // --- HOOKS & STATE ---
     const [email, setEmail] = useState('');
-    const [message, setMessage] = useState(''); // State cho thông báo thành công.
-    const [error, setError] = useState(''); // State cho thông báo lỗi.
-    const [loading, setLoading] = useState(false); // State cho trạng thái đang gửi yêu cầu.
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    /**
-     * Xử lý sự kiện submit form.
-     * @param {React.FormEvent} e - Sự kiện submit.
-     */
     const handleForgotPassword = async (e: React.FormEvent) => {
-        e.preventDefault(); // Ngăn trang tải lại.
+        e.preventDefault();
         
         if (!email) {
             setError('Vui lòng nhập địa chỉ email của bạn.');
             return;
         }
 
-        // Reset state trước khi gửi yêu cầu mới.
         setLoading(true);
         setMessage('');
         setError('');
 
         try {
-            // Gọi API `forgotPassword`.
             const response = await forgotPassword(email);
-            // Hiển thị thông báo thành công từ server.
             setMessage(response.message || 'Yêu cầu đã được gửi. Vui lòng kiểm tra email của bạn.');
         } catch (err: any) {
-            // Hiển thị thông báo lỗi từ server.
             const errorMessage = err.response?.data?.message || 'Gửi yêu cầu thất bại. Vui lòng thử lại.';
             setError(errorMessage);
         } finally {
-            // Dừng trạng thái loading.
             setLoading(false);
         }
     };
@@ -125,27 +158,41 @@ const ForgotPasswordPage: React.FC = () => {
     // --- RENDER LOGIC ---
     return (
         <PageContainer>
-            <Container>
+            <Box>
                 <Title>Quên mật khẩu</Title>
-                <Form onSubmit={handleForgotPassword}>
-                    <Input 
-                        type="email" 
-                        placeholder="Nhập email của bạn" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        // Vô hiệu hóa input khi đang tải hoặc đã gửi thành công để tránh người dùng thao tác thừa.
-                        disabled={loading || !!message} 
-                    />
-                    
-                    {message && <Message>{message}</Message>}
-                    {error && <Error>{error}</Error>}
-                    
-                    <Button type="submit" disabled={loading || !!message}>
-                        {loading ? <Spinner size={20} /> : 'Gửi email khôi phục'}
-                    </Button>
-                </Form>
-                <BackLink to="/login">Quay lại trang Đăng nhập</BackLink>
-            </Container>
+                
+                {/* If a success message exists, just show that and the link back */}
+                {message ? (
+                    <>
+                        <Success>{message}</Success>
+                        <BackLinkContainer>
+                            <BackLink to="/login">Quay lại trang Đăng nhập</BackLink>
+                        </BackLinkContainer>
+                    </>
+                ) : (
+                    <>
+                        <Form onSubmit={handleForgotPassword}>
+                            <Input 
+                                type="email" 
+                                placeholder="Nhập email của bạn" 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)} 
+                                disabled={loading} 
+                                required
+                            />
+                            
+                            {error && <Error>{error}</Error>}
+                            
+                            <Button type="submit" disabled={loading}>
+                                {loading ? <Spinner size={24} /> : 'Gửi email khôi phục'}
+                            </Button>
+                        </Form>
+                        <BackLinkContainer>
+                            <BackLink to="/login">Hủy</BackLink>
+                        </BackLinkContainer>
+                    </>
+                )}
+            </Box>
         </PageContainer>
     );
 };
