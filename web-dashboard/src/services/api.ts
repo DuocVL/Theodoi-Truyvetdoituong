@@ -147,6 +147,11 @@ export const activateAccount = async (token: string): Promise<{ message: string 
   return response.data;
 };
 
+export const activateSubjectAccount = async (data: { token: string; username: string; password: string }): Promise<{ message: string }> => {
+  const response = await apiClient.post('/subjects/activate', data);
+  return response.data;
+};
+
 /** Lấy thông tin người dùng đang đăng nhập */
 export const getMe = async (): Promise<User> => {
   const response = await apiClient.get<User>('/auth/me');

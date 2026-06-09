@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import SubjectService from '../services/subjects.service';
 import { RequestWithUser } from '../types/data';
 import { activateAccountSchema, createSubjectSchema, updateSubjectSchema } from '../dtos/subjects.dto';
+import { getUserByAccountId } from '../repositories/user.repository';
 import { z } from 'zod';
 
 class SubjectController {
@@ -15,7 +16,8 @@ class SubjectController {
         return;
       }
       const subjectData = createSubjectSchema.parse(req.body);
-      const createdByUserId = req.account?.id || '';
+      const user = await getUserByAccountId(req.account?.id as string);
+      const createdByUserId = user?.id;
       if (!createdByUserId) {
         res.status(401).json({ message: 'Unauthorized: Account ID not found' });
         return;

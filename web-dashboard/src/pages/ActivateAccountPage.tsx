@@ -7,9 +7,9 @@
  * Sau đó, trang sẽ hiển thị thông báo thành công hoặc thất bại cho người dùng.
  */
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { activateAccount } from '../services/api';
+import { activateSubjectAccount } from '../services/api';
 import styled from 'styled-components';
 import Spinner from '../components/Spinner';
 
@@ -61,54 +61,64 @@ const BackLink = styled(Link)`
     }
 `;
 
+const ErrorMessage = styled.p`
+    color: #e53e3e;
+    font-size: 0.9rem;
+    text-align: center;
+`;
+
+const SuccessMessage = styled.p`
+    color: #2f855a;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 1rem;
+`;
+
 // ==================================================================
 // ACTIVATION PAGE COMPONENT
 // ==================================================================
 
 const ActivateAccountPage: React.FC = () => {
     // --- HOOKS & STATE ---
-    const [searchParams] = useSearchParams(); // Hook để truy cập các tham số query trên URL (ví dụ: ?token=...).
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [message, setMessage] = useState('Đang kích hoạt tài khoản của bạn, vui lòng chờ...');
-
-    // `useRef` được dùng để ngăn `useEffect` chạy 2 lần trong môi trường `StrictMode` của React.
-    // Ở chế độ Strict, React sẽ mount, unmount, rồi mount lại component để tìm lỗi tiềm ẩn.
-    // `hasRun.current` sẽ giữ nguyên giá trị `true` sau lần chạy đầu tiên, ngăn logic kích hoạt bị gọi lại.
-    const hasRun = useRef(false);
+    const [searchParams] = useSearchParams();
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [message, setMessage] = useState('');
 
     // --- SIDE EFFECTS ---
-    useEffect(() => {
-        // Lấy giá trị của tham số `token` từ URL.
-        const token = searchParams.get('token');
+    const token = searchParams.get('token');
 
-        // 1. Kiểm tra sự tồn tại của token.
+    useEffect(() => {
         if (!token) {
             setStatus('error');
             setMessage('Đường dẫn không hợp lệ hoặc thiếu mã kích hoạt.');
-            return; // Dừng thực thi nếu không có token.
         }
+    }, [token]);
 
-        // 2. Chặn thực thi lại trong StrictMode.
-        if (hasRun.current) return;
-        hasRun.current = true; // Đánh dấu là đã chạy.
-
-        // 3. Hàm xử lý logic kích hoạt.
-        const processActivation = async () => {
-            try {
-                // Gọi API để kích hoạt tài khoản với token đã lấy.
-                const response = await activateAccount(token);
-                setStatus('success');
-                setMessage(response.message || 'Tài khoản đã được kích hoạt thành công! Bạn có thể đăng nhập ngay bây giờ.');
-            } catch (err: any) {
-                setStatus('error');
-                // Lấy thông báo lỗi từ response của API, nếu không có thì dùng thông báo mặc định.
-                const errorMessage = err.response?.data?.message || 'Kích hoạt thất bại. Mã có thể không hợp lệ hoặc đã hết hạn.';
-                setMessage(errorMessage);
-            }
-        };
-
-        processActivation();
-    }, [searchParams]); // Effect này sẽ chạy lại nếu `searchParams` thay đổi (thực tế chỉ chạy 1 lần khi trang tải).
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (password !== confirmPassword) {
+            setStatus('error');
+            setMessage('Mật khẩu xác nhận không khớp.');
+            return;
+        }
+        
+        setStatus('loading');
+        try {
+            const response = await activateSubjectAccount({ 
+                token: token!, 
+                username, 
+                password 
+            });
+            setStatus('success');
+            setMessage(response.message || 'Tài khoản đã được kích hoạt thành công!');
+        } catch (err: any) {
+            setStatus('error');
+            setMessage(err.response?.data?.message || 'Kích hoạt thất bại. Vui lòng thử lại.');
+        }
+    };
 
     // --- RENDER LOGIC ---
     return (
@@ -116,15 +126,53 @@ const ActivateAccountPage: React.FC = () => {
             <Container>
                 <Title>Kích hoạt tài khoản</Title>
                 
-                {/* Hiển thị Spinner khi đang trong trạng thái loading */}
-                {status === 'loading' && <Spinner size={50} />}
-                
-                {/* Hiển thị thông báo với màu sắc tương ứng */}
-                <Message status={status}>{message}</Message>
-                
-                {/* Chỉ hiển thị link quay về khi quá trình đã hoàn tất (thành công hoặc lỗi) */}
-                {status !== 'loading' && (
-                    <BackLink to="/login">Quay về trang Đăng nhập</BackLink>
+                {status === 'success' ? (
+                    <>
+                        <SuccessMessage>{message}</SuccessMessage>
+                        <BackLink to="/login" style={{display: 'block'}}>Đến trang Đăng nhập</BackLink>
+                    </>
+                ) : (
+                    <Form onSubmit={handleSubmit}>
+                        <InputGroup>
+                            <Label>Tên đăng nhập mới</Label>
+                            <Input 
+                                type="text" 
+                                value={username} 
+                                onChange={(e) => setUsername(e.target.value)} 
+                                required 
+                                placeholder="Nhập tên đăng nhập"
+                            />
+                        </InputGroup>
+                        <InputGroup>
+                            <Label>Mật khẩu</Label>
+                            <Input 
+                                type="password" 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required 
+                                placeholder="Tối thiểu 8 ký tự"
+                            />
+                        </InputGroup>
+                        <InputGroup>
+                            <Label>Xác nhận mật khẩu</Label>
+                            <Input 
+                                type="password" 
+                                value={confirmPassword} 
+                                onChange={(e) => setConfirmPassword(e.target.value)} 
+                                required 
+                            />
+                        </InputGroup>
+
+                        {status === 'error' && <ErrorMessage>{message}</ErrorMessage>}
+
+                        <Button type="submit" disabled={status === 'loading' || !token}>
+                            {status === 'loading' ? <Spinner size={20} /> : 'Kích hoạt ngay'}
+                        </Button>
+                    </Form>
+                )}
+
+                {!token && (
+                     <BackLink to="/login" style={{display: 'block'}}>Quay về trang Đăng nhập</BackLink>
                 )}
             </Container>
         </PageContainer>
