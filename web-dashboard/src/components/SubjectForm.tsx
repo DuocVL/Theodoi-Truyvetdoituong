@@ -19,7 +19,7 @@ export type SubjectFormData = Omit<Subject, '_id' | 'createdAt' | 'updatedAt' | 
 
 interface SubjectFormProps {
   initialData?: Partial<SubjectFormData>;
-  onSubmit: (data: SubjectFormData) => Promise<void>;
+  onSubmit: (data: Partial<SubjectFormData>) => Promise<void>; // Allow partial data for submission
   isSaving: boolean;
   submitButtonText: string;
   error: string | null;
@@ -44,7 +44,6 @@ const FormGrid = styled.div`
   }
 `;
 
-// A new component for a row that spans the full width of the grid
 const FormRow = styled.div`
   grid-column: 1 / -1;
 `;
@@ -158,7 +157,32 @@ const SubjectForm: React.FC<SubjectFormProps> = ({ initialData, onSubmit, isSavi
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData as SubjectFormData);
+
+    // Create a copy of the data to process before submitting.
+    const dataToSubmit: Partial<SubjectFormData> = { ...formData };
+
+    // Convert local datetime strings to full ISO strings (UTC).
+    // If the field is empty, delete it to send `undefined` instead of `''`.
+    if (dataToSubmit.monitoringStart) {
+        dataToSubmit.monitoringStart = new Date(dataToSubmit.monitoringStart).toISOString();
+    } else {
+        delete dataToSubmit.monitoringStart;
+    }
+
+    if (dataToSubmit.monitoringEnd) {
+        dataToSubmit.monitoringEnd = new Date(dataToSubmit.monitoringEnd).toISOString();
+    } else {
+        delete dataToSubmit.monitoringEnd;
+    }
+
+    // Also ensure optional string fields are not sent as empty strings.
+    if (!dataToSubmit.dob) delete dataToSubmit.dob;
+    if (!dataToSubmit.idNumber) delete dataToSubmit.idNumber;
+    if (!dataToSubmit.address) delete dataToSubmit.address;
+    if (!dataToSubmit.phone) delete dataToSubmit.phone;
+
+    // Call the parent onSubmit with the processed data.
+    onSubmit(dataToSubmit);
   };
 
   return (
