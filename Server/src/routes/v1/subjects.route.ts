@@ -2,7 +2,7 @@ import { Router } from 'express';
 import SubjectController from '../../controllers/subjects.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
-import { UserAccountRole } from '../../../generated/prisma'; // Import the Role enum
+import { UserAccountRole } from '../../../generated/prisma/client'; // Import the Role enum
 
 class SubjectRoute {
   public path = '/subjects';
