@@ -65,7 +65,7 @@ class SubjectService {
       }
 
       // Use the correct frontend URL from env config
-      const activationLink = `${env.FRONTEND_URL}/subjects/activate?token=${token}`;
+      const activationLink = `${env.FRONTEND_URL}/activate-account/subjects?token=${token}`;
       // Call the singleton service directly
       await emailService.sendActivationEmail(account.email, subject.full_name, activationLink);
 
