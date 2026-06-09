@@ -9,7 +9,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { createSubject } from '../services/api';
+import { createSubject, type Subject } from '../services/api';
 import SubjectForm, { type SubjectFormData } from '../components/SubjectForm';
 
 // ==================================================================
@@ -38,54 +38,53 @@ const Title = styled.h1`
 // PAGE COMPONENT
 // ==================================================================
 
+// Định nghĩa một kiểu dữ liệu cho dữ liệu đầu vào của hàm createSubject,
+// trong đó fullName và email là bắt buộc.
+// Các trường khác có thể có hoặc không.
+type CreateSubjectPayload = Partial<Omit<Subject, '_id' | 'createdAt' | 'updatedAt' | 'status' | 'fullName' | 'email'>> & {
+  fullName: string;
+  email: string;
+};
+
+
 const AddSubjectPage: React.FC = () => {
   // --- HOOKS & STATE ---
-  const [error, setError] = useState<string | null>(null); // State để lưu thông báo lỗi từ server.
-  const [isSaving, setIsSaving] = useState(false); // State để theo dõi quá trình lưu, dùng để vô hiệu hóa form và hiển thị spinner.
-  const navigate = useNavigate(); // Hook từ React Router để thực hiện điều hướng chương trình.
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const navigate = useNavigate();
 
   /**
    * Hàm được gọi khi người dùng submit form trong component `SubjectForm`.
-   * @param {SubjectFormData} data - Dữ liệu từ form đã được `SubjectForm` thu thập.
+   * @param {Partial<SubjectFormData>} data - Dữ liệu từ form đã được `SubjectForm` thu thập.
    */
   const handleSubmit = async (data: Partial<SubjectFormData>) => {
-    setError(null); // Reset lỗi trước mỗi lần submit.
-    setIsSaving(true); // Bắt đầu quá trình lưu.
+    setError(null);
+    setIsSaving(true);
     try {
-      // Gọi API `createSubject` với dữ liệu từ form.
-      // API trả về một object có dạng { message: string, data: Subject }
-      const response = await createSubject(data);
-      
-      // Lấy thông báo từ phản hồi của API để đảm bảo tính nhất quán
-      const successMessage = response.message || `Đã thêm thành công đối tượng: ${response.data.full_name}`;
+      // Vì form đã có validation `required` cho fullName và email, 
+      // ta có thể tự tin khẳng định với TypeScript rằng chúng tồn tại.
+      const payload = data as CreateSubjectPayload;
 
-      // Điều hướng người dùng về trang danh sách đối tượng sau khi tạo thành công.
-      // `navigate` cho phép truyền một `state` object. Ở đây, ta truyền một thông báo thành công
-      // để trang danh sách có thể hiển thị nó.
+      const response = await createSubject(payload);
+      
+      // Bây giờ response có kiểu { message: string, data: Subject }, nên có thể truy cập an toàn.
+      const successMessage = response.message || `Đã thêm thành công đối tượng: ${response.data.fullName}`;
+
       navigate('/subjects', { state: { successMessage } });
 
     } catch (err: any) {
-      // Xử lý lỗi từ API.
       const errorMessage = err.response?.data?.message || 'Đã xảy ra lỗi khi thêm đối tượng. Vui lòng kiểm tra lại thông tin.';
       setError(errorMessage);
 
     } finally {
-      // Dù thành công hay thất bại, quá trình lưu đã kết thúc.
       setIsSaving(false);
     }
-  };
+  };  
 
   // --- RENDER LOGIC ---
   return (
     <Container>
       <Title>Tạo Đối tượng Mới</Title>
-      {/* 
-        Render component `SubjectForm` và truyền các props cần thiết:
-        - `onSubmit`: Hàm xử lý logic khi form được submit.
-        - `isSaving`: Trạng thái đang lưu để form có thể hiển thị spinner/vô hiệu hóa.
-        - `submitButtonText`: Nhãn cho nút submit.
-        - `error`: Thông báo lỗi để form hiển thị.
-      */}
       <SubjectForm
         onSubmit={handleSubmit}
         isSaving={isSaving}
