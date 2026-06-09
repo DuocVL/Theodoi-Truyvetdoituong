@@ -73,24 +73,23 @@ const apiClient = axios.create({
 // 1. Request Interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken'); // Đổi tên để rõ ràng hơn
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+    // Luôn kiểm tra token từ localStorage để đảm bảo các tab khác hoặc các lần tải lại trang vẫn được xác thực.
+    const token = localStorage.getItem('token');
+    if (token && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Biến để quản lý trạng thái làm mới token
 let isRefreshing = false;
-// Hàng đợi để lưu các yêu cầu bị lỗi trong khi chờ token mới
-let failedQueue: ((token: string) => void)[] = [];
+let failedQueue: Array<(token: string) => void> = [];
 
 const processQueue = (error: Error | null, token: string | null = null) => {
   failedQueue.forEach(prom => {
     if (error) {
-      prom(Promise.reject(error));
+      (prom as any)(error);
     } else {
       prom(token!);
     }
@@ -104,10 +103,8 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Nếu lỗi là 401 và có thông điệp token hết hạn, và chưa có yêu cầu refresh nào đang chạy
     if (error.response?.status === 401 && error.response.data?.message === "Unauthorized: Token has expired" && !originalRequest._retry) {
       if (isRefreshing) {
-        // Nếu đang có một yêu cầu refresh khác chạy, thêm yêu cầu hiện tại vào hàng đợi
         return new Promise(function(resolve, reject) {
           failedQueue.push((token: string) => {
             originalRequest.headers['Authorization'] = 'Bearer ' + token;
@@ -121,38 +118,29 @@ apiClient.interceptors.response.use(
 
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
-        // Nếu không có refresh token, không thể làm gì, đăng xuất người dùng
         isRefreshing = false;
-        // TODO: Có thể gọi hàm logout ở đây để dọn dẹp triệt để hơn
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        logout(); // Sử dụng hàm logout tập trung
         window.location.href = '/login'; 
         return Promise.reject(error);
       }
 
       try {
-        console.log('Access token expired. Refreshing token...');
         const response = await apiClient.post<AuthResponse>('/auth/refresh-token', { refreshToken });
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
 
-        // Lưu token mới
-        localStorage.setItem('accessToken', newAccessToken);
+        localStorage.setItem('token', newAccessToken);
         localStorage.setItem('refreshToken', newRefreshToken);
 
-        // Cập nhật header cho axios instance và thực hiện lại yêu cầu ban đầu
         apiClient.defaults.headers.common['Authorization'] = 'Bearer ' + newAccessToken;
         originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
         
-        // Thực hiện lại các yêu cầu trong hàng đợi với token mới
         processQueue(null, newAccessToken);
-
         return apiClient(originalRequest);
+
       } catch (refreshError) {
-        // Nếu refresh token cũng thất bại, đăng xuất người dùng
         console.error('Refresh token failed', refreshError);
         processQueue(refreshError, null);
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        logout(); // Sử dụng hàm logout tập trung
         window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {
@@ -160,7 +148,6 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // Nếu không phải lỗi 401 do token hết hạn, chỉ trả về lỗi đó
     return Promise.reject(error);
   }
 );
@@ -171,7 +158,22 @@ apiClient.interceptors.response.use(
 
 export const login = async (username: string, password: string, device_id: string): Promise<AuthResponse> => {
   const response = await apiClient.post<AuthResponse>('/auth/login', { username, password, device_id });
+  const { accessToken } = response.data;
+
+  // FIX: Cập nhật ngay lập tức header mặc định của axios instance.
+  // Điều này đảm bảo các yêu cầu (như getMe) được gọi ngay sau login sẽ được xác thực.
+  if (accessToken) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+  }
+
   return response.data;
+};
+
+/** Xóa token khỏi header và localStorage. */
+export const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    delete apiClient.defaults.headers.common['Authorization'];
 };
 
 export const register = async (data: RegisterData): Promise<{ message: string }> => {
