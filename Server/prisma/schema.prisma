@@ -42,7 +42,7 @@ model User {
   id         String      @id @default(uuid())
   account_id String      @unique
   full_name  String
-  role       UserAccountRole @default(OPERATOR)
+  role       UserAccountRole @default(USER) // Default role is now USER
   status     Boolean     @default(true)
   avatar_id  String?     @unique
   created_at DateTime    @default(now())
@@ -294,10 +294,10 @@ enum AccountStatus {
   SUSPENDED
 }
 
+// Simplified user roles
 enum UserAccountRole {
-  ADMIN
-  MANAGER
-  OPERATOR
+  ADMIN // Can do everything
+  USER  // Can manage subjects and related entities
 }
 
 enum SubjectStatus {

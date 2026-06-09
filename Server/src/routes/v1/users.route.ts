@@ -1,10 +1,15 @@
 import { Router } from 'express';
 import UserController from '../../controllers/users.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
+<<<<<<< HEAD
 import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
 import { UserAccountRole } from '../../../generated/prisma/client'; // Import the Role enum
+=======
+import { checkRole } from '../../middlewares/rbac.middleware';
+import { UserAccountRole } from '../../../generated/prisma';
+>>>>>>> e157ed48ba125601431dc5f5ede55d2f9e233c78
 
-class UserRoute {
+class UsersRoute {
   public path = '/users';
   public router = Router();
   public userController = new UserController();
@@ -14,43 +19,15 @@ class UserRoute {
   }
 
   private initializeRoutes() {
-    // All user-related routes require authentication first.
-    this.router.use(authMiddleware);
+    // All user management routes are protected and restricted to ADMINs.
+    this.router.use(authMiddleware, checkRole([UserAccountRole.ADMIN]));
 
-    // GET routes: View all users or a specific one.
-    // Allowed for ADMIN and MANAGER roles.
-    this.router.get(
-      '/',
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER]),
-      this.userController.getAll
-    );
-    this.router.get(
-      '/:id',
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.MANAGER]),
-      this.userController.getById
-    );
-
-    // POST route: Create a new user.
-    // We will assume that user creation happens via the /auth/register endpoint for now.
-    // If there's a need for an admin to create a user, we would add a POST route here.
-    // this.router.post('/', checkRole([UserAccountRole.ADMIN]), this.userController.create);
-
-    // PUT route: Update an existing user.
-    // Restricted to ADMIN role.
-    this.router.put(
-      '/:id',
-      checkRole([UserAccountRole.ADMIN]),
-      this.userController.update
-    );
-
-    // DELETE route: Delete a user.
-    // Restricted to ADMIN role.
-    this.router.delete(
-      '/:id',
-      checkRole([UserAccountRole.ADMIN]),
-      this.userController.delete
-    );
+    this.router.get(`${this.path}`, this.userController.getUsers);
+    this.router.get(`${this.path}/:id`, this.userController.getUserById);
+    this.router.post(`${this.path}`, this.userController.createUser);
+    this.router.put(`${this.path}/:id`, this.userController.updateUser);
+    this.router.delete(`${this.path}/:id`, this.userController.deleteUser);
   }
 }
 
-export default UserRoute;
+export default UsersRoute;

@@ -28,8 +28,7 @@ export type AccountStatus = (typeof AccountStatus)[keyof typeof AccountStatus]
 
 export const UserAccountRole = {
   ADMIN: 'ADMIN',
-  MANAGER: 'MANAGER',
-  OPERATOR: 'OPERATOR'
+  USER: 'USER'
 } as const
 
 export type UserAccountRole = (typeof UserAccountRole)[keyof typeof UserAccountRole]
