@@ -1,8 +1,8 @@
 
 import { Router } from 'express';
-import { ImageController } from '@/controllers/image.controller';
-import upload from '@/middlewares/upload.middleware';
-import { authMiddleware } from '@/middlewares/auth.middleware'; // Assuming you want to protect these routes
+import { ImageController } from '../../controllers/image.controller';
+import upload from '../../middlewares/upload.middleware';
+import { authMiddleware } from '../..//middlewares/auth.middleware'; // Assuming you want to protect these routes
 
 const router = Router();
 const imageController = new ImageController();
