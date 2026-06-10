@@ -215,14 +215,26 @@ class SubjectService {
     return updatedSubject;
   }
 
+  // FIX: Đảo ngược thứ tự xóa để tuân thủ ràng buộc khóa ngoại
   public async deleteSubject(subjectId: string): Promise<any> {
-    return prisma.$transaction(async (tx) => {
-      const subject = await tx.subject.findUnique({ where: { id: subjectId } });
-      if (!subject) {
-        throw new HttpException(404, 'Subject not found');
-      }
+    const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
+    if (!subject) {
+      throw new HttpException(404, 'Subject not found');
+    }
 
-      await tx.account.delete({ where: { id: subject.account_id } });
+    // Lấy account_id ra trước khi thực hiện transaction
+    const accountIdToDelete = subject.account_id;
+
+    return prisma.$transaction(async (tx) => {
+      // BƯỚC 1: Xóa bản ghi con (subject) trước.
+      // Thao tác này sẽ giải phóng ràng buộc 'RESTRICT' lên bảng accounts.
+      await tx.subject.delete({ where: { id: subjectId } });
+
+      // BƯỚC 2: Sau khi subject đã bị xóa, giờ ta có thể xóa account một cách an toàn.
+      // Đảm bảo accountId tồn tại trước khi xóa
+      if (accountIdToDelete) {
+          await tx.account.delete({ where: { id: accountIdToDelete } });
+      }
 
       return { message: "Subject and associated account deleted successfully." };
     });
