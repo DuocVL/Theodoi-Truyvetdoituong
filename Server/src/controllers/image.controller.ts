@@ -1,11 +1,10 @@
 
 import { Request, Response, NextFunction } from 'express';
-import { Container } from 'typedi';
 import { ImageService } from '@/services/image.service';
 import { HttpException } from '@/exceptions/http-exception';
 
 export class ImageController {
-  private imageService = Container.get(ImageService);
+  private imageService = new ImageService();
 
   public uploadImage = async (req: Request, res: Response, next: NextFunction) => {
     try {

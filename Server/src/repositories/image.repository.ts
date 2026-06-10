@@ -1,12 +1,8 @@
 
 import { PrismaClient, Image } from '@prisma/client';
-import { Service } from 'typedi';
 import { HttpException } from '@/exceptions/http-exception';
 
-@Service()
 export class ImageRepository {
-  // It's generally better to inject the prisma client rather than instantiating it here
-  // For now, we'll keep it simple.
   private prisma = new PrismaClient();
 
   public async createImage(fileData: Omit<Image, 'id' | 'created_at' | 'updated_at' | 'checkinImage' | 'subjectAvatar' | 'userAvatar'>): Promise<Image> {
