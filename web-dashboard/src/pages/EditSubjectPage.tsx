@@ -1,38 +1,108 @@
 /**
  * @file EditSubjectPage.tsx
- * @description
- * Trang này cho phép người dùng chỉnh sửa thông tin của một đối tượng đã tồn tại.
- * - Đầu tiên, nó lấy `id` của đối tượng từ URL.
- * - Sau đó, nó gọi API để lấy dữ liệu hiện tại của đối tượng đó.
- * - Dữ liệu này được truyền vào `SubjectForm` dưới dạng `initialData` để điền vào các trường.
- * - Khi người dùng submit, trang sẽ gọi API để cập nhật thông tin.
+ * @description Trang chỉnh sửa thông tin chi tiết của một đối tượng.
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { getSubjectById, updateSubject, type Subject } from '../services/api';
-import SubjectForm, { type SubjectFormData } from '../components/SubjectForm';
 import Spinner from '../components/Spinner';
 
 // ==================================================================
-// STYLED COMPONENTS
+// STYLED COMPONENTS (Tương tự AddSubjectPage)
 // ==================================================================
 
-const Container = styled.div`
-  /* ... */
+const FormContainer = styled.div`
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 `;
+
 const Title = styled.h1`
-  /* ... */
+  font-size: 1.8rem;
+  color: #1a202c;
+  margin-bottom: 2rem;
+  text-align: center;
 `;
-const LoadingContainer = styled.div`
-  /* ... */
+
+const Form = styled.form`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
 `;
-const ErrorContainer = styled.div`
-  /* ... */
+
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
-const BackLink = styled(Link)`
-  /* ... */
+
+const Label = styled.label`
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #4a5568;
+`;
+
+const Input = styled.input`
+  padding: 0.75rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  &:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 1px #4299e1;
+  }
+`;
+
+const Select = styled.select`
+  padding: 0.75rem;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white;
+`;
+
+const ButtonContainer = styled.div`
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+const Button = styled.button`
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &[type="submit"] {
+    background-color: #3182ce;
+    color: white;
+    &:hover { background-color: #2b6cb0; }
+  }
+
+  &[type="button"] {
+    background-color: #e2e8f0;
+    color: #2d3748;
+    &:hover { background-color: #cbd5e0; }
+  }
+`;
+
+const CenteredMessage = styled.div`
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: #718096;
 `;
 
 // ==================================================================
@@ -40,97 +110,123 @@ const BackLink = styled(Link)`
 // ==================================================================
 
 const EditSubjectPage: React.FC = () => {
-  // --- HOOKS & STATE ---
-  const { id } = useParams<{ id: string }>(); // Lấy `id` từ URL, ví dụ: /subjects/edit/123 -> id là "123".
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [subject, setSubject] = useState<Subject | null>(null); // State để lưu dữ liệu đối tượng được fetch về.
-  const [error, setError] = useState<string | null>(null); // State cho các lỗi (cả lúc fetch và lúc lưu).
-  const [initialLoading, setInitialLoading] = useState(true); // State cho trạng thái tải dữ liệu ban đầu.
-  const [isSaving, setIsSaving] = useState(false); // State cho trạng thái đang lưu sau khi submit.
+  // Dùng Partial<Subject> để khởi tạo rỗng, vì dữ liệu sẽ được fetch sau
+  const [formData, setFormData] = useState<Partial<Subject>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // --- DATA FETCHING (useEffect) ---
   useEffect(() => {
     if (!id) {
-      // Nếu không có id trên URL, điều hướng về trang danh sách.
-      navigate('/subjects');
-      return;
+        setError("ID của đối tượng không tồn tại.");
+        setLoading(false);
+        return;
     }
 
     const fetchSubject = async () => {
       try {
-        // Gọi API để lấy thông tin chi tiết của đối tượng dựa trên id.
-        const data = await getSubjectById(id);
-        setSubject(data);
+        const subjectData = await getSubjectById(id);
+        setFormData(subjectData);
       } catch (err) {
-        setError('Không thể tải thông tin đối tượng hoặc đối tượng không tồn tại.');
+        setError('Không thể tải thông tin đối tượng. Vui lòng thử lại.');
+        console.error(err);
       } finally {
-        setInitialLoading(false); // Dừng trạng thái tải ban đầu.
+        setLoading(false);
       }
     };
 
     fetchSubject();
-  }, [id, navigate]); // Effect này sẽ chạy lại nếu `id` hoặc `navigate` thay đổi.
+  }, [id]);
 
-  // --- EVENT HANDLERS ---
-  const handleSubmit = async (data: SubjectFormData) => {
-    if (!id) return; // Bảo vệ trong trường hợp không có id.
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    setIsSaving(true);
-    setError(null); // Reset lỗi trước khi lưu.
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+
     try {
-      // Gọi API `updateSubject` để cập nhật thông tin.
-      const updatedSubject = await updateSubject(id, data);
-      // Điều hướng về trang danh sách với thông báo thành công.
-      navigate('/subjects', { state: { successMessage: `Đã cập nhật thành công đối tượng: ${updatedSubject.fullName}` } });
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Đã xảy ra lỗi khi cập nhật. Vui lòng kiểm tra lại thông tin.';
-      setError(errorMessage);
-    } finally {
-      setIsSaving(false); // Dừng trạng thái lưu.
+      await updateSubject(id, formData);
+      // Chuyển về trang danh sách với thông báo thành công
+      navigate('/subjects', { state: { successMessage: 'Cập nhật đối tượng thành công!' } });
+    } catch (err) {
+      console.error(err);
+      alert('Cập nhật thất bại. Vui lòng kiểm tra lại thông tin.');
     }
   };
 
-  // --- RENDER LOGIC ---
-
-  // 1. Trạng thái tải dữ liệu ban đầu.
-  if (initialLoading) {
-    return (
-        <Container>
-            <LoadingContainer>
-                <Spinner size={50} />
-                <p>Đang tải dữ liệu...</p>
-            </LoadingContainer>
-        </Container>
-    );
+  if (loading) {
+    return <CenteredMessage><Spinner size={50} /></CenteredMessage>;
   }
 
-  // 2. Trạng thái lỗi khi không thể tải được dữ liệu đối tượng.
-  if (error && !subject) {
-    return (
-        <Container>
-            <ErrorContainer>
-                <p>{error}</p>
-                <BackLink to="/subjects">Quay lại danh sách</BackLink>
-            </ErrorContainer>
-        </Container>
-    );
+  if (error) {
+    return <CenteredMessage style={{ color: 'red' }}>{error}</CenteredMessage>;
   }
 
-  // 3. Trạng thái thành công: hiển thị form với dữ liệu đã tải.
   return (
-    <Container>
+    <FormContainer>
       <Title>Chỉnh sửa Đối tượng</Title>
-      {subject && ( // Chỉ render form khi đã có dữ liệu `subject`.
-        <SubjectForm
-          initialData={subject} // Truyền dữ liệu ban đầu vào form.
-          onSubmit={handleSubmit}
-          isSaving={isSaving}
-          submitButtonText="Lưu Thay đổi"
-          error={error} // Lỗi này có thể là lỗi từ lúc submit.
-        />
-      )}
-    </Container>
+      <Form onSubmit={handleSubmit}>
+        <FormGroup>
+          <Label htmlFor="fullName">Họ và Tên</Label>
+          <Input id="fullName" name="fullName" value={formData.fullName || ''} onChange={handleChange} required />
+        </FormGroup>
+        <FormGroup>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" name="email" type="email" value={formData.email || ''} onChange={handleChange} required />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="idNumber">CCCD</Label>
+          <Input id="idNumber" name="idNumber" value={formData.idNumber || ''} onChange={handleChange} required />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="phone">Số điện thoại</Label>
+          <Input id="phone" name="phone" value={formData.phone || ''} onChange={handleChange} />
+        </FormGroup>
+         <FormGroup>
+          <Label htmlFor="dob">Ngày sinh</Label>
+          <Input id="dob" name="dob" type="date" value={formData.dob || ''} onChange={handleChange} />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="gender">Giới tính</Label>
+          <Select id="gender" name="gender" value={formData.gender || ''} onChange={handleChange}>
+            <option value="">-- Chọn giới tính --</option>
+            <option value="Male">Nam</option>
+            <option value="Female">Nữ</option>
+            <option value="Other">Khác</option>
+          </Select>
+        </FormGroup>
+        <FormGroup style={{ gridColumn: '1 / -1' }}>
+          <Label htmlFor="address">Địa chỉ</Label>
+          <Input id="address" name="address" value={formData.address || ''} onChange={handleChange} />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="monitoringStart">Ngày bắt đầu theo dõi</Label>
+          <Input id="monitoringStart" name="monitoringStart" type="date" value={formData.monitoringStart ? new Date(formData.monitoringStart).toISOString().split('T')[0] : ''} onChange={handleChange} />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="monitoringEnd">Ngày kết thúc theo dõi</Label>
+          <Input id="monitoringEnd" name="monitoringEnd" type="date" value={formData.monitoringEnd ? new Date(formData.monitoringEnd).toISOString().split('T')[0] : ''} onChange={handleChange} />
+        </FormGroup>
+        <FormGroup>
+          <Label htmlFor="status">Trạng thái</Label>
+          <Select id="status" name="status" value={formData.status || ''} onChange={handleChange} required>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+            <option value="COMPLETED">COMPLETED</option>
+          </Select>
+        </FormGroup>
+
+        <ButtonContainer>
+          <Button type="button" onClick={() => navigate('/subjects')}>Hủy</Button>
+          <Button type="submit">Cập nhật</Button>
+        </ButtonContainer>
+      </Form>
+    </FormContainer>
   );
 };
 

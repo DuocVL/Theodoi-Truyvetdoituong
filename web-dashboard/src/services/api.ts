@@ -25,13 +25,13 @@ export interface RegisterData {
 }
 
 export interface Subject {
-  _id: string; // Frontend đang dùng _id
+  _id: string;
   username: string;
   email: string;
-  fullName: string; // Frontend đang dùng fullName
+  fullName: string;
   dob?: string;
   gender?: string;
-  idNumber?: string; // Frontend đang dùng idNumber
+  idNumber?: string;
   address?: string;
   phone?: string;
   monitoringStart?: string;
@@ -40,6 +40,45 @@ export interface Subject {
   createdAt: string;
   updatedAt: string;
 }
+
+// Kiểu dữ liệu thô từ server (snake_case)
+type ServerSubject = {
+    id: string;
+    account_id: string;
+    code: string;
+    full_name: string;
+    dob: string;
+    gender: string;
+    id_number: string;
+    address: string;
+    phone: string;
+    status: string;
+    monitoring_start: string;
+    monitoring_end: string | null;
+    created_by: string;
+    created_at: string;
+    update_at: string;
+    username?: string;
+    email?: string;
+  };
+
+/** Hàm chuyển đổi dữ liệu từ server sang client */
+const mapServerToClientSubject = (subject: ServerSubject): Subject => ({
+    _id: subject.id,
+    fullName: subject.full_name,
+    idNumber: subject.id_number,
+    monitoringStart: subject.monitoring_start,
+    monitoringEnd: subject.monitoring_end || undefined,
+    createdAt: subject.created_at,
+    updatedAt: subject.update_at,
+    username: subject.username || '',
+    email: subject.email || '',
+    dob: subject.dob ? new Date(subject.dob).toISOString().split('T')[0] : undefined,
+    gender: subject.gender,
+    address: subject.address,
+    phone: subject.phone,
+    status: subject.status,
+});
 
 export interface TrackingPoint {
   lat: number;
@@ -198,64 +237,20 @@ export const resetPassword = async (token: string, password: string): Promise<{ 
   return response.data;
 };
 
-// FIX: Cập nhật hàm getSubjects để xử lý đúng cấu trúc dữ liệu từ server
 export const getSubjects = async (): Promise<Subject[]> => {
-  // 1. Định nghĩa kiểu dữ liệu thô từ server (snake_case)
-  type ServerSubject = {
-    id: string;
-    account_id: string;
-    code: string;
-    full_name: string;
-    dob: string;
-    gender: string;
-    id_number: string;
-    address: string;
-    phone: string;
-    status: string;
-    monitoring_start: string;
-    monitoring_end: string | null;
-    created_by: string;
-    created_at: string;
-    update_at: string;
-    username?: string; // username có thể không có nếu account chưa được kích hoạt
-    email?: string; // email có thể không có
-  };
-
-  // 2. Gọi API và chỉ định kiểu trả về là { data: ServerSubject[] }
   const response = await apiClient.get<{ data: ServerSubject[] }>('/subjects');
-
-  // 3. Lấy mảng dữ liệu thô từ `response.data.data`
   const serverSubjects = response.data.data;
 
-  if (!Array.isArray(serverSubjects)) {
-    return []; // Trả về mảng rỗng nếu API không trả về đúng định dạng
-  }
+  if (!Array.isArray(serverSubjects)) return [];
 
-  // 4. Dùng .map() để chuyển đổi từ cấu trúc server (snake_case) sang cấu trúc frontend (camelCase)
-  const clientSubjects: Subject[] = serverSubjects.map(subject => ({
-    _id: subject.id, // Ánh xạ id -> _id
-    fullName: subject.full_name, // Ánh xạ full_name -> fullName
-    idNumber: subject.id_number, // Ánh xạ id_number -> idNumber
-    monitoringStart: subject.monitoring_start,
-    monitoringEnd: subject.monitoring_end || undefined,
-    createdAt: subject.created_at,
-    updatedAt: subject.update_at,
-    // Giữ nguyên các trường có tên giống nhau
-    username: subject.username || '', // Đảm bảo username luôn là string
-    email: subject.email || '', // Đảm bảo email luôn là string
-    dob: subject.dob,
-    gender: subject.gender,
-    address: subject.address,
-    phone: subject.phone,
-    status: subject.status,
-  }));
-
-  return clientSubjects;
+  return serverSubjects.map(mapServerToClientSubject);
 };
 
+// FIX: Cập nhật hàm getSubjectById để xử lý đúng cấu trúc dữ liệu từ server
 export const getSubjectById = async (id: string): Promise<Subject> => {
-  const response = await apiClient.get<{ subject: Subject }>(`/subjects/${id}`);
-  return response.data.subject;
+  const response = await apiClient.get<{ data: ServerSubject }>(`/subjects/${id}`);
+  // Dữ liệu chi tiết nằm trong response.data.data
+  return mapServerToClientSubject(response.data.data);
 };
 
 export const createSubject = async (subjectData: Partial<Omit<Subject, '_id' | 'createdAt' | 'updatedAt' | 'status'>>): Promise<ApiResponse<Subject>> => {
@@ -263,9 +258,27 @@ export const createSubject = async (subjectData: Partial<Omit<Subject, '_id' | '
   return response.data;
 };
 
-export const updateSubject = async (id: string, subjectData: Partial<Omit<Subject, '_id'>>): Promise<Subject> => {
-  const response = await apiClient.put<{ subject: Subject }>(`/subjects/${id}`, subjectData);
-  return response.data.subject;
+// FIX: Cập nhật hàm updateSubject để gửi đi dữ liệu đúng định dạng snake_case
+export const updateSubject = async (id: string, subjectData: Partial<Subject>): Promise<ApiResponse<Subject>> => {
+  // Chuyển đổi dữ liệu từ camelCase (frontend) sang snake_case (backend)
+  const serverData = {
+    full_name: subjectData.fullName,
+    id_number: subjectData.idNumber,
+    monitoring_start: subjectData.monitoringStart,
+    monitoring_end: subjectData.monitoringEnd,
+    dob: subjectData.dob,
+    gender: subjectData.gender,
+    address: subjectData.address,
+    phone: subjectData.phone,
+    status: subjectData.status,
+    email: subjectData.email
+  };
+
+  const response = await apiClient.put<ApiResponse<ServerSubject>>(`/subjects/${id}`, serverData);
+  return {
+    message: response.data.message,
+    data: mapServerToClientSubject(response.data.data)
+  };
 };
 
 export const deleteSubject = async (id: string): Promise<{ message: string }> => {
