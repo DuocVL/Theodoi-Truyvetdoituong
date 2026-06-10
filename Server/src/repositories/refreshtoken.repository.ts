@@ -40,7 +40,7 @@ export const deleteByAccountIdAndDeviceId = async (accountId: string, deviceId: 
     await prisma.refreshToken.deleteMany({
         where: {
             account_id: accountId,
-            //device_id: deviceId,
+            device_id: deviceId,
         },
     });
 };
