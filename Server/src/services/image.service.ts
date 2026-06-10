@@ -1,5 +1,4 @@
 
-import { Service } from 'typedi';
 import fs from 'fs/promises';
 import path from 'path';
 import { ImageRepository } from '@/repositories/image.repository';
@@ -9,9 +8,8 @@ import { Image } from '@prisma/client';
 // Define the allowed upload types, matching middleware
 type UploadType = 'avatars' | 'checkins' | 'subjects';
 
-@Service()
 export class ImageService {
-  constructor(private readonly imageRepository: ImageRepository) {}
+  private imageRepository = new ImageRepository();
 
   /**
    * Handles the upload of a file, creates a corresponding database record.
