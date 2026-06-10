@@ -1,3 +1,4 @@
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -34,7 +35,9 @@ app.use(loggingMiddleware);
 app.use('/api/v1', v1Routes);
 
 // Static file serving for uploaded images
-app.use('/uploads/auth_images', express.static(path.resolve(process.cwd(), 'uploads/auth_images')));
+const uploadsPath = path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsPath));
+
 
 // Error handling middleware (should be last)
 app.use(errorMiddleware);

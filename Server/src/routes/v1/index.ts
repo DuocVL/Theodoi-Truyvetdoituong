@@ -7,6 +7,7 @@ import ZoneRoute from './zones.route';
 import logRoutes from './log.route';
 import trackingRoutes from './tracking.route';
 import FaceRoute from './face.route';
+import imageRouter from './image.route'; // Import the new image router
 
 const router = Router();
 
@@ -29,5 +30,8 @@ router.use('/logs', logRoutes);
 router.use('/tracking', trackingRoutes);
 // Xử lý nhận diện/đăng ký khuôn mặt
 router.use(faceRoute.path, faceRoute.router);
+
+// Add the image routes
+router.use('/images', imageRouter);
 
 export default router;
