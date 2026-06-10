@@ -44,7 +44,6 @@ class SubjectRoute {
     );
     this.router.get(
       '/:id',
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.USER]),
       this.subjectController.getById
     );
   }
