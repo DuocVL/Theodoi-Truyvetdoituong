@@ -16,12 +16,16 @@ export async function update(id: string, data: Prisma.SubjectUpdateInput): Promi
 
 export async function findById(id: string): Promise<Subject | null> {
     return prisma.subject.findUnique({
-        where: { id }
+        where: { id },
+        // Mặc định không include account để tránh rò rỉ username/password.
+        // Nếu cần lấy thông tin liên quan, hãy sử dụng select cụ thể trong Service.
     });
 }
 
 export async function findByFullName(full_name: string): Promise<Subject[]> {
     return prisma.subject.findMany({
-        where: { full_name }
+        where: { 
+            full_name: { contains: full_name, mode: 'insensitive' } 
+        }
     });
 }

@@ -133,7 +133,6 @@ class SubjectService {
       include: {
         account: {
           select: {
-            username: true,
             email: true,
             status: true
           }
@@ -144,7 +143,6 @@ class SubjectService {
             full_name: true,
             account: {
               select: {
-                username: true,
                 email: true
               }
             }
@@ -159,7 +157,14 @@ class SubjectService {
     const subject = await prisma.subject.findUnique({
       where: { id: subjectId },
       include: {
-        account: true,
+        account: {
+          select: {
+            id: true,
+            email: true,
+            status: true,
+            type: true
+          }
+        },
         checkin: {
           orderBy: {
             checkin_time: 'desc'
@@ -172,7 +177,6 @@ class SubjectService {
             full_name: true,
             account: {
               select: {
-                username: true,
                 email: true
               }
             }
