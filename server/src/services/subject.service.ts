@@ -9,17 +9,59 @@ class SubjectService {
   public prisma = new PrismaClient();
 
   public async findAllSubjects(): Promise<Subject[]> {
-    const allSubjects: Subject[] = await this.subjects.findMany();
+    // Tối ưu hóa: chỉ lấy các trường cần thiết cho danh sách
+    const allSubjects = await this.subjects.findMany({
+      select: {
+          id: true,
+          full_name: true,
+          id_number: true,
+          status: true,
+          // Các trường khác được ẩn đi để tối ưu
+      },
+      orderBy: {
+        created_at: 'desc'
+      }
+    }) as any;
     return allSubjects;
   }
 
-  public async findSubjectById(subjectId: string): Promise<Subject> {
+  // FIX: Tối ưu hóa và bảo mật hàm findSubjectById
+  public async findSubjectById(subjectId: string): Promise<Partial<Subject & Account>> {
     if (isEmpty(subjectId)) throw new HttpException(400, "SubjectId is empty");
 
-    const findSubject: Subject = await this.subjects.findUnique({ where: { id: subjectId } });
-    if (!findSubject) throw new HttpException(409, "Subject doesn't exist");
+    const findSubject = await this.subjects.findUnique({
+      where: { id: subjectId },
+      // Chỉ chọn các trường cần thiết cho việc chỉnh sửa
+      select: {
+        id: true,
+        full_name: true,
+        dob: true,
+        gender: true,
+        id_number: true,
+        address: true,
+        phone: true,
+        status: true,
+        monitoring_start: true,
+        monitoring_end: true,
+        // Lấy email từ account liên quan, không lấy các thông tin nhạy cảm khác
+        account: {
+          select: {
+            email: true,
+          }
+        }
+      }
+    });
 
-    return findSubject;
+    if (!findSubject) throw new HttpException(404, "Subject doesn't exist");
+
+    // "Làm phẳng" cấu trúc dữ liệu để frontend dễ sử dụng
+    const flattenedSubject = {
+        ...findSubject,
+        email: findSubject.account?.email, // Gộp email vào object chính
+    };
+    delete (flattenedSubject as any).account; // Xóa object account lồng nhau
+
+    return flattenedSubject;
   }
 
   public async createSubject(subjectData: CreateSubjectDto, createdBy: string): Promise<Subject> {
@@ -49,7 +91,7 @@ class SubjectService {
     return newSubject;
   }
 
-  public async updateSubject(subjectId: string, subjectData: CreateSubjectDto): Promise<Subject> {
+  public async updateSubject(subjectId: string, subjectData: Partial<CreateSubjectDto>): Promise<Subject> {
     if (isEmpty(subjectData)) throw new HttpException(400, "subjectData is empty");
 
     const findSubject: Subject = await this.subjects.findUnique({ where: { id: subjectId } });
@@ -59,22 +101,15 @@ class SubjectService {
     return updateSubjectData;
   }
 
-  // FIX: Sửa lại logic xóa để đảm bảo thứ tự đúng
   public async deleteSubject(subjectId: string): Promise<Subject> {
     if (isEmpty(subjectId)) throw new HttpException(400, "SubjectId is empty");
 
     const findSubject: Subject = await this.subjects.findUnique({ where: { id: subjectId } });
     if (!findSubject) throw new HttpException(409, "Subject doesn't exist");
 
-    // Sử dụng transaction để đảm bảo cả hai hành động cùng thành công hoặc thất bại
     const deletedSubject = await this.prisma.$transaction(async (prisma) => {
-        // 1. Xóa bản ghi Subject trước
         const deleted = await prisma.subject.delete({ where: { id: subjectId } });
-
-        // 2. Sau đó mới xóa Account liên quan
-        // findSubject.account_id chứa id của account cần xóa
         await prisma.account.delete({ where: { id: findSubject.account_id } });
-
         return deleted;
     });
 
