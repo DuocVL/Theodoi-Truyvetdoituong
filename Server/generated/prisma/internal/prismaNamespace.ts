@@ -1884,6 +1884,10 @@ export type RequestLogScalarFieldEnum = (typeof RequestLogScalarFieldEnum)[keyof
 
 export const ImageScalarFieldEnum = {
   id: 'id',
+  file_name: 'file_name',
+  stored_name: 'stored_name',
+  mime_type: 'mime_type',
+  size: 'size',
   url: 'url',
   alt_text: 'alt_text',
   created_at: 'created_at',

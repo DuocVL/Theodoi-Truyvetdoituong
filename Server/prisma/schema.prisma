@@ -263,10 +263,19 @@ model RequestLog {
 
 model Image {
   id            String   @id @default(uuid())
+
+  file_name     String
+  stored_name   String
+  mime_type     String
+  size          Int
+
   url           String
+
   alt_text      String?
+
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+
   checkinImage  Checkin? @relation("CheckinToImage")
   subjectAvatar Subject? @relation("SubjectToAvatar")
   userAvatar    User?    @relation("UserToAvatar")
