@@ -61,7 +61,7 @@ class SubjectController {
   public update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const role = req.role?.toUpperCase();
-      if (role !== 'ADMIN') {
+      if (role !== 'ADMIN' && role !== 'USER' ) {
         res.status(403).json({ message: 'Forbidden' });
         return;
       }
@@ -77,7 +77,7 @@ class SubjectController {
   public delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const role = req.role?.toUpperCase();
-      if (role !== 'ADMIN') {
+      if (role !== 'ADMIN' && role !== 'USER') {
         res.status(403).json({ message: 'Forbidden' });
         return;
       }

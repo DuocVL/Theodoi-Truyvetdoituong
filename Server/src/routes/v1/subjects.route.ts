@@ -28,12 +28,10 @@ class SubjectRoute {
     );
     this.router.put(
       '/:id',
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.USER]),
       this.subjectController.update
     );
     this.router.delete(
       '/:id',
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.USER]),
       this.subjectController.delete
     );
 
