@@ -25,13 +25,13 @@ export interface RegisterData {
 }
 
 export interface Subject {
-  _id: string;
+  _id: string; // Frontend đang dùng _id
   username: string;
   email: string;
-  fullName: string;
+  fullName: string; // Frontend đang dùng fullName
   dob?: string;
   gender?: string;
-  idNumber?: string;
+  idNumber?: string; // Frontend đang dùng idNumber
   address?: string;
   phone?: string;
   monitoringStart?: string;
@@ -70,10 +70,8 @@ const apiClient = axios.create({
 
 // --- Interceptors ---
 
-// 1. Request Interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // Luôn kiểm tra token từ localStorage để đảm bảo các tab khác hoặc các lần tải lại trang vẫn được xác thực.
     const token = localStorage.getItem('token');
     if (token && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -97,7 +95,6 @@ const processQueue = (error: Error | null, token: string | null = null) => {
   failedQueue = [];
 };
 
-// 2. Response Interceptor
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -105,7 +102,7 @@ apiClient.interceptors.response.use(
 
     if (error.response?.status === 401 && error.response.data?.message === "Unauthorized: Token has expired" && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function(resolve) {
           failedQueue.push((token: string) => {
             originalRequest.headers['Authorization'] = 'Bearer ' + token;
             resolve(apiClient(originalRequest));
@@ -119,7 +116,7 @@ apiClient.interceptors.response.use(
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
         isRefreshing = false;
-        logout(); // Sử dụng hàm logout tập trung
+        logout();
         window.location.href = '/login'; 
         return Promise.reject(error);
       }
@@ -140,7 +137,7 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         console.error('Refresh token failed', refreshError);
         processQueue(refreshError, null);
-        logout(); // Sử dụng hàm logout tập trung
+        logout();
         window.location.href = '/login';
         return Promise.reject(refreshError);
       } finally {
@@ -159,17 +156,12 @@ apiClient.interceptors.response.use(
 export const login = async (username: string, password: string, device_id: string): Promise<AuthResponse> => {
   const response = await apiClient.post<AuthResponse>('/auth/login', { username, password, device_id });
   const { accessToken } = response.data;
-
-  // FIX: Cập nhật ngay lập tức header mặc định của axios instance.
-  // Điều này đảm bảo các yêu cầu (như getMe) được gọi ngay sau login sẽ được xác thực.
   if (accessToken) {
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
   }
-
   return response.data;
 };
 
-/** Xóa token khỏi header và localStorage. */
 export const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
@@ -206,9 +198,59 @@ export const resetPassword = async (token: string, password: string): Promise<{ 
   return response.data;
 };
 
+// FIX: Cập nhật hàm getSubjects để xử lý đúng cấu trúc dữ liệu từ server
 export const getSubjects = async (): Promise<Subject[]> => {
-  const response = await apiClient.get<{ subjects: Subject[] }>('/subjects');
-  return response.data.subjects;
+  // 1. Định nghĩa kiểu dữ liệu thô từ server (snake_case)
+  type ServerSubject = {
+    id: string;
+    account_id: string;
+    code: string;
+    full_name: string;
+    dob: string;
+    gender: string;
+    id_number: string;
+    address: string;
+    phone: string;
+    status: string;
+    monitoring_start: string;
+    monitoring_end: string | null;
+    created_by: string;
+    created_at: string;
+    update_at: string;
+    username?: string; // username có thể không có nếu account chưa được kích hoạt
+    email?: string; // email có thể không có
+  };
+
+  // 2. Gọi API và chỉ định kiểu trả về là { data: ServerSubject[] }
+  const response = await apiClient.get<{ data: ServerSubject[] }>('/subjects');
+
+  // 3. Lấy mảng dữ liệu thô từ `response.data.data`
+  const serverSubjects = response.data.data;
+
+  if (!Array.isArray(serverSubjects)) {
+    return []; // Trả về mảng rỗng nếu API không trả về đúng định dạng
+  }
+
+  // 4. Dùng .map() để chuyển đổi từ cấu trúc server (snake_case) sang cấu trúc frontend (camelCase)
+  const clientSubjects: Subject[] = serverSubjects.map(subject => ({
+    _id: subject.id, // Ánh xạ id -> _id
+    fullName: subject.full_name, // Ánh xạ full_name -> fullName
+    idNumber: subject.id_number, // Ánh xạ id_number -> idNumber
+    monitoringStart: subject.monitoring_start,
+    monitoringEnd: subject.monitoring_end || undefined,
+    createdAt: subject.created_at,
+    updatedAt: subject.update_at,
+    // Giữ nguyên các trường có tên giống nhau
+    username: subject.username || '', // Đảm bảo username luôn là string
+    email: subject.email || '', // Đảm bảo email luôn là string
+    dob: subject.dob,
+    gender: subject.gender,
+    address: subject.address,
+    phone: subject.phone,
+    status: subject.status,
+  }));
+
+  return clientSubjects;
 };
 
 export const getSubjectById = async (id: string): Promise<Subject> => {
