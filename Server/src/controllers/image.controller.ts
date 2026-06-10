@@ -1,7 +1,6 @@
-
 import { Request, Response, NextFunction } from 'express';
-import { ImageService } from '@/services/image.service';
-import { HttpException } from '@/exceptions/http-exception';
+import { ImageService } from '../services/image.service';
+import { HttpException } from '../exceptions/http-exception';
 
 export class ImageController {
   private imageService = new ImageService();
@@ -9,7 +8,7 @@ export class ImageController {
   public uploadImage = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const file = req.file;
-      const uploadType = req.body.uploadType; // 'avatars', 'checkins', 'subjects'
+      const uploadType = req.body.uploadType as any; // 'avatars', 'checkins', 'subjects'
 
       if (!file) {
         return next(new HttpException(400, 'No file uploaded.'));
@@ -32,7 +31,7 @@ export class ImageController {
 
   public getImageById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const imageId = req.params.id;
+      const imageId = req.params.id as string;
       const image = await this.imageService.getImage(imageId);
       res.status(200).json({ data: image });
     } catch (error) {
@@ -42,7 +41,7 @@ export class ImageController {
 
   public deleteImageById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const imageId = req.params.id;
+      const imageId = req.params.id as string;
       await this.imageService.deleteImage(imageId);
       res.status(200).json({ message: 'Image deleted successfully' });
     } catch (error) {

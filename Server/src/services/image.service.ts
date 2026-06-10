@@ -1,9 +1,9 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { ImageRepository } from '@/repositories/image.repository';
-import { HttpException } from '@/exceptions/http-exception';
-import { Image } from '@prisma/client';
+import { ImageRepository } from '../repositories/image.repository';
+import { HttpException } from '../exceptions/http-exception';
+import { Image , Prisma } from '../../generated/prisma/client';
 
 // Define the allowed upload types, matching middleware
 type UploadType = 'avatars' | 'checkins' | 'subjects';
@@ -72,7 +72,7 @@ export class ImageService {
 
     } catch (error) {
         // If the file doesn't exist, ENOENT error is thrown. We can ignore it and proceed to delete from DB.
-        if (error.code !== 'ENOENT') {
+        if ( error instanceof Prisma.PrismaClientKnownRequestError && error.code !== 'ENOENT') {
             console.error(`Error during image deletion for ID ${imageId}:`, error);
             throw new HttpException(500, `Failed to delete image. File system or DB error.`);
         }
