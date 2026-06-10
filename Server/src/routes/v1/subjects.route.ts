@@ -24,7 +24,6 @@ class SubjectRoute {
     // Accessible by both ADMIN and USER roles.
     this.router.post(
       '/',
-      authMiddleware,
       this.subjectController.create
     );
     this.router.put(
