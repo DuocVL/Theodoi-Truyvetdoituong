@@ -3,65 +3,58 @@ import { Account, Prisma, PrismaClient, Subject } from '@prisma/client';
 import { isEmpty } from '@utils/util';
 import { CreateSubjectDto } from '@dtos/subjects.dto';
 
+/**
+ * "Làm phẳng" cấu trúc subject, gộp email từ account vào.
+ * @param subject - Đối tượng subject có chứa object account lồng nhau.
+ * @returns Đối tượng subject đã được làm phẳng.
+ */
+const flattenSubject = (subject: any) => {
+  if (!subject) return subject;
+  const { account, ...rest } = subject;
+  return {
+    ...rest,
+    email: account?.email,
+  };
+};
+
 class SubjectService {
   public subjects = new PrismaClient().subject;
   public accounts = new PrismaClient().account;
   public prisma = new PrismaClient();
 
-  public async findAllSubjects(): Promise<Subject[]> {
-    // Tối ưu hóa: chỉ lấy các trường cần thiết cho danh sách
+  // FIX: Sửa lại hàm findAll để trả về dữ liệu nhất quán
+  public async findAllSubjects(): Promise<any[]> {
     const allSubjects = await this.subjects.findMany({
-      select: {
-          id: true,
-          full_name: true,
-          id_number: true,
-          status: true,
-          // Các trường khác được ẩn đi để tối ưu
-      },
       orderBy: {
         created_at: 'desc'
+      },
+      include: {
+        account: {
+          select: { email: true }
+        }
       }
-    }) as any;
-    return allSubjects;
+    });
+    // Áp dụng hàm flatten cho tất cả các đối tượng trong danh sách
+    return allSubjects.map(flattenSubject);
   }
 
-  // FIX: Tối ưu hóa và bảo mật hàm findSubjectById
+  // FIX: Sử dụng lại hàm flatten để đảm bảo nhất quán
   public async findSubjectById(subjectId: string): Promise<Partial<Subject & Account>> {
     if (isEmpty(subjectId)) throw new HttpException(400, "SubjectId is empty");
 
     const findSubject = await this.subjects.findUnique({
       where: { id: subjectId },
-      // Chỉ chọn các trường cần thiết cho việc chỉnh sửa
-      select: {
-        id: true,
-        full_name: true,
-        dob: true,
-        gender: true,
-        id_number: true,
-        address: true,
-        phone: true,
-        status: true,
-        monitoring_start: true,
-        monitoring_end: true,
-        // Lấy email từ account liên quan, không lấy các thông tin nhạy cảm khác
+      include: {
         account: {
-          select: {
-            email: true,
-          }
+          select: { email: true }
         }
       }
     });
 
     if (!findSubject) throw new HttpException(404, "Subject doesn't exist");
 
-    // "Làm phẳng" cấu trúc dữ liệu để frontend dễ sử dụng
-    const flattenedSubject = {
-        ...findSubject,
-        email: findSubject.account?.email, // Gộp email vào object chính
-    };
-    delete (flattenedSubject as any).account; // Xóa object account lồng nhau
-
-    return flattenedSubject;
+    // Sử dụng hàm flatten chung
+    return flattenSubject(findSubject);
   }
 
   public async createSubject(subjectData: CreateSubjectDto, createdBy: string): Promise<Subject> {

@@ -14,29 +14,30 @@ import Spinner from '../components/Spinner';
 // ==================================================================
 
 const PageWrapper = styled.div`
-  padding: 1.5rem; // Thêm padding cho toàn bộ trang
+  padding: 1.5rem;
 `;
 
 const FormContainer = styled.div`
   max-width: 800px;
-  margin: 0 auto; // Bỏ margin-top để PageWrapper kiểm soát
+  margin: 0 auto;
   padding: 2.5rem;
-  background-color: #fff;
+  background-color: #1a202c; // Nền tối cho form container
+  color: #e2e8f0; // Chữ sáng
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 `;
 
 const Title = styled.h1`
-  font-size: 2.2rem; // Tăng kích thước font
-  color: #1a202c;
-  margin-bottom: 2.5rem; // Tăng khoảng cách
+  font-size: 2.2rem;
+  color: #fff; // Chữ trắng cho tiêu đề
+  margin-bottom: 2.5rem;
   text-align: center;
 `;
 
 const Form = styled.form`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.75rem; // Tăng khoảng cách giữa các ô
+  gap: 1.75rem;
 `;
 
 const FormGroup = styled.div`
@@ -47,22 +48,26 @@ const FormGroup = styled.div`
 const Label = styled.label`
   margin-bottom: 0.5rem;
   font-weight: 600;
-  color: #4a5568;
+  color: #a0aec0; // Màu chữ label sáng hơn
 `;
 
 const commonInputStyles = `
   padding: 0.8rem 1rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid #4a5568;
   border-radius: 6px;
   font-size: 1rem;
-  background-color: white;
-  color: #2d3748;
+  background-color: #2d3748; // Nền đen cho input
+  color: #e2e8f0; // Chữ trắng cho input
   transition: border-color 0.2s, box-shadow 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #4299e1;
-    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+    border-color: #63b3ed; // Viền xanh sáng khi focus
+    box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.5);
+  }
+
+  &::placeholder {
+      color: #718096;
   }
 `;
 
@@ -72,7 +77,6 @@ const Input = styled.input`
 
 const Select = styled.select`
   ${commonInputStyles}
-  // Đảm bảo mũi tên dropdown hiển thị
   appearance: menulist;
 `;
 
@@ -100,9 +104,9 @@ const Button = styled.button`
   }
 
   &[type="button"] {
-    background-color: #e2e8f0;
-    color: #2d3748;
-    &:hover { background-color: #cbd5e0; transform: translateY(-2px); }
+    background-color: #4a5568;
+    color: #e2e8f0;
+    &:hover { background-color: #718096; transform: translateY(-2px); }
   }
 `;
 
@@ -168,11 +172,11 @@ const EditSubjectPage: React.FC = () => {
   };
 
   if (loading) {
-    return <CenteredMessage><Spinner size={50} /></CenteredMessage>;
+    return <CenteredMessage><Spinner size={50} color="#e2e8f0" /></CenteredMessage>;
   }
 
   if (error) {
-    return <CenteredMessage style={{ color: 'red' }}>{error}</CenteredMessage>;
+    return <CenteredMessage style={{ color: '#f56565' }}>{error}</CenteredMessage>;
   }
 
   return (
