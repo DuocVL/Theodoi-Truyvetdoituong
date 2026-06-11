@@ -1,22 +1,41 @@
+
 import { Router } from 'express';
 import { CheckinController } from '../../controllers/checkin.controller';
-import { validate } from '../../middlewares/validate.middleware';
-import { CreateCheckinDto, UpdateCheckinDto } from '../../dtos/checkin.dto';
+import { CheckinService } from '../../services/checkin.service';
+import { CheckinRepository } from '../../repositories/checkin.repository';
+import { Routes } from '@/interfaces/routes.interface';
+import { validationMiddleware } from '@/middlewares/validation.middleware';
+import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
 
-export class CheckinRoute{
+export class CheckinRoute implements Routes {
   public path = '/checkins';
   public router = Router();
-  public checkinController = new CheckinController();
+
+  // Composition Root: Instantiate and inject dependencies here
+  private readonly repository = new CheckinRepository();
+  private readonly service = new CheckinService(this.repository);
+  public controller = new CheckinController(this.service);
 
   constructor() {
     this.initializeRoutes();
   }
 
   private initializeRoutes() {
-    this.router.post(`${this.path}`, validate(CreateCheckinDto, 'body'), this.checkinController.createCheckin);
-    this.router.get(`${this.path}/:id`, this.checkinController.getCheckinById);
-    this.router.get(`${this.path}/subject/:subjectId`, this.checkinController.getCheckinsBySubject);
-    this.router.patch(`${this.path}/:id`, validationMiddleware(UpdateCheckinDto, 'body', true), this.checkinController.updateCheckin);
-    this.router.delete(`${this.path}/:id`, this.checkinController.deleteCheckin);
+    this.router.post(
+        `${this.path}`,
+        validationMiddleware(CreateCheckinDto, 'body'),
+        this.controller.createCheckin
+    );
+
+    this.router.get(`${this.path}/:id`, this.controller.getCheckinById);
+    this.router.get(`${this.path}/subject/:subjectId`, this.controller.getCheckinsBySubject);
+
+    this.router.patch(
+        `${this.path}/:id`,
+        validationMiddleware(UpdateCheckinDto, 'body', true), // `true` allows partial updates
+        this.controller.updateCheckin
+    );
+    
+    this.router.delete(`${this.path}/:id`, this.controller.deleteCheckin);
   }
 }
