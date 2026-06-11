@@ -1,11 +1,9 @@
-
 import { Router } from 'express';
 import { CheckinController } from '../../controllers/checkin.controller';
 import { CheckinService } from '../../services/checkin.service';
 import { CheckinRepository } from '../../repositories/checkin.repository';
-import { Routes } from '@/interfaces/routes.interface';
-import { validationMiddleware } from '@/middlewares/validation.middleware';
-import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
+import { validate } from '../../middlewares/validate.middleware';
+import { CreateCheckinDto, UpdateCheckinDto } from '../../dtos/checkins.dto';
 
 export class CheckinRoute implements Routes {
   public path = '/checkins';
