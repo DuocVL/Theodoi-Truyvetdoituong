@@ -5,15 +5,12 @@ import { HttpException } from '@/exceptions/http-exception';
 import { Checkin } from '@prisma/client';
 
 export class CheckinService {
-  private checkinRepository = new CheckinRepository();
+  // Service now depends on an abstraction, not a concrete implementation.
+  constructor(private readonly checkinRepository: CheckinRepository) {}
 
   public async createCheckin(data: CreateCheckinDto): Promise<Checkin> {
-    // Here you could add more business logic, 
-    // e.g., check if the subject exists, if the location is within a valid zone, etc.
+    // Business logic can be expanded here. For example, validating if the subject is active.
     const newCheckin = await this.checkinRepository.createCheckin(data);
-    if (!newCheckin) {
-      throw new HttpException(500, 'Could not create check-in');
-    }
     return newCheckin;
   }
 
@@ -26,19 +23,21 @@ export class CheckinService {
   }
 
   public async getCheckinsBySubject(subjectId: string): Promise<Checkin[]> {
-    // You might want to add pagination here for performance reasons
+    // Logic for pagination or filtering can be added here if needed.
     const checkins = await this.checkinRepository.findCheckinsBySubject(subjectId);
     return checkins;
   }
 
   public async updateCheckin(id: string, data: UpdateCheckinDto): Promise<Checkin> {
-    const checkin = await this.getCheckinById(id); // Ensures check-in exists
+    // The existence check is now handled by the repository, 
+    // so we can directly call the update method.
     const updatedCheckin = await this.checkinRepository.updateCheckin(id, data);
     return updatedCheckin;
   }
 
-  public async deleteCheckin(id: string): Promise<void> {
-    const checkin = await this.getCheckinById(id); // Ensures check-in exists
-    await this.checkinRepository.deleteCheckin(id);
+  public async deleteCheckin(id: string): Promise<Checkin> {
+    // The existence check is also handled by the repository here.
+    const deletedCheckin = await this.checkinRepository.deleteCheckin(id);
+    return deletedCheckin;
   }
 }

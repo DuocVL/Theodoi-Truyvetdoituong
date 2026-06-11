@@ -1,26 +1,36 @@
 
-import { PrismaClient, Checkin } from '@prisma/client';
+import { PrismaClient, Checkin, Prisma } from '@prisma/client';
 import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
+import { HttpException } from '@/exceptions/http-exception';
 
 export class CheckinRepository {
   private prisma = new PrismaClient();
 
   public async createCheckin(data: CreateCheckinDto): Promise<Checkin> {
     const { latitude, longitude, ...rest } = data;
-    const location = `POINT(${longitude} ${latitude})`;
+    const point = `POINT(${longitude} ${latitude})`;
 
-    const newCheckin = await this.prisma.$executeRaw`
-        INSERT INTO checkins (subject_id, notes, image_id, device_id, checkin_time, location) 
-        VALUES (${rest.subject_id}, ${rest.notes}, ${rest.image_id}, ${rest.device_id}, ${rest.checkin_time}, ST_GeomFromText(${location}, 4326))
-    `;
-    //This is not ideal, but we have to do it because of the raw query
-    const createdCheckin = await this.prisma.checkin.findFirst({
-        orderBy: {
-            checkin_time: 'desc'
-        }
-    })
+    // Prisma does not yet have first-class support for PostGIS geography types in its ORM methods (like create).
+    // Therefore, a raw query is necessary to use the ST_GeomFromText function.
+    // The transaction ensures that the INSERT and the subsequent SELECT are atomic.
+    const result = await this.prisma.$transaction(async (tx) => {
+        await tx.$executeRaw`
+            INSERT INTO checkins (id, subject_id, notes, image_id, device_id, checkin_time, location)
+            VALUES (uuid_generate_v4(), ${rest.subject_id}, ${rest.notes}, ${rest.image_id}, ${rest.device_id}, ${rest.checkin_time}, ST_GeomFromText(${point}, 4326))
+        `;
+        const newCheckin = await tx.checkin.findFirst({ 
+            orderBy: { checkin_time: 'desc' },
+            where: { subject_id: rest.subject_id }
+         });
+        return newCheckin;
+    });
+    
 
-    return createdCheckin as Checkin;
+    if (!result) {
+        throw new HttpException(500, 'Could not retrieve the check-in after creating it.');
+    }
+
+    return result;
   }
 
   public async findCheckinById(id: string): Promise<Checkin | null> {
@@ -35,13 +45,27 @@ export class CheckinRepository {
   }
 
   public async updateCheckin(id: string, data: UpdateCheckinDto): Promise<Checkin> {
-    return this.prisma.checkin.update({
-      where: { id },
-      data,
-    });
+    try {
+        return await this.prisma.checkin.update({
+            where: { id },
+            data,
+        });
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            throw new HttpException(404, 'Check-in not found.');
+        }
+        throw error;
+    }
   }
 
   public async deleteCheckin(id: string): Promise<Checkin> {
-    return this.prisma.checkin.delete({ where: { id } });
+    try {
+        return await this.prisma.checkin.delete({ where: { id } });
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+            throw new HttpException(404, 'Check-in not found.');
+        }
+        throw error;
+    }
   }
 }

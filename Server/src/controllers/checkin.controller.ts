@@ -1,59 +1,60 @@
 
-import { Request, Response, NextFunction } from 'express';
-import { CheckinService } from '../services/checkin.service';
-import { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
+import { NextFunction, Request, Response } from 'express';
+import { CheckinService } from '@/services/checkin.service';
+import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
+import { Checkin } from '@prisma/client';
 
 export class CheckinController {
-  private checkinService = new CheckinService();
+  constructor(private readonly checkinService: CheckinService) {}
 
-  public createCheckin = async (req: Request, res: Response, next: NextFunction) => {
+  public createCheckin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const data: CreateCheckinDto = req.body;
-      const newCheckin = await this.checkinService.createCheckin(data);
+      const checkinData: CreateCheckinDto = req.body;
+      const newCheckin: Checkin = await this.checkinService.createCheckin(checkinData);
       res.status(201).json({ data: newCheckin, message: 'created' });
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  public getCheckinById = async (req: Request, res: Response, next: NextFunction) => {
+  public getCheckinById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id = req.params.id;
-      const checkin = await this.checkinService.getCheckinById(id);
+      const checkinId: string = req.params.id;
+      const checkin: Checkin = await this.checkinService.getCheckinById(checkinId);
       res.status(200).json({ data: checkin });
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  public getCheckinsBySubject = async (req: Request, res: Response, next: NextFunction) => {
+  public getCheckinsBySubject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const subjectId = req.params.subjectId;
-      const checkins = await this.checkinService.getCheckinsBySubject(subjectId);
+      const subjectId: string = req.params.subjectId;
+      const checkins: Checkin[] = await this.checkinService.getCheckinsBySubject(subjectId);
       res.status(200).json({ data: checkins });
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  public updateCheckin = async (req: Request, res: Response, next: NextFunction) => {
+  public updateCheckin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id = req.params.id;
-      const data: UpdateCheckinDto = req.body;
-      const updatedCheckin = await this.checkinService.updateCheckin(id, data);
+      const checkinId: string = req.params.id;
+      const checkinData: UpdateCheckinDto = req.body;
+      const updatedCheckin: Checkin = await this.checkinService.updateCheckin(checkinId, checkinData);
       res.status(200).json({ data: updatedCheckin, message: 'updated' });
     } catch (error) {
       next(error);
     }
-  }
+  };
 
-  public deleteCheckin = async (req: Request, res: Response, next: NextFunction) => {
+  public deleteCheckin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id = req.params.id;
-      await this.checkinService.deleteCheckin(id);
-      res.status(204).send(); // No Content
+      const checkinId: string = req.params.id;
+      const deletedCheckin: Checkin = await this.checkinService.deleteCheckin(checkinId);
+      res.status(200).json({ data: deletedCheckin, message: 'deleted' });
     } catch (error) {
       next(error);
     }
-  }
+  };
 }
