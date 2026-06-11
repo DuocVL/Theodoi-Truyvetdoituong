@@ -1,7 +1,7 @@
 
-import { CheckinRepository } from '@/repositories/checkin.repository';
-import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
-import { HttpException } from '@/exceptions/http-exception';
+import { CheckinRepository } from '../repositories/checkin.repository';
+import { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
+import { HttpException } from '../exceptions/http-exception';
 import { Checkin } from '@prisma/client';
 
 /**

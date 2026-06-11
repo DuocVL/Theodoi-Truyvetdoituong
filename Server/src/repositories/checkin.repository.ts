@@ -1,14 +1,14 @@
 
-import { PrismaClient, Checkin, Prisma } from '@prisma/client';
+import { PrismaClient, Checkin, Prisma } from '../../generated/prisma/client';
+import { prisma } from '../configs/prisma';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
-import { HttpException } from '@/exceptions/http-exception';
+import { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
+import { HttpException } from '../exceptions/http-exception';
 
 /**
  * Repository class for all database interactions related to Check-ins.
  */
 export class CheckinRepository {
-  private prisma = new PrismaClient();
 
   /**
    * Creates a new check-in record in the database using a raw SQL query within a transaction
@@ -22,7 +22,7 @@ export class CheckinRepository {
     const point = `POINT(${longitude} ${latitude})`;
     const newCheckinId = uuidv4(); // Generate UUID in the application to prevent race conditions.
 
-    const result = await this.prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       await tx.$executeRaw`
         INSERT INTO "Checkin" (id, subject_id, notes, image_id, device_id, checkin_time, location)
         VALUES (${newCheckinId}, ${rest.subject_id}, ${rest.notes}, ${rest.image_id}, ${rest.device_id}, ${rest.checkin_time}::timestamp, ST_SetSRID(ST_GeomFromText(${point}), 4326))
@@ -49,7 +49,7 @@ export class CheckinRepository {
    * @returns A Checkin object or null if not found.
    */
   public async findCheckinById(id: string): Promise<Checkin | null> {
-    return this.prisma.checkin.findUnique({ where: { id } });
+    return prisma.checkin.findUnique({ where: { id } });
   }
 
   /**
@@ -58,7 +58,7 @@ export class CheckinRepository {
    * @returns An array of Checkin objects.
    */
   public async findCheckinsBySubject(subjectId: string): Promise<Checkin[]> {
-    return this.prisma.checkin.findMany({
+    return prisma.checkin.findMany({
       where: { subject_id: subjectId },
       orderBy: { checkin_time: 'desc' },
     });
@@ -73,7 +73,7 @@ export class CheckinRepository {
    */
   public async updateCheckin(id: string, data: UpdateCheckinDto): Promise<Checkin> {
     try {
-      return await this.prisma.checkin.update({
+      return await prisma.checkin.update({
         where: { id },
         data,
       });
@@ -93,7 +93,7 @@ export class CheckinRepository {
    */
   public async deleteCheckin(id: string): Promise<Checkin> {
     try {
-      return await this.prisma.checkin.delete({ where: { id } });
+      return await prisma.checkin.delete({ where: { id } });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
         throw new HttpException(404, 'Check-in not found.');

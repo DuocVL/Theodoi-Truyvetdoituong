@@ -3,9 +3,9 @@ import { CheckinController } from '../../controllers/checkin.controller';
 import { CheckinService } from '../../services/checkin.service';
 import { CheckinRepository } from '../../repositories/checkin.repository';
 import { validate } from '../../middlewares/validate.middleware';
-import { CreateCheckinDto, UpdateCheckinDto } from '../../dtos/checkins.dto';
+import { createCheckinSchema, updateCheckinSchema } from '../../dtos/checkin.dto';
 
-export class CheckinRoute implements Routes {
+export class CheckinRoute {
   public path = '/checkins';
   public router = Router();
 
@@ -21,7 +21,7 @@ export class CheckinRoute implements Routes {
   private initializeRoutes() {
     this.router.post(
         `${this.path}`,
-        validationMiddleware(CreateCheckinDto, 'body'),
+        validate(createCheckinSchema),
         this.controller.createCheckin
     );
 
@@ -30,7 +30,7 @@ export class CheckinRoute implements Routes {
 
     this.router.patch(
         `${this.path}/:id`,
-        validationMiddleware(UpdateCheckinDto, 'body', true), // `true` allows partial updates
+        validate(updateCheckinSchema),
         this.controller.updateCheckin
     );
     
