@@ -4,7 +4,7 @@ import { Request } from 'express';
 import crypto from 'crypto';
 import path from 'path';
 import fs from 'fs';
-import { HttpException } from '@/exceptions/http-exception';
+import { HttpException } from '../exceptions/http-exception';
 
 // Define the allowed upload types
 type UploadType = 'avatars' | 'checkins' | 'subjects';

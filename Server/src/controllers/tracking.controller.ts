@@ -11,25 +11,29 @@ class TrackingController {
     }
   };
 
+  public getById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const checkin = await trackingService.getCheckinById(id);
+      if (!checkin) {
+        res.status(404).json({ message: 'Không tìm thấy dữ liệu check-in này.' });
+        return;
+      }
+      res.status(200).json({ data: checkin });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public getCheckinHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { subjectId } = req.params;
     const { from, to } = req.query;
 
-    if (!from || !to) {
-      res.status(400).json({ message: 'Missing required query parameters: from, to' });
-      return;
-    }
-
     try {
-      const fromDate = new Date(String(from));
-      const toDate = new Date(String(to));
+      const fromDate = from ? new Date(String(from)) : undefined;
+      const toDate = to ? new Date(String(to)) : undefined;
 
-      if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) {
-        res.status(400).json({ message: 'Invalid query parameters: from, to must be valid dates' });
-        return;
-      }
-
-      if (fromDate > toDate) {
+      if (fromDate && toDate && fromDate > toDate) {
         res.status(400).json({ message: 'Invalid query parameters: from must be before or equal to to' });
         return;
       }

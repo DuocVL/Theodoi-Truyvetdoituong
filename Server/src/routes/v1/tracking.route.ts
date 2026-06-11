@@ -1,20 +1,18 @@
 import { Router } from 'express';
 import trackingController from '../../controllers/tracking.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
-import { UserAccountRole } from '../../../generated/prisma/client'; // Import the Role enum
 
 
 const router = Router();
 
 // All tracking routes require authentication and are accessible by ADMIN and USER roles.
-router.use(authMiddleware, checkRole([
-  UserAccountRole.ADMIN,
-  UserAccountRole.USER
-]));
+router.use(authMiddleware);
 
 // Get aggregated tracking data for all subjects
 router.get('/', trackingController.getAll);
+
+// Get details of a specific check-in record
+router.get('/checkin/:id', trackingController.getById);
 
 // Get the movement history for a specific subject
 router.get('/history/:subjectId', trackingController.getCheckinHistory);

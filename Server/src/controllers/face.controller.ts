@@ -87,15 +87,16 @@ class FaceController {
       const geoJsonString = JSON.stringify({ type: 'Point', coordinates: [lng, lat] });
       const rawQuery = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
 
+      // Thực hiện lưu bản ghi với tọa độ PostGIS
       const checkinRecords = await prisma.$queryRaw<any[]>`
         INSERT INTO "checkins" (subject_id, location, status, face_verified, confidence, checkin_time)
         VALUES (${subject.id}, ${rawQuery}, 'PROCESSING', false, 0, NOW())
         RETURNING id;
       `;
-      const checkinRecord = checkinRecords[0];
+      const newCheckinId = checkinRecords[0].id;
 
       const jobData = {
-        checkinId: checkinRecord.id.toString(),
+        checkinId: newCheckinId.toString(),
         subjectId: subject.id,
         files: files.map(f => ({ 
             buffer: f.buffer.toString('base64'),
@@ -107,8 +108,8 @@ class FaceController {
       await faceVerificationQueue.add('verify-face', jobData);
 
       res.status(202).json({ 
-        message: 'Check-in accepted and is being processed.',
-        checkinId: checkinRecord.id.toString()
+        message: 'Yêu cầu điểm danh đã được tiếp nhận và đang xử lý nhận diện.',
+        checkinId: newCheckinId.toString()
       });
 
     } catch (error) {
