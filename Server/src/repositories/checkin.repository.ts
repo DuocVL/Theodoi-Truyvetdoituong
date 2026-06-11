@@ -1,65 +1,47 @@
-import { prisma } from '../configs/prisma';
-import type { Checkin } from '../../generated/prisma/client';
 
-// Define a custom input type since Prisma.CheckinCreateInput is not generated
-export type CreateCheckinInput = {
-  subject_id: string;
-  lat: number;
-  lon: number;
-  image_url?: string;
-  face_verified?: boolean;
-  confidence: number;
-  status?: string;
-};
+import { PrismaClient, Checkin } from '@prisma/client';
+import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
 
-export const createCheckin = async (
-  data: CreateCheckinInput
-): Promise<Checkin> => {
-  const { subject_id, lat, lon, image_url, face_verified, confidence, status } = data;
+export class CheckinRepository {
+  private prisma = new PrismaClient();
 
-  // Use a raw query to insert data, including the PostGIS geography type
-  // ST_MakePoint creates a point, and ::geography casts it to the geography type.
-  const result = await prisma.$queryRaw<Checkin[]>`
-    INSERT INTO "checkins" (
-      "subject_id",
-      "location",
-      "image_url",
-      "face_verified",
-      "confidence",
-      "status"
-    ) VALUES (
-      ${subject_id},
-      ST_MakePoint(${lon}, ${lat})::geography,
-      ${image_url},
-      ${face_verified},
-      ${confidence},
-      ${status}
-    )
-    RETURNING id, subject_id, ST_AsGeoJSON(location) as location, image_url, face_verified, confidence, status, checkin_time
-  `;
+  public async createCheckin(data: CreateCheckinDto): Promise<Checkin> {
+    const { latitude, longitude, ...rest } = data;
+    const location = `POINT(${longitude} ${latitude})`;
 
-  return result[0];
-};
-
-export const getCheckinById = async (id: bigint): Promise<Checkin | null> => {
-    // Note: The 'id' in schema is BigInt, so the parameter type should be bigint.
-    // Raw query is safer here to correctly handle the geography type on return.
-    const result = await prisma.$queryRaw<Checkin[]>`
-        SELECT id, subject_id, ST_AsGeoJSON(location) as location, image_url, face_verified, confidence, status, checkin_time
-        FROM "checkins"
-        WHERE "id" = ${id}
+    const newCheckin = await this.prisma.$executeRaw`
+        INSERT INTO checkins (subject_id, notes, image_id, device_id, checkin_time, location) 
+        VALUES (${rest.subject_id}, ${rest.notes}, ${rest.image_id}, ${rest.device_id}, ${rest.checkin_time}, ST_GeomFromText(${location}, 4326))
     `;
-    return result[0] || null;
-};
+    //This is not ideal, but we have to do it because of the raw query
+    const createdCheckin = await this.prisma.checkin.findFirst({
+        orderBy: {
+            checkin_time: 'desc'
+        }
+    })
 
-export const findLastCheckin = async (subjectId: string): Promise<Checkin | null> => {
-    // Raw query is also recommended here.
-    const result = await prisma.$queryRaw<Checkin[]>`
-        SELECT id, subject_id, ST_AsGeoJSON(location) as location, image_url, face_verified, confidence, status, checkin_time
-        FROM "checkins"
-        WHERE "subject_id" = ${subjectId}
-        ORDER BY "checkin_time" DESC
-        LIMIT 1
-    `;
-    return result[0] || null;
-};
+    return createdCheckin as Checkin;
+  }
+
+  public async findCheckinById(id: string): Promise<Checkin | null> {
+    return this.prisma.checkin.findUnique({ where: { id } });
+  }
+
+  public async findCheckinsBySubject(subjectId: string): Promise<Checkin[]> {
+    return this.prisma.checkin.findMany({ 
+        where: { subject_id: subjectId },
+        orderBy: { checkin_time: 'desc' } 
+    });
+  }
+
+  public async updateCheckin(id: string, data: UpdateCheckinDto): Promise<Checkin> {
+    return this.prisma.checkin.update({
+      where: { id },
+      data,
+    });
+  }
+
+  public async deleteCheckin(id: string): Promise<Checkin> {
+    return this.prisma.checkin.delete({ where: { id } });
+  }
+}

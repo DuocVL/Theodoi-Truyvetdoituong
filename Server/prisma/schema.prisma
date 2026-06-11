@@ -76,7 +76,7 @@ model Subject {
   update_at        DateTime      @updatedAt
   deleted_at       DateTime?
   alert            Alert[]       @relation("SubjectToAlert")
-  checkin          Checkin[]     @relation("SubjectToCheckin")
+  checkins         Checkin[]     @relation("SubjectToCheckin")
   events           EventLog[]    @relation("SubjectToEventLog")
   faceData         FaceData[]    @relation("SubjectToFaceData")
   subjectZone      SubjectZone[] @relation("SubjectToSubjectZone")
@@ -147,7 +147,7 @@ model FaceData {
 model Zone {
   id          String                   @id @default(uuid())
   zone_name   String
-  geom        Unsupported("geography")
+  geom        Unsupported("geography(Polygon, 4326)")
   description String?
   created_by  String
   is_active   Boolean                  @default(true)
@@ -173,17 +173,21 @@ model SubjectZone {
 }
 
 model Checkin {
-  id            BigInt                   @id @default(autoincrement())
+  id            String                         @id @default(uuid())
   subject_id    String
-  location      Unsupported("geography")
-  image_id      String?                  @unique
-  face_verified Boolean                  @default(false)
-  confidence    Float
-  status        String                   @default("ON_TIME")
-  checkin_time  DateTime                 @default(now())
-  image         Image?                   @relation("CheckinToImage", fields: [image_id], references: [id])
-  subject       Subject                  @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
+  location      Unsupported("geography(Point, 4326)")
+  notes         String?
+  image_id      String?                        @unique
+  device_id     String?
+  face_verified Boolean                        @default(false)
+  confidence    Float?
+  status        String                         @default("ON_TIME") // Consider an enum for this
+  checkin_time  DateTime                       @default(now())
 
+  image         Image?                         @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
+  subject       Subject                        @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
+
+  @@index([location], type: Gist)
   @@index([subject_id, checkin_time])
   @@map("checkins")
 }
@@ -194,7 +198,7 @@ model Alert {
   type        String
   severity    Int
   message     String
-  location    Unsupported("geography")?
+  location    Unsupported("geography(Point, 4326)")?
   status      String                    @default("PENDING")
   resolved_by String?
   resolved_at DateTime?
@@ -202,13 +206,14 @@ model Alert {
   resolver    User?                     @relation("ResolvedAlerts", fields: [resolved_by], references: [id])
   subject     Subject                   @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
 
+  @@index([location], type: Gist)
   @@index([subject_id, status])
   @@index([created_at(sort: Desc)])
   @@map("alerts")
 }
 
 model EventLog {
-  id          BigInt   @id @default(autoincrement())
+  id          String   @id @default(uuid())
   subject_id  String
   event_type  String
   description String
@@ -220,7 +225,7 @@ model EventLog {
 }
 
 model SystemLog {
-  id         BigInt   @id @default(autoincrement())
+  id         String    @id @default(uuid())
   user_id    String?
   action     String
   entity     String?
@@ -233,8 +238,8 @@ model SystemLog {
   request_id String?
   status     String?
   error      String?
-  created_at DateTime @default(now())
-  user       User?    @relation("UserToSystemLog", fields: [user_id], references: [id])
+  created_at DateTime  @default(now())
+  user       User?     @relation("UserToSystemLog", fields: [user_id], references: [id], onDelete: SetNull)
 
   @@index([user_id])
   @@index([entity, entity_id])
