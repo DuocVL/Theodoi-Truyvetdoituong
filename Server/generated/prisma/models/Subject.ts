@@ -279,7 +279,7 @@ export type SubjectWhereInput = {
   update_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   deleted_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   alert?: Prisma.AlertListRelationFilter
-  checkin?: Prisma.CheckinListRelationFilter
+  checkins?: Prisma.CheckinListRelationFilter
   events?: Prisma.EventLogListRelationFilter
   faceData?: Prisma.FaceDataListRelationFilter
   subjectZone?: Prisma.SubjectZoneListRelationFilter
@@ -307,7 +307,7 @@ export type SubjectOrderByWithRelationInput = {
   update_at?: Prisma.SortOrder
   deleted_at?: Prisma.SortOrderInput | Prisma.SortOrder
   alert?: Prisma.AlertOrderByRelationAggregateInput
-  checkin?: Prisma.CheckinOrderByRelationAggregateInput
+  checkins?: Prisma.CheckinOrderByRelationAggregateInput
   events?: Prisma.EventLogOrderByRelationAggregateInput
   faceData?: Prisma.FaceDataOrderByRelationAggregateInput
   subjectZone?: Prisma.SubjectZoneOrderByRelationAggregateInput
@@ -338,7 +338,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   update_at?: Prisma.DateTimeFilter<"Subject"> | Date | string
   deleted_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   alert?: Prisma.AlertListRelationFilter
-  checkin?: Prisma.CheckinListRelationFilter
+  checkins?: Prisma.CheckinListRelationFilter
   events?: Prisma.EventLogListRelationFilter
   faceData?: Prisma.FaceDataListRelationFilter
   subjectZone?: Prisma.SubjectZoneListRelationFilter
@@ -409,7 +409,7 @@ export type SubjectCreateInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneCreateNestedManyWithoutSubjectInput
@@ -437,7 +437,7 @@ export type SubjectUncheckedCreateInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
@@ -459,7 +459,7 @@ export type SubjectUpdateInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUpdateManyWithoutSubjectNestedInput
@@ -487,7 +487,7 @@ export type SubjectUncheckedUpdateInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
@@ -734,12 +734,12 @@ export type SubjectUpdateOneRequiredWithoutSubjectZoneNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutSubjectZoneInput, Prisma.SubjectUpdateWithoutSubjectZoneInput>, Prisma.SubjectUncheckedUpdateWithoutSubjectZoneInput>
 }
 
-export type SubjectUpdateOneRequiredWithoutCheckinNestedInput = {
-  create?: Prisma.XOR<Prisma.SubjectCreateWithoutCheckinInput, Prisma.SubjectUncheckedCreateWithoutCheckinInput>
-  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutCheckinInput
-  upsert?: Prisma.SubjectUpsertWithoutCheckinInput
+export type SubjectUpdateOneRequiredWithoutCheckinsNestedInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutCheckinsInput, Prisma.SubjectUncheckedCreateWithoutCheckinsInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutCheckinsInput
+  upsert?: Prisma.SubjectUpsertWithoutCheckinsInput
   connect?: Prisma.SubjectWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutCheckinInput, Prisma.SubjectUpdateWithoutCheckinInput>, Prisma.SubjectUncheckedUpdateWithoutCheckinInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutCheckinsInput, Prisma.SubjectUpdateWithoutCheckinsInput>, Prisma.SubjectUncheckedUpdateWithoutCheckinsInput>
 }
 
 export type SubjectCreateNestedOneWithoutAlertInput = {
@@ -818,7 +818,7 @@ export type SubjectCreateWithoutAccountInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneCreateNestedManyWithoutSubjectInput
@@ -844,7 +844,7 @@ export type SubjectUncheckedCreateWithoutAccountInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
@@ -882,7 +882,7 @@ export type SubjectUpdateWithoutAccountInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUpdateManyWithoutSubjectNestedInput
@@ -908,7 +908,7 @@ export type SubjectUncheckedUpdateWithoutAccountInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
@@ -930,7 +930,7 @@ export type SubjectCreateWithoutCreatorInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneCreateNestedManyWithoutSubjectInput
@@ -956,7 +956,7 @@ export type SubjectUncheckedCreateWithoutCreatorInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
@@ -1027,7 +1027,7 @@ export type SubjectCreateWithoutFaceDataInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
@@ -1054,7 +1054,7 @@ export type SubjectUncheckedCreateWithoutFaceDataInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
 }
@@ -1091,7 +1091,7 @@ export type SubjectUpdateWithoutFaceDataInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
@@ -1118,7 +1118,7 @@ export type SubjectUncheckedUpdateWithoutFaceDataInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
 }
@@ -1139,7 +1139,7 @@ export type SubjectCreateWithoutSubjectZoneInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
@@ -1166,7 +1166,7 @@ export type SubjectUncheckedCreateWithoutSubjectZoneInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
 }
@@ -1203,7 +1203,7 @@ export type SubjectUpdateWithoutSubjectZoneInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
@@ -1230,12 +1230,12 @@ export type SubjectUncheckedUpdateWithoutSubjectZoneInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
-export type SubjectCreateWithoutCheckinInput = {
+export type SubjectCreateWithoutCheckinsInput = {
   id?: string
   code?: string
   full_name: string
@@ -1259,7 +1259,7 @@ export type SubjectCreateWithoutCheckinInput = {
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
 }
 
-export type SubjectUncheckedCreateWithoutCheckinInput = {
+export type SubjectUncheckedCreateWithoutCheckinsInput = {
   id?: string
   account_id: string
   code?: string
@@ -1283,23 +1283,23 @@ export type SubjectUncheckedCreateWithoutCheckinInput = {
   subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
 }
 
-export type SubjectCreateOrConnectWithoutCheckinInput = {
+export type SubjectCreateOrConnectWithoutCheckinsInput = {
   where: Prisma.SubjectWhereUniqueInput
-  create: Prisma.XOR<Prisma.SubjectCreateWithoutCheckinInput, Prisma.SubjectUncheckedCreateWithoutCheckinInput>
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutCheckinsInput, Prisma.SubjectUncheckedCreateWithoutCheckinsInput>
 }
 
-export type SubjectUpsertWithoutCheckinInput = {
-  update: Prisma.XOR<Prisma.SubjectUpdateWithoutCheckinInput, Prisma.SubjectUncheckedUpdateWithoutCheckinInput>
-  create: Prisma.XOR<Prisma.SubjectCreateWithoutCheckinInput, Prisma.SubjectUncheckedCreateWithoutCheckinInput>
+export type SubjectUpsertWithoutCheckinsInput = {
+  update: Prisma.XOR<Prisma.SubjectUpdateWithoutCheckinsInput, Prisma.SubjectUncheckedUpdateWithoutCheckinsInput>
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutCheckinsInput, Prisma.SubjectUncheckedCreateWithoutCheckinsInput>
   where?: Prisma.SubjectWhereInput
 }
 
-export type SubjectUpdateToOneWithWhereWithoutCheckinInput = {
+export type SubjectUpdateToOneWithWhereWithoutCheckinsInput = {
   where?: Prisma.SubjectWhereInput
-  data: Prisma.XOR<Prisma.SubjectUpdateWithoutCheckinInput, Prisma.SubjectUncheckedUpdateWithoutCheckinInput>
+  data: Prisma.XOR<Prisma.SubjectUpdateWithoutCheckinsInput, Prisma.SubjectUncheckedUpdateWithoutCheckinsInput>
 }
 
-export type SubjectUpdateWithoutCheckinInput = {
+export type SubjectUpdateWithoutCheckinsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1323,7 +1323,7 @@ export type SubjectUpdateWithoutCheckinInput = {
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
 }
 
-export type SubjectUncheckedUpdateWithoutCheckinInput = {
+export type SubjectUncheckedUpdateWithoutCheckinsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
   code?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1362,7 +1362,7 @@ export type SubjectCreateWithoutAlertInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
-  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneCreateNestedManyWithoutSubjectInput
@@ -1389,7 +1389,7 @@ export type SubjectUncheckedCreateWithoutAlertInput = {
   created_at?: Date | string
   update_at?: Date | string
   deleted_at?: Date | string | null
-  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
@@ -1426,7 +1426,7 @@ export type SubjectUpdateWithoutAlertInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUpdateManyWithoutSubjectNestedInput
@@ -1453,7 +1453,7 @@ export type SubjectUncheckedUpdateWithoutAlertInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1475,7 +1475,7 @@ export type SubjectCreateWithoutEventsInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
@@ -1502,7 +1502,7 @@ export type SubjectUncheckedCreateWithoutEventsInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
 }
@@ -1539,7 +1539,7 @@ export type SubjectUpdateWithoutEventsInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
@@ -1566,7 +1566,7 @@ export type SubjectUncheckedUpdateWithoutEventsInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
 }
@@ -1587,7 +1587,7 @@ export type SubjectCreateWithoutAvatarInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneCreateNestedManyWithoutSubjectInput
@@ -1613,7 +1613,7 @@ export type SubjectUncheckedCreateWithoutAvatarInput = {
   update_at?: Date | string
   deleted_at?: Date | string | null
   alert?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
-  checkin?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   events?: Prisma.EventLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   subjectZone?: Prisma.SubjectZoneUncheckedCreateNestedManyWithoutSubjectInput
@@ -1651,7 +1651,7 @@ export type SubjectUpdateWithoutAvatarInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUpdateManyWithoutSubjectNestedInput
@@ -1677,7 +1677,7 @@ export type SubjectUncheckedUpdateWithoutAvatarInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1718,7 +1718,7 @@ export type SubjectUpdateWithoutCreatorInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUpdateManyWithoutSubjectNestedInput
@@ -1744,7 +1744,7 @@ export type SubjectUncheckedUpdateWithoutCreatorInput = {
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   alert?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
-  checkin?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   events?: Prisma.EventLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   subjectZone?: Prisma.SubjectZoneUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1776,7 +1776,7 @@ export type SubjectUncheckedUpdateManyWithoutCreatorInput = {
 
 export type SubjectCountOutputType = {
   alert: number
-  checkin: number
+  checkins: number
   events: number
   faceData: number
   subjectZone: number
@@ -1784,7 +1784,7 @@ export type SubjectCountOutputType = {
 
 export type SubjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   alert?: boolean | SubjectCountOutputTypeCountAlertArgs
-  checkin?: boolean | SubjectCountOutputTypeCountCheckinArgs
+  checkins?: boolean | SubjectCountOutputTypeCountCheckinsArgs
   events?: boolean | SubjectCountOutputTypeCountEventsArgs
   faceData?: boolean | SubjectCountOutputTypeCountFaceDataArgs
   subjectZone?: boolean | SubjectCountOutputTypeCountSubjectZoneArgs
@@ -1810,7 +1810,7 @@ export type SubjectCountOutputTypeCountAlertArgs<ExtArgs extends runtime.Types.E
 /**
  * SubjectCountOutputType without action
  */
-export type SubjectCountOutputTypeCountCheckinArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type SubjectCountOutputTypeCountCheckinsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CheckinWhereInput
 }
 
@@ -1855,7 +1855,7 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   update_at?: boolean
   deleted_at?: boolean
   alert?: boolean | Prisma.Subject$alertArgs<ExtArgs>
-  checkin?: boolean | Prisma.Subject$checkinArgs<ExtArgs>
+  checkins?: boolean | Prisma.Subject$checkinsArgs<ExtArgs>
   events?: boolean | Prisma.Subject$eventsArgs<ExtArgs>
   faceData?: boolean | Prisma.Subject$faceDataArgs<ExtArgs>
   subjectZone?: boolean | Prisma.Subject$subjectZoneArgs<ExtArgs>
@@ -1934,7 +1934,7 @@ export type SubjectSelectScalar = {
 export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "code" | "full_name" | "dob" | "gender" | "id_number" | "address" | "phone" | "status" | "monitoring_start" | "monitoring_end" | "avatar_id" | "created_by" | "created_at" | "update_at" | "deleted_at", ExtArgs["result"]["subject"]>
 export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   alert?: boolean | Prisma.Subject$alertArgs<ExtArgs>
-  checkin?: boolean | Prisma.Subject$checkinArgs<ExtArgs>
+  checkins?: boolean | Prisma.Subject$checkinsArgs<ExtArgs>
   events?: boolean | Prisma.Subject$eventsArgs<ExtArgs>
   faceData?: boolean | Prisma.Subject$faceDataArgs<ExtArgs>
   subjectZone?: boolean | Prisma.Subject$subjectZoneArgs<ExtArgs>
@@ -1958,7 +1958,7 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Subject"
   objects: {
     alert: Prisma.$AlertPayload<ExtArgs>[]
-    checkin: Prisma.$CheckinPayload<ExtArgs>[]
+    checkins: Prisma.$CheckinPayload<ExtArgs>[]
     events: Prisma.$EventLogPayload<ExtArgs>[]
     faceData: Prisma.$FaceDataPayload<ExtArgs>[]
     subjectZone: Prisma.$SubjectZonePayload<ExtArgs>[]
@@ -2379,7 +2379,7 @@ readonly fields: SubjectFieldRefs;
 export interface Prisma__SubjectClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   alert<T extends Prisma.Subject$alertArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$alertArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  checkin<T extends Prisma.Subject$checkinArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$checkinArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CheckinPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  checkins<T extends Prisma.Subject$checkinsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$checkinsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CheckinPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   events<T extends Prisma.Subject$eventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EventLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   faceData<T extends Prisma.Subject$faceDataArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$faceDataArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FaceDataPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   subjectZone<T extends Prisma.Subject$subjectZoneArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$subjectZoneArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubjectZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2857,9 +2857,9 @@ export type Subject$alertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * Subject.checkin
+ * Subject.checkins
  */
-export type Subject$checkinArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Subject$checkinsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Checkin
    */

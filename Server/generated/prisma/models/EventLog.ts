@@ -20,22 +20,12 @@ export type EventLogModel = runtime.Types.Result.DefaultSelection<Prisma.$EventL
 
 export type AggregateEventLog = {
   _count: EventLogCountAggregateOutputType | null
-  _avg: EventLogAvgAggregateOutputType | null
-  _sum: EventLogSumAggregateOutputType | null
   _min: EventLogMinAggregateOutputType | null
   _max: EventLogMaxAggregateOutputType | null
 }
 
-export type EventLogAvgAggregateOutputType = {
-  id: number | null
-}
-
-export type EventLogSumAggregateOutputType = {
-  id: bigint | null
-}
-
 export type EventLogMinAggregateOutputType = {
-  id: bigint | null
+  id: string | null
   subject_id: string | null
   event_type: string | null
   description: string | null
@@ -43,7 +33,7 @@ export type EventLogMinAggregateOutputType = {
 }
 
 export type EventLogMaxAggregateOutputType = {
-  id: bigint | null
+  id: string | null
   subject_id: string | null
   event_type: string | null
   description: string | null
@@ -59,14 +49,6 @@ export type EventLogCountAggregateOutputType = {
   _all: number
 }
 
-
-export type EventLogAvgAggregateInputType = {
-  id?: true
-}
-
-export type EventLogSumAggregateInputType = {
-  id?: true
-}
 
 export type EventLogMinAggregateInputType = {
   id?: true
@@ -131,18 +113,6 @@ export type EventLogAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: EventLogAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: EventLogSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: EventLogMinAggregateInputType
@@ -173,21 +143,17 @@ export type EventLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: EventLogCountAggregateInputType | true
-  _avg?: EventLogAvgAggregateInputType
-  _sum?: EventLogSumAggregateInputType
   _min?: EventLogMinAggregateInputType
   _max?: EventLogMaxAggregateInputType
 }
 
 export type EventLogGroupByOutputType = {
-  id: bigint
+  id: string
   subject_id: string
   event_type: string
   description: string
   created_at: Date
   _count: EventLogCountAggregateOutputType | null
-  _avg: EventLogAvgAggregateOutputType | null
-  _sum: EventLogSumAggregateOutputType | null
   _min: EventLogMinAggregateOutputType | null
   _max: EventLogMaxAggregateOutputType | null
 }
@@ -211,7 +177,7 @@ export type EventLogWhereInput = {
   AND?: Prisma.EventLogWhereInput | Prisma.EventLogWhereInput[]
   OR?: Prisma.EventLogWhereInput[]
   NOT?: Prisma.EventLogWhereInput | Prisma.EventLogWhereInput[]
-  id?: Prisma.BigIntFilter<"EventLog"> | bigint | number
+  id?: Prisma.StringFilter<"EventLog"> | string
   subject_id?: Prisma.StringFilter<"EventLog"> | string
   event_type?: Prisma.StringFilter<"EventLog"> | string
   description?: Prisma.StringFilter<"EventLog"> | string
@@ -229,7 +195,7 @@ export type EventLogOrderByWithRelationInput = {
 }
 
 export type EventLogWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  id?: string
   AND?: Prisma.EventLogWhereInput | Prisma.EventLogWhereInput[]
   OR?: Prisma.EventLogWhereInput[]
   NOT?: Prisma.EventLogWhereInput | Prisma.EventLogWhereInput[]
@@ -247,17 +213,15 @@ export type EventLogOrderByWithAggregationInput = {
   description?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   _count?: Prisma.EventLogCountOrderByAggregateInput
-  _avg?: Prisma.EventLogAvgOrderByAggregateInput
   _max?: Prisma.EventLogMaxOrderByAggregateInput
   _min?: Prisma.EventLogMinOrderByAggregateInput
-  _sum?: Prisma.EventLogSumOrderByAggregateInput
 }
 
 export type EventLogScalarWhereWithAggregatesInput = {
   AND?: Prisma.EventLogScalarWhereWithAggregatesInput | Prisma.EventLogScalarWhereWithAggregatesInput[]
   OR?: Prisma.EventLogScalarWhereWithAggregatesInput[]
   NOT?: Prisma.EventLogScalarWhereWithAggregatesInput | Prisma.EventLogScalarWhereWithAggregatesInput[]
-  id?: Prisma.BigIntWithAggregatesFilter<"EventLog"> | bigint | number
+  id?: Prisma.StringWithAggregatesFilter<"EventLog"> | string
   subject_id?: Prisma.StringWithAggregatesFilter<"EventLog"> | string
   event_type?: Prisma.StringWithAggregatesFilter<"EventLog"> | string
   description?: Prisma.StringWithAggregatesFilter<"EventLog"> | string
@@ -265,7 +229,7 @@ export type EventLogScalarWhereWithAggregatesInput = {
 }
 
 export type EventLogCreateInput = {
-  id?: bigint | number
+  id?: string
   event_type: string
   description: string
   created_at?: Date | string
@@ -273,7 +237,7 @@ export type EventLogCreateInput = {
 }
 
 export type EventLogUncheckedCreateInput = {
-  id?: bigint | number
+  id?: string
   subject_id: string
   event_type: string
   description: string
@@ -281,7 +245,7 @@ export type EventLogUncheckedCreateInput = {
 }
 
 export type EventLogUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   event_type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -289,7 +253,7 @@ export type EventLogUpdateInput = {
 }
 
 export type EventLogUncheckedUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
   event_type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
@@ -297,7 +261,7 @@ export type EventLogUncheckedUpdateInput = {
 }
 
 export type EventLogCreateManyInput = {
-  id?: bigint | number
+  id?: string
   subject_id: string
   event_type: string
   description: string
@@ -305,14 +269,14 @@ export type EventLogCreateManyInput = {
 }
 
 export type EventLogUpdateManyMutationInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   event_type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type EventLogUncheckedUpdateManyInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
   event_type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
@@ -337,10 +301,6 @@ export type EventLogCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
 }
 
-export type EventLogAvgOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-}
-
 export type EventLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   subject_id?: Prisma.SortOrder
@@ -355,10 +315,6 @@ export type EventLogMinOrderByAggregateInput = {
   event_type?: Prisma.SortOrder
   description?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
-}
-
-export type EventLogSumOrderByAggregateInput = {
-  id?: Prisma.SortOrder
 }
 
 export type EventLogCreateNestedManyWithoutSubjectInput = {
@@ -404,14 +360,14 @@ export type EventLogUncheckedUpdateManyWithoutSubjectNestedInput = {
 }
 
 export type EventLogCreateWithoutSubjectInput = {
-  id?: bigint | number
+  id?: string
   event_type: string
   description: string
   created_at?: Date | string
 }
 
 export type EventLogUncheckedCreateWithoutSubjectInput = {
-  id?: bigint | number
+  id?: string
   event_type: string
   description: string
   created_at?: Date | string
@@ -447,7 +403,7 @@ export type EventLogScalarWhereInput = {
   AND?: Prisma.EventLogScalarWhereInput | Prisma.EventLogScalarWhereInput[]
   OR?: Prisma.EventLogScalarWhereInput[]
   NOT?: Prisma.EventLogScalarWhereInput | Prisma.EventLogScalarWhereInput[]
-  id?: Prisma.BigIntFilter<"EventLog"> | bigint | number
+  id?: Prisma.StringFilter<"EventLog"> | string
   subject_id?: Prisma.StringFilter<"EventLog"> | string
   event_type?: Prisma.StringFilter<"EventLog"> | string
   description?: Prisma.StringFilter<"EventLog"> | string
@@ -455,28 +411,28 @@ export type EventLogScalarWhereInput = {
 }
 
 export type EventLogCreateManySubjectInput = {
-  id?: bigint | number
+  id?: string
   event_type: string
   description: string
   created_at?: Date | string
 }
 
 export type EventLogUpdateWithoutSubjectInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   event_type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type EventLogUncheckedUpdateWithoutSubjectInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   event_type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type EventLogUncheckedUpdateManyWithoutSubjectInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   event_type?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -536,7 +492,7 @@ export type $EventLogPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     subject: Prisma.$SubjectPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: bigint
+    id: string
     subject_id: string
     event_type: string
     description: string
@@ -965,7 +921,7 @@ export interface Prisma__EventLogClient<T, Null = never, ExtArgs extends runtime
  * Fields of the EventLog model
  */
 export interface EventLogFieldRefs {
-  readonly id: Prisma.FieldRef<"EventLog", 'BigInt'>
+  readonly id: Prisma.FieldRef<"EventLog", 'String'>
   readonly subject_id: Prisma.FieldRef<"EventLog", 'String'>
   readonly event_type: Prisma.FieldRef<"EventLog", 'String'>
   readonly description: Prisma.FieldRef<"EventLog", 'String'>

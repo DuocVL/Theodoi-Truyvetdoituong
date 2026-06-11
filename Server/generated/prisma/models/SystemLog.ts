@@ -20,22 +20,12 @@ export type SystemLogModel = runtime.Types.Result.DefaultSelection<Prisma.$Syste
 
 export type AggregateSystemLog = {
   _count: SystemLogCountAggregateOutputType | null
-  _avg: SystemLogAvgAggregateOutputType | null
-  _sum: SystemLogSumAggregateOutputType | null
   _min: SystemLogMinAggregateOutputType | null
   _max: SystemLogMaxAggregateOutputType | null
 }
 
-export type SystemLogAvgAggregateOutputType = {
-  id: number | null
-}
-
-export type SystemLogSumAggregateOutputType = {
-  id: bigint | null
-}
-
 export type SystemLogMinAggregateOutputType = {
-  id: bigint | null
+  id: string | null
   user_id: string | null
   action: string | null
   entity: string | null
@@ -50,7 +40,7 @@ export type SystemLogMinAggregateOutputType = {
 }
 
 export type SystemLogMaxAggregateOutputType = {
-  id: bigint | null
+  id: string | null
   user_id: string | null
   action: string | null
   entity: string | null
@@ -82,14 +72,6 @@ export type SystemLogCountAggregateOutputType = {
   _all: number
 }
 
-
-export type SystemLogAvgAggregateInputType = {
-  id?: true
-}
-
-export type SystemLogSumAggregateInputType = {
-  id?: true
-}
 
 export type SystemLogMinAggregateInputType = {
   id?: true
@@ -177,18 +159,6 @@ export type SystemLogAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
-   * Select which fields to average
-  **/
-  _avg?: SystemLogAvgAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
-   * Select which fields to sum
-  **/
-  _sum?: SystemLogSumAggregateInputType
-  /**
-   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-   * 
    * Select which fields to find the minimum value
   **/
   _min?: SystemLogMinAggregateInputType
@@ -219,14 +189,12 @@ export type SystemLogGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   _count?: SystemLogCountAggregateInputType | true
-  _avg?: SystemLogAvgAggregateInputType
-  _sum?: SystemLogSumAggregateInputType
   _min?: SystemLogMinAggregateInputType
   _max?: SystemLogMaxAggregateInputType
 }
 
 export type SystemLogGroupByOutputType = {
-  id: bigint
+  id: string
   user_id: string | null
   action: string
   entity: string | null
@@ -241,8 +209,6 @@ export type SystemLogGroupByOutputType = {
   error: string | null
   created_at: Date
   _count: SystemLogCountAggregateOutputType | null
-  _avg: SystemLogAvgAggregateOutputType | null
-  _sum: SystemLogSumAggregateOutputType | null
   _min: SystemLogMinAggregateOutputType | null
   _max: SystemLogMaxAggregateOutputType | null
 }
@@ -266,7 +232,7 @@ export type SystemLogWhereInput = {
   AND?: Prisma.SystemLogWhereInput | Prisma.SystemLogWhereInput[]
   OR?: Prisma.SystemLogWhereInput[]
   NOT?: Prisma.SystemLogWhereInput | Prisma.SystemLogWhereInput[]
-  id?: Prisma.BigIntFilter<"SystemLog"> | bigint | number
+  id?: Prisma.StringFilter<"SystemLog"> | string
   user_id?: Prisma.StringNullableFilter<"SystemLog"> | string | null
   action?: Prisma.StringFilter<"SystemLog"> | string
   entity?: Prisma.StringNullableFilter<"SystemLog"> | string | null
@@ -302,7 +268,7 @@ export type SystemLogOrderByWithRelationInput = {
 }
 
 export type SystemLogWhereUniqueInput = Prisma.AtLeast<{
-  id?: bigint | number
+  id?: string
   AND?: Prisma.SystemLogWhereInput | Prisma.SystemLogWhereInput[]
   OR?: Prisma.SystemLogWhereInput[]
   NOT?: Prisma.SystemLogWhereInput | Prisma.SystemLogWhereInput[]
@@ -338,17 +304,15 @@ export type SystemLogOrderByWithAggregationInput = {
   error?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   _count?: Prisma.SystemLogCountOrderByAggregateInput
-  _avg?: Prisma.SystemLogAvgOrderByAggregateInput
   _max?: Prisma.SystemLogMaxOrderByAggregateInput
   _min?: Prisma.SystemLogMinOrderByAggregateInput
-  _sum?: Prisma.SystemLogSumOrderByAggregateInput
 }
 
 export type SystemLogScalarWhereWithAggregatesInput = {
   AND?: Prisma.SystemLogScalarWhereWithAggregatesInput | Prisma.SystemLogScalarWhereWithAggregatesInput[]
   OR?: Prisma.SystemLogScalarWhereWithAggregatesInput[]
   NOT?: Prisma.SystemLogScalarWhereWithAggregatesInput | Prisma.SystemLogScalarWhereWithAggregatesInput[]
-  id?: Prisma.BigIntWithAggregatesFilter<"SystemLog"> | bigint | number
+  id?: Prisma.StringWithAggregatesFilter<"SystemLog"> | string
   user_id?: Prisma.StringNullableWithAggregatesFilter<"SystemLog"> | string | null
   action?: Prisma.StringWithAggregatesFilter<"SystemLog"> | string
   entity?: Prisma.StringNullableWithAggregatesFilter<"SystemLog"> | string | null
@@ -365,7 +329,7 @@ export type SystemLogScalarWhereWithAggregatesInput = {
 }
 
 export type SystemLogCreateInput = {
-  id?: bigint | number
+  id?: string
   action: string
   entity?: string | null
   entity_id?: string | null
@@ -382,7 +346,7 @@ export type SystemLogCreateInput = {
 }
 
 export type SystemLogUncheckedCreateInput = {
-  id?: bigint | number
+  id?: string
   user_id?: string | null
   action: string
   entity?: string | null
@@ -399,7 +363,7 @@ export type SystemLogUncheckedCreateInput = {
 }
 
 export type SystemLogUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
   entity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entity_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -416,7 +380,7 @@ export type SystemLogUpdateInput = {
 }
 
 export type SystemLogUncheckedUpdateInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   action?: Prisma.StringFieldUpdateOperationsInput | string
   entity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -433,7 +397,7 @@ export type SystemLogUncheckedUpdateInput = {
 }
 
 export type SystemLogCreateManyInput = {
-  id?: bigint | number
+  id?: string
   user_id?: string | null
   action: string
   entity?: string | null
@@ -450,7 +414,7 @@ export type SystemLogCreateManyInput = {
 }
 
 export type SystemLogUpdateManyMutationInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
   entity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entity_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -466,7 +430,7 @@ export type SystemLogUpdateManyMutationInput = {
 }
 
 export type SystemLogUncheckedUpdateManyInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   user_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   action?: Prisma.StringFieldUpdateOperationsInput | string
   entity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -509,10 +473,6 @@ export type SystemLogCountOrderByAggregateInput = {
   created_at?: Prisma.SortOrder
 }
 
-export type SystemLogAvgOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-}
-
 export type SystemLogMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
@@ -541,10 +501,6 @@ export type SystemLogMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   error?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
-}
-
-export type SystemLogSumOrderByAggregateInput = {
-  id?: Prisma.SortOrder
 }
 
 export type SystemLogCreateNestedManyWithoutUserInput = {
@@ -590,7 +546,7 @@ export type SystemLogUncheckedUpdateManyWithoutUserNestedInput = {
 }
 
 export type SystemLogCreateWithoutUserInput = {
-  id?: bigint | number
+  id?: string
   action: string
   entity?: string | null
   entity_id?: string | null
@@ -606,7 +562,7 @@ export type SystemLogCreateWithoutUserInput = {
 }
 
 export type SystemLogUncheckedCreateWithoutUserInput = {
-  id?: bigint | number
+  id?: string
   action: string
   entity?: string | null
   entity_id?: string | null
@@ -651,7 +607,7 @@ export type SystemLogScalarWhereInput = {
   AND?: Prisma.SystemLogScalarWhereInput | Prisma.SystemLogScalarWhereInput[]
   OR?: Prisma.SystemLogScalarWhereInput[]
   NOT?: Prisma.SystemLogScalarWhereInput | Prisma.SystemLogScalarWhereInput[]
-  id?: Prisma.BigIntFilter<"SystemLog"> | bigint | number
+  id?: Prisma.StringFilter<"SystemLog"> | string
   user_id?: Prisma.StringNullableFilter<"SystemLog"> | string | null
   action?: Prisma.StringFilter<"SystemLog"> | string
   entity?: Prisma.StringNullableFilter<"SystemLog"> | string | null
@@ -668,7 +624,7 @@ export type SystemLogScalarWhereInput = {
 }
 
 export type SystemLogCreateManyUserInput = {
-  id?: bigint | number
+  id?: string
   action: string
   entity?: string | null
   entity_id?: string | null
@@ -684,7 +640,7 @@ export type SystemLogCreateManyUserInput = {
 }
 
 export type SystemLogUpdateWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
   entity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entity_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -700,7 +656,7 @@ export type SystemLogUpdateWithoutUserInput = {
 }
 
 export type SystemLogUncheckedUpdateWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
   entity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entity_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -716,7 +672,7 @@ export type SystemLogUncheckedUpdateWithoutUserInput = {
 }
 
 export type SystemLogUncheckedUpdateManyWithoutUserInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.StringFieldUpdateOperationsInput | string
   entity?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   entity_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -821,7 +777,7 @@ export type $SystemLogPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: bigint
+    id: string
     user_id: string | null
     action: string
     entity: string | null
@@ -1259,7 +1215,7 @@ export interface Prisma__SystemLogClient<T, Null = never, ExtArgs extends runtim
  * Fields of the SystemLog model
  */
 export interface SystemLogFieldRefs {
-  readonly id: Prisma.FieldRef<"SystemLog", 'BigInt'>
+  readonly id: Prisma.FieldRef<"SystemLog", 'String'>
   readonly user_id: Prisma.FieldRef<"SystemLog", 'String'>
   readonly action: Prisma.FieldRef<"SystemLog", 'String'>
   readonly entity: Prisma.FieldRef<"SystemLog", 'String'>

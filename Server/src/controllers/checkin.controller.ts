@@ -1,7 +1,7 @@
 
 import { Request, Response, NextFunction } from 'express';
-import { CheckinService } from '@/services/checkin.service';
-import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
+import { CheckinService } from '../services/checkin.service';
+import { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
 
 export class CheckinController {
   private checkinService = new CheckinService();
