@@ -1,157 +1,169 @@
 import cv2
 import os
 import numpy as np
-import random
-
-BASE_DIR = "test_data"
-
-# =========================
-# CREATE FOLDERS
-# =========================
-folders = [
-    "enroll/user_01",
-    "verify/same_person",
-    "verify/different_person",
-    "verify/spoof_image",
-    "verify/replay_video",
-    "verify/low_quality",
-    "verify/bad_pose",
-    "verify/multi_faces",
-    "verify/no_face"
-]
-
-for f in folders:
-    os.makedirs(os.path.join(BASE_DIR, f), exist_ok=True)
-
+import argparse
+from typing import List, Tuple
 
 # =========================
-# CAPTURE IMAGES FROM WEBCAM
+# CONSTANTS
 # =========================
-def capture_images(save_dir, count=10, label="Capture", show_gui=True):
+DEFAULT_BASE_DIR = "test_data"
+
+# =========================
+# IMAGE CAPTURE UTILITY
+# =========================
+def capture_images(save_dir: str, count: int, user_id: str, show_gui: bool = True):
+    """Mở webcam và chụp 'count' tấm ảnh, lưu vào 'save_dir'."""
+    os.makedirs(save_dir, exist_ok=True)
     cap = cv2.VideoCapture(0)
-    saved = 0
+    if not cap.isOpened():
+        print("Error: Could not open webcam.")
+        return
 
-    print(f"[INFO] Capturing {count} images for {save_dir}")
+    saved_count = 0
+    print(f"\n[INFO] Capturing {count} images for user '{user_id}' into '{save_dir}'.")
+    print("Press 'c' to capture, 'q' to quit.")
 
-    while saved < count:
+    while saved_count < count:
         ret, frame = cap.read()
         if not ret:
+            print("Error: Could not read frame from webcam.")
             break
 
         if show_gui:
-            cv2.imshow(label, frame)
+            # Hiển thị thông tin lên màn hình
+            display_text = f"Capturing: {saved_count+1}/{count}. Press 'c' to save."
+            cv2.putText(frame, display_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            cv2.imshow(f"Capture for {user_id}", frame)
 
-        key = cv2.waitKey(1)
+        key = cv2.waitKey(1) & 0xFF
 
         if key == ord('c'):
-            path = os.path.join(save_dir, f"{saved}.jpg")
+            path = os.path.join(save_dir, f"{user_id}_{saved_count}.jpg")
             cv2.imwrite(path, frame)
-            print("Saved:", path)
-            saved += 1
-
-        if key == ord('q'):
+            print(f"Saved: {path}")
+            saved_count += 1
+        elif key == ord('q'):
+            print("Capture cancelled by user.")
             break
 
     cap.release()
-    cv2.destroyAllWindows()
-
-
-# =========================
-# AUGMENTATION
-# =========================
-def augment_image(img):
-    results = []
-
-    # blur
-    results.append(cv2.GaussianBlur(img, (15, 15), 0))
-
-    # brightness up
-    results.append(cv2.convertScaleAbs(img, alpha=1.2, beta=40))
-
-    # dark
-    results.append(cv2.convertScaleAbs(img, alpha=0.5, beta=0))
-
-    # noise
-    noise = np.random.normal(0, 25, img.shape)
-    noisy = np.clip(img.astype(np.float32) + noise, 0, 255).astype(np.uint8)
-    results.append(noisy)
-
-    return results
-
+    if show_gui:
+        cv2.destroyAllWindows()
 
 # =========================
-# GENERATE LOW QUALITY
+# DATA AUGMENTATION
 # =========================
-def generate_low_quality(src_dir, dst_dir):
-    for file in os.listdir(src_dir):
-        img = cv2.imread(os.path.join(src_dir, file))
+def augment_image(img: np.ndarray) -> List[Tuple[str, np.ndarray]]:
+    """Tạo ra các phiên bản biến đổi của một ảnh."""
+    augmentations = []
+
+    # 1. Gaussian Blur
+    augmentations.append(("blur", cv2.GaussianBlur(img, (21, 21), 0)))
+
+    # 2. Brightness Increase
+    augmentations.append(("bright", cv2.convertScaleAbs(img, alpha=1.5, beta=50)))
+
+    # 3. Brightness Decrease (Dark)
+    augmentations.append(("dark", cv2.convertScaleAbs(img, alpha=0.6, beta=0)))
+
+    # 4. Salt and Pepper Noise
+    noise = np.random.randint(0, 255, img.shape, dtype=np.uint8)
+    noisy_img = np.where(noise < 10, 0, np.where(noise > 245, 255, img))
+    augmentations.append(("noise", noisy_img))
+    
+    return augmentations
+
+def generate_augmented_data(src_dir: str, dst_dir: str):
+    """Tạo dữ liệu biến đổi từ một thư mục nguồn."""
+    os.makedirs(dst_dir, exist_ok=True)
+    print(f"\n[INFO] Generating augmented data from '{src_dir}' to '{dst_dir}'...")
+    for filename in os.listdir(src_dir):
+        img_path = os.path.join(src_dir, filename)
+        img = cv2.imread(img_path)
         if img is None:
             continue
 
+        base_name = os.path.splitext(filename)[0]
         aug_imgs = augment_image(img)
 
-        for i, aug in enumerate(aug_imgs):
-            path = os.path.join(dst_dir, f"{file}_aug_{i}.jpg")
-            cv2.imwrite(path, aug)
-
+        for aug_name, aug_img in aug_imgs:
+            new_filename = f"{base_name}_{aug_name}.jpg"
+            path = os.path.join(dst_dir, new_filename)
+            cv2.imwrite(path, aug_img)
+    print("Augmented data generation complete.")
 
 # =========================
-# EXTRACT VIDEO FRAMES
+# VIDEO FRAME EXTRACTION
 # =========================
-def extract_video_frames(video_path, dst_dir):
+def extract_video_frames(video_path: str, dst_dir: str, frame_interval: int):
+    """Trích xuất các khung hình từ video."""
+    os.makedirs(dst_dir, exist_ok=True)
     cap = cv2.VideoCapture(video_path)
-    count = 0
+    if not cap.isOpened():
+        print(f"Error: Could not open video file {video_path}")
+        return
 
+    print(f"\n[INFO] Extracting frames from '{video_path}' to '{dst_dir}'...")
+    frame_count = 0
+    saved_count = 0
     while True:
         ret, frame = cap.read()
         if not ret:
             break
 
-        if count % 10 == 0:
-            path = os.path.join(dst_dir, f"frame_{count}.jpg")
+        if frame_count % frame_interval == 0:
+            path = os.path.join(dst_dir, f"frame_{saved_count:04d}.jpg")
             cv2.imwrite(path, frame)
-
-        count += 1
+            saved_count += 1
+        
+        frame_count += 1
 
     cap.release()
-
-
-# =========================
-# GENERATE RANDOM NO FACE
-# =========================
-def generate_no_face(dst_dir, count=10):
-    for i in range(count):
-        img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
-        cv2.imwrite(os.path.join(dst_dir, f"{i}.jpg"), img)
-
+    print(f"Extracted {saved_count} frames.")
 
 # =========================
-# MAIN FLOW
+# MAIN CLI LOGIC
 # =========================
+def main():
+    parser = argparse.ArgumentParser(description="Test Data Generation Script for Face Service")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # --- Capture Command ---
+    parser_capture = subparsers.add_parser("capture", help="Capture images from webcam.")
+    parser_capture.add_argument("--user", required=True, help="User ID (e.g., user_01).")
+    parser_capture.add_argument("--type", required=True, choices=["enroll", "verify_same", "verify_diff", "verify_pose"], help="Type of data to capture.")
+    parser_capture.add_argument("--count", type=int, default=5, help="Number of images to capture.")
+    parser_capture.add_argument("--base_dir", default=DEFAULT_BASE_DIR, help="Base directory for test data.")
+
+    # --- Augment Command ---
+    parser_augment = subparsers.add_parser("augment", help="Generate augmented images from a source directory.")
+    parser_augment.add_argument("--src", required=True, help="Source directory.")
+    parser_augment.add_argument("--dst", required=True, help="Destination directory for augmented images.")
+
+    # --- Extract Command ---
+    parser_extract = subparsers.add_parser("extract", help="Extract frames from a video.")
+    parser_extract.add_argument("--video", required=True, help="Path to the video file.")
+    parser_extract.add_argument("--output", required=True, help="Output directory for frames.")
+    parser_extract.add_argument("--interval", type=int, default=10, help="Interval between frames to extract.")
+
+    args = parser.parse_args()
+
+    if args.command == "capture":
+        dir_map = {
+            "enroll": f"enroll/{args.user}",
+            "verify_same": f"verify/{args.user}/same_person",
+            "verify_diff": f"verify/{args.user}/different_person",
+            "verify_pose": f"verify/{args.user}/bad_pose",
+        }
+        save_dir = os.path.join(args.base_dir, dir_map[args.type])
+        capture_images(save_dir, args.count, args.user)
+
+    elif args.command == "augment":
+        generate_augmented_data(args.src, args.dst)
+
+    elif args.command == "extract":
+        extract_video_frames(args.video, args.output, args.interval)
+
 if __name__ == "__main__":
-
-    # 1. ENROLL (user_01)
-    capture_images(os.path.join(BASE_DIR, "enroll/user_01"), 5)
-
-    # 2. SAME PERSON (khác thời điểm)
-    capture_images(os.path.join(BASE_DIR, "verify/same_person"), 8)
-
-    # 3. LOW QUALITY
-    generate_low_quality(
-        os.path.join(BASE_DIR, "verify/same_person"),
-        os.path.join(BASE_DIR, "verify/low_quality")
-    )
-
-    # 4. NO FACE
-    generate_no_face(os.path.join(BASE_DIR, "verify/no_face"))
-
-    print("\n=== DONE BASIC DATA ===")
-
-    print("""
-    BẠN CẦN TỰ LÀM THÊM:
-    - different_person (nhờ người khác chụp)
-    - spoof_image (chụp lại từ màn hình)
-    - replay_video (dùng video rồi extract)
-    - multi_faces (chụp 2 người)
-    - bad_pose (quay ngang đầu)
-    """)
+    main()

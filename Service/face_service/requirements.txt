@@ -1,6 +1,8 @@
-fastapi
-uvicorn
-opencv-python
-numpy
-insightface
-python-multipart
+# Đây là một ví dụ, phiên bản thực tế sẽ phụ thuộc vào môi trường của bạn
+fastapi==0.104.1
+uvicorn==0.24.0.post1
+opencv-python==4.8.1.78
+numpy==1.26.2
+insightface==0.7.3
+python-multipart==0.0.6
+#... và các thư viện phụ thuộc khác do 'pip freeze' tạo ra
