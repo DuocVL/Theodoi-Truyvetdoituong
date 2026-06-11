@@ -4,7 +4,14 @@ import { CheckinService } from '@/services/checkin.service';
 import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
 import { Checkin } from '@prisma/client';
 
+/**
+ * Controller for handling HTTP requests related to check-ins.
+ */
 export class CheckinController {
+  /**
+   * Injects the CheckinService dependency.
+   * @param checkinService An instance of CheckinService.
+   */
   constructor(private readonly checkinService: CheckinService) {}
 
   public createCheckin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -51,8 +58,9 @@ export class CheckinController {
   public deleteCheckin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const checkinId: string = req.params.id;
-      const deletedCheckin: Checkin = await this.checkinService.deleteCheckin(checkinId);
-      res.status(200).json({ data: deletedCheckin, message: 'deleted' });
+      await this.checkinService.deleteCheckin(checkinId);
+      // Following RESTful best practices, a successful DELETE should return a 204 No Content response.
+      res.status(204).send();
     } catch (error) {
       next(error);
     }
