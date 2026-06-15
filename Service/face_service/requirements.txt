@@ -12,3 +12,7 @@ insightface==0.7.3
 
 # --- Server Utilities ---
 python-multipart==0.0.6
+
+# --- Environment Variable Management ---
+# Used to load variables from a .env file into the environment.
+python-dotenv==1.0.0
