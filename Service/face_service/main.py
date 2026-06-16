@@ -46,7 +46,6 @@ app = FastAPI()
 async def startup_event():
     logging.basicConfig(level=logging.INFO)
     logging.info(f"Service starting with Anti-Spoofing Level: '{SERVER_SPOOF_LEVEL}' (Threshold: {ACTIVE_SPOOF_THRESHOLD})")
-    # The device info will be logged by face_engine.py and anti_spoof_model.py themselves
 
 # =========================
 # DEPENDENCIES & HELPERS
