@@ -1,18 +1,24 @@
 
-# It is strongly recommended to generate this file using `pip freeze > requirements.txt` 
-# from a working virtual environment to ensure all dependencies and their exact versions are captured.
-
+# === Core Framework ===
+# Web framework chính để xây dựng API
 fastapi==0.104.1
+
+# ASGI server để chạy FastAPI
 uvicorn[standard]==0.24.0
 
-# --- Core CV and ML Libraries ---
-opencv-python==4.8.1.78
-numpy==1.26.2
-insightface==0.7.3
-
-# --- Server Utilities ---
+# Cần thiết để xử lý upload file dạng form-data
 python-multipart==0.0.6
 
-# --- Environment Variable Management ---
-# Used to load variables from a .env file into the environment.
-python-dotenv==1.0.0
+# === Computer Vision & Machine Learning ===
+
+# Thư viện nền tảng cho xử lý hình ảnh và tính toán ma trận
+numpy==1.26.2
+opencv-python==4.8.1.78
+
+# Thư viện chính cho việc nhận dạng và phân tích khuôn mặt
+# Bao gồm cả model và các công cụ cần thiết
+insightface==0.7.3
+
+# Ghi chú: insightface sẽ tự động tải các model cần thiết 
+# và có thể yêu cầu onnxruntime. Để đơn giản, chúng ta không cần liệt kê
+# onnxruntime ở đây vì pip sẽ tự động xử lý nó như một dependency của insightface.
