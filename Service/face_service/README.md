@@ -2,6 +2,10 @@ Cách chạy dự án
 cd Service/face_service
 venv
 venv\Scripts\activate
+pip install --upgrade pip
+
+pip install fastapi uvicorn insightface opencv-python numpy python-multipart onnxruntime
+pip install onnxruntime-gpu
 chạy
 uvicorn main:app --host 0.0.0.0 --port 8000
 

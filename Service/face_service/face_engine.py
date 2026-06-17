@@ -1,56 +1,76 @@
-
-import numpy as np
 import cv2
-import insightface
+import numpy as np
 from insightface.app import FaceAnalysis
 
-# =========================
-# MODEL INITIALIZATION
-# =========================
-# Chỉ cần thực hiện một lần khi service khởi động
+app = FaceAnalysis(name="buffalo_s")
+app.prepare(ctx_id=0)
 
-# Khởi tạo FaceAnalysis. Đây là model chính để xử lý khuôn mặt.
-# 'buffalo_l' là một model tổng hợp mạnh mẽ của insightface.
-app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])
-app.prepare(ctx_id=0, det_size=(640, 640)) # ctx_id=0 cho CPU
 
-print("InsightFace model loaded successfully on CPU.")
+def detect_and_embed(image):
 
-# =========================
-# CORE FUNCTION
-# =========================
+    faces = app.get(image)
 
-def detect_and_embed(image: np.ndarray):
-    """
-    Phát hiện khuôn mặt trong ảnh và trích xuất vector embedding.
+    if len(faces) == 0:
+        return None, "NO_FACE"
 
-    Args:
-        image: Ảnh đầu vào dưới dạng một numpy array (đã được đọc bằng cv2).
+    if len(faces) > 1:
+        return None, "MULTIPLE_FACES"
 
-    Returns:
-        Một tuple (data, error):
-        - data (dict): Chứa embedding nếu thành công.
-        - error (str): Thông báo lỗi nếu thất bại.
-    """
-    try:
-        # Sử dụng model để tìm tất cả các khuôn mặt trong ảnh
-        faces = app.get(image)
+    face = faces[0]
 
-        # Xử lý các trường hợp không tìm thấy hoặc tìm thấy quá nhiều khuôn mặt
-        if not faces:
-            return None, "NO_FACE_DETECTED: Không tìm thấy khuôn mặt nào trong ảnh."
-        
-        if len(faces) > 1:
-            return None, f"MULTIPLE_FACES_DETECTED: Tìm thấy {len(faces)} khuôn mặt. Vui lòng chỉ cung cấp ảnh có một khuôn mặt."
+    embedding = face.embedding.astype(np.float32)
 
-        # Lấy embedding từ khuôn mặt duy nhất đã tìm thấy
-        face = faces[0]
-        embedding = face.normed_embedding
+    embedding = (
+        embedding /
+        np.linalg.norm(embedding)
+    )
 
-        return {"embedding": embedding}, None
+    quality = calc_quality(
+        image,
+        face
+    )
 
-    except Exception as e:
-        # Bắt các lỗi không mong muốn khác trong quá trình xử lý
-        print(f"[ERROR] in detect_and_embed: {e}")
-        return None, f"INTERNAL_ERROR: Đã có lỗi xảy ra trong quá trình xử lý ảnh: {e}"
+    return {
+        "embedding": embedding.tolist(),
+        "quality": quality
+    }, None
 
+
+def calc_quality(image, face):
+
+    gray = cv2.cvtColor(
+        image,
+        cv2.COLOR_BGR2GRAY
+    )
+
+    blur_score = cv2.Laplacian(
+        gray,
+        cv2.CV_64F
+    ).var()
+
+    bbox = face.bbox
+
+    face_area = (
+        (bbox[2] - bbox[0]) *
+        (bbox[3] - bbox[1])
+    )
+
+    image_area = (
+        image.shape[0] *
+        image.shape[1]
+    )
+
+    size_score = (
+        face_area /
+        image_area
+    )
+
+    quality = (
+        min(blur_score / 100.0, 1.0)
+        * 0.5
+        +
+        min(size_score * 5, 1.0)
+        * 0.5
+    )
+
+    return float(quality)
