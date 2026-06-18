@@ -53,7 +53,7 @@ class LoginActivity : AppCompatActivity() {
     private fun handleLogin() {
         val username = binding.etUsername.text.toString().trim()
         val password = binding.etPassword.text.toString().trim()
-        val deviceId = getDeviceId()
+        val deviceId = getDeviceAndroidId()
 
         if (username.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show()
@@ -84,7 +84,7 @@ class LoginActivity : AppCompatActivity() {
         finish() // Finish LoginActivity so user can't go back to it
     }
 
-    private fun getDeviceId(): String {
+    private fun getDeviceAndroidId(): String {
         return DeviceUtils.getAndroidId(this)
     }
 
@@ -93,7 +93,7 @@ class LoginActivity : AppCompatActivity() {
         Log.i(TAG, "Manufacturer: ${DeviceUtils.manufacturer}")
         Log.i(TAG, "Model: ${DeviceUtils.model}")
         Log.i(TAG, "Android Version: ${DeviceUtils.androidVersion} (SDK ${DeviceUtils.sdkVersion})")
-        Log.i(TAG, "Android ID: ${getDeviceId()}")
+        Log.i(TAG, "Android ID: ${getDeviceAndroidId()}")
         Log.i(TAG, "Is Emulator: ${DeviceUtils.isEmulator}")
         Log.i(TAG, "Is Rooted: ${DeviceUtils.isRooted}")
         Log.i(TAG, "====================================================")
