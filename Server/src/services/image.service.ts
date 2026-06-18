@@ -1,13 +1,12 @@
-
-import { PrismaClient, Image } from '@prisma/client';
+import { PrismaClient, Image } from '../../generated/prisma/client';
+import { prisma } from '../configs/prisma'
 import { UploadedFile } from 'express-fileupload';
-import { HttpException } from '@/exceptions/http-exception';
+import { HttpException } from '../exceptions/http-exception';
 
 // Giả định: bạn có một utility để xử lý việc lưu file
 // import { saveFileToDisk } from '@/utils/file-handler';
 
 export class ImageService {
-  private prisma = new PrismaClient();
 
   /**
    * Giả lập việc lưu file ảnh và tạo bản ghi trong CSDL.
@@ -26,7 +25,7 @@ export class ImageService {
     const mockFilePath = `/${destinationFolder}/${Date.now()}-${imageFile.name}`;
 
     try {
-      const newImageRecord = await this.prisma.image.create({
+      const newImageRecord = await prisma.image.create({
         data: {
           // ID sẽ được tự tạo bởi CSDL
           url: mockFilePath,
