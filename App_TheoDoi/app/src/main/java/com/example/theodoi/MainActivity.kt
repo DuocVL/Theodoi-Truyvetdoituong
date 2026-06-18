@@ -268,7 +268,6 @@ class MainActivity : AppCompatActivity() {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
-    // Thêm hàm callback để xử lý kết quả
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults: IntArray
     ) {
@@ -280,7 +279,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this,
                     "Quyền truy cập Camera bị từ chối.",
                     Toast.LENGTH_SHORT).show()
-                finish() // Hoặc hiển thị thông báo yêu cầu người dùng cấp quyền trong cài đặt
+                finish()
             }
         }
     }
