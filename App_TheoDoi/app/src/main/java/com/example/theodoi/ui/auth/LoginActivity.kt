@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
         finish() // Finish LoginActivity so user can't go back to it
     }
 
-    private fun getDeviceId(): String {
+     private fun getDeviceId(): String {
         return Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
     }
 }
