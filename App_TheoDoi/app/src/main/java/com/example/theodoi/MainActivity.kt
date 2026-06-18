@@ -56,7 +56,9 @@ class MainActivity : AppCompatActivity() {
         if (allPermissionsGranted()) {
             startCamera()
         } else {
-            // Thực tế bạn nên xử lý xin quyền tại đây, hàm rút gọn giữ nguyên
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_PERMISSIONS
+            )
         }
 
         binding.btnRegister.setOnClickListener { resetLivenessChallenge(SystemMode.REGISTER) }
@@ -264,6 +266,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun allPermissionsGranted() = arrayOf(Manifest.permission.CAMERA).all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    // Thêm hàm callback để xử lý kết quả
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionsGranted()) {
+                startCamera()
+            } else {
+                Toast.makeText(this,
+                    "Quyền truy cập Camera bị từ chối.",
+                    Toast.LENGTH_SHORT).show()
+                finish() // Hoặc hiển thị thông báo yêu cầu người dùng cấp quyền trong cài đặt
+            }
+        }
     }
 
     override fun onDestroy() {
