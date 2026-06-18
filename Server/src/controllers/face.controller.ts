@@ -1,4 +1,3 @@
-
 import { NextFunction, Response } from 'express';
 import multer from 'multer';
 import faceService from '../services/face.service';

@@ -1,6 +1,6 @@
 
 import { PrismaClient } from '@prisma/client';
-import { HttpException } from '@/exceptions/http-exception';
+import { HttpException } from '../exceptions/http-exception';
 
 // Giả định: bạn có một thư viện để tính toán khoảng cách cosine
 // import { cosineSimilarity } from '@/utils/face-math';

@@ -9,7 +9,7 @@ object ApiClient {
 
     // IMPORTANT: Replace with your computer's actual IP address in the local network.
     // 'localhost' or '127.0.0.1' will not work from an Android emulator or device.
-    private const val BASE_URL = "http://192.168.1.10:3333/"
+    private const val BASE_URL = "http://192.168.44.101:3333/"
 
     // Create a logging interceptor to view request and response logs in Logcat.
     // This is extremely helpful for debugging.
