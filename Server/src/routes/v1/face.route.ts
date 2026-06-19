@@ -1,17 +1,30 @@
 
+/**
+ * @file face.route.ts
+ * @description
+ * File này định nghĩa các API endpoints cho module quản lý dữ liệu khuôn mặt (Face).
+ * Nó bao gồm các route để đăng ký embedding khuôn mặt và truy xuất thông tin khuôn mặt của người dùng.
+ * File này cũng đóng vai trò là "Composition Root" cho module, nơi các dependencies
+ * (Repository, Service, Controller) được khởi tạo và tiêm vào nhau theo nguyên tắc Dependency Injection.
+ */
+
 import { Router } from 'express';
 import { Routes } from '@/interfaces/routes.interface';
 import { authMiddleware } from '@/middlewares/auth.middleware';
+// Giả sử bạn có một middleware mới cho Zod
+// import { zodValidationMiddleware } from '@/middlewares/zod.middleware'; 
 
 // Import các thành phần của module
 import { FaceController } from '@/controllers/face.controller';
 import { FaceService } from '@/services/face.service';
 import { FaceRepository } from '@/repositories/face.repository';
+import { registerFaceSchema } from '@/dtos/face.dto';
 
-// Middleware cho file upload
-import multer from 'multer';
-const storage = multer.memoryStorage();
-const upload = multer({ storage, limits: { files: 5, fileSize: 10 * 1024 * 1024 } });
+// Placeholder cho middleware Zod, bạn cần thay thế bằng middleware thực tế của mình
+// Ví dụ:
+// const validationMiddleware = (schema) => (req, res, next) => { ... }; 
+// Tôi sẽ sử dụng lại tên `validationMiddleware` để không phá vỡ cấu trúc hiện tại
+import { validationMiddleware } from '@/middlewares/validation.middleware';
 
 export class FaceRoute implements Routes {
   public path = '/face';
@@ -27,54 +40,19 @@ export class FaceRoute implements Routes {
   }
 
   private initializeRoutes() {
-    // Áp dụng auth middleware cho tất cả các route bên dưới
     this.router.use(authMiddleware);
 
-    /**
-     * @openapi
-     * /face/register:
-     *   post:
-     *     summary: Đăng ký khuôn mặt cho subject hiện tại
-     *     tags: [Face]
-     *     requestBody:
-     *       required: true
-     *       content:
-     *         multipart/form-data:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               files:
-     *                 type: array
-     *                 items:
-     *                   type: string
-     *                   format: binary
-     *     responses:
-     *       201: { description: 'Đăng ký thành công' }
-     */
     this.router.post(
       `${this.path}/register`,
-      upload.array('files', 5),
+      // Sử dụng middleware với Zod schema
+      // Middleware này sẽ nhận schema và xác thực `req.body`
+      validationMiddleware(registerFaceSchema, 'body'), // Giả sử middleware của bạn có thể xử lý Zod
       this.controller.register,
     );
 
-    /**
-     * @openapi
-     * /face/subject/{subjectId}:
-     *   get:
-     *     summary: Lấy tất cả dữ liệu khuôn mặt của một subject
-     *     tags: [Face]
-     *     parameters:
-     *       - in: path
-     *         name: subjectId
-     *         required: true
-     *         schema:
-     *           type: string
-     *     responses:
-     *       200: { description: 'Thành công' }
-     */
     this.router.get(
       `${this.path}/me`,
-      this.controller.getFaceData,
+      this.controller.getMyFaceData,
     );
   }
 }
