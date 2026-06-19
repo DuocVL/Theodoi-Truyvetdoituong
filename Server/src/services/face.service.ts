@@ -1,44 +1,71 @@
 
-import { PrismaClient } from '@prisma/client';
-import { HttpException } from '../exceptions/http-exception';
+import { FaceRepository } from '@/repositories/face.repository';
+import { HttpException } from '@/exceptions/http-exception';
+import axios from 'axios';
+import FormData from 'form-data';
+import { FaceData } from '@prisma/client';
 
-// Giả định: bạn có một thư viện để tính toán khoảng cách cosine
-// import { cosineSimilarity } from '@/utils/face-math';
+// Địa chỉ của service Python xử lý AI
+const FACE_SERVICE_URL = process.env.FACE_SERVICE_URL || 'http://face-service:5000';
 
 export class FaceService {
-  private prisma = new PrismaClient();
+  constructor(private readonly faceRepository: FaceRepository) {}
 
   /**
-   * Giả lập việc xác thực khuôn mặt bằng cách so sánh embedding.
-   * @param subjectId ID của subject cần xác thực.
-   * @param incomingEmbedding Embedding nhận từ client.
-   * @returns boolean cho biết xác thực thành công hay không.
+   * Gọi service Python để tạo embedding từ nhiều ảnh, sau đó lưu vào CSDL.
+   * @param subjectId ID của subject đang đăng ký.
+   * @param files Mảng các file ảnh upload.
+   * @returns Bản ghi FaceData mới được tạo.
    */
-  public async verifySubjectByEmbedding(
+  public async registerFace(
     subjectId: string,
-    incomingEmbedding: number[],
-  ): Promise<boolean> {
-    console.log(`Simulating: Verifying face for subject ${subjectId}...`);
-
-    // Lấy embedding đã đăng ký của subject từ CSDL
-    const subject = await this.prisma.subject.findUnique({
-      where: { id: subjectId },
-      select: { face_embedding: true }, // Giả sử bạn có trường này trong model Subject
-    });
-
-    if (!subject || !subject.face_embedding) {
-      throw new HttpException(404, 'Subject not found or has no registered face embedding.');
+    files: Express.Multer.File[],
+  ): Promise<FaceData> {
+    if (!files || files.length < 3) {
+      throw new HttpException(400, 'At least 3 images are required for registration.');
     }
 
-    // Giả lập logic so sánh embedding
-    // const registeredEmbedding = subject.face_embedding as number[];
-    // const similarity = cosineSimilarity(registeredEmbedding, incomingEmbedding);
-    // const SIMILARITY_THRESHOLD = 0.9;
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('files', file.buffer, file.originalname);
+    });
 
-    // Trong bản giả lập, chúng ta sẽ luôn trả về true nếu có embedding
-    const isMatch = true; // similarity > SIMILARITY_THRESHOLD;
+    try {
+      // Gọi đến service Python để lấy embedding trung bình
+      const response = await axios.post(
+        `${FACE_SERVICE_URL}/register`,
+        formData,
+        {
+          headers: formData.getHeaders(),
+        },
+      );
 
-    console.log(`Simulating: Verification result: ${isMatch}`);
-    return isMatch;
+      const embedding: number[] = response.data.embedding;
+
+      if (!embedding) {
+        throw new HttpException(500, 'Failed to generate embedding from face service.');
+      }
+
+      // Lưu embedding vào CSDL thông qua repository
+      const newFaceData = await this.faceRepository.create(subjectId, embedding);
+      return newFaceData;
+
+    } catch (error) {
+      console.error('Error calling face service:', error);
+      throw new HttpException(502, 'Bad Gateway: Could not connect to face processing service.');
+    }
+  }
+
+  /**
+   * Lấy tất cả dữ liệu khuôn mặt đã đăng ký của một subject.
+   * @param subjectId ID của subject.
+   * @returns Mảng các bản ghi FaceData.
+   */
+  public async getFaceDataForSubject(subjectId: string): Promise<FaceData[]> {
+    const faceData = await this.faceRepository.findBySubjectId(subjectId);
+    if (!faceData || faceData.length === 0) {
+      throw new HttpException(404, `No face data found for subject with ID ${subjectId}`);
+    }
+    return faceData;
   }
 }

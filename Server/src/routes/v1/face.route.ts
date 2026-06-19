@@ -1,40 +1,80 @@
+
 import { Router } from 'express';
-import FaceController from '../../controllers/face.controller';
-import { authMiddleware } from '../../middlewares/auth.middleware';
-import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
-import { UserAccountRole } from '../../../generated/prisma/client'; // Import the Role enum
+import { Routes } from '@/interfaces/routes.interface';
+import { authMiddleware } from '@/middlewares/auth.middleware';
 
+// Import các thành phần của module
+import { FaceController } from '@/controllers/face.controller';
+import { FaceService } from '@/services/face.service';
+import { FaceRepository } from '@/repositories/face.repository';
 
-class FaceRoute {
+// Middleware cho file upload
+import multer from 'multer';
+const storage = multer.memoryStorage();
+const upload = multer({ storage, limits: { files: 5, fileSize: 10 * 1024 * 1024 } });
+
+export class FaceRoute implements Routes {
   public path = '/face';
   public router = Router();
-  public faceController = new FaceController();
+
+  // --- COMPOSITION ROOT ---
+  private readonly repository = new FaceRepository();
+  private readonly service = new FaceService(this.repository);
+  public controller = new FaceController(this.service);
 
   constructor() {
     this.initializeRoutes();
   }
 
   private initializeRoutes() {
+    // Áp dụng auth middleware cho tất cả các route bên dưới
     this.router.use(authMiddleware);
 
-    // Route to register a new face.
-    // Accessible by ADMIN and USER roles.
+    /**
+     * @openapi
+     * /face/register:
+     *   post:
+     *     summary: Đăng ký khuôn mặt cho subject hiện tại
+     *     tags: [Face]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         multipart/form-data:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               files:
+     *                 type: array
+     *                 items:
+     *                   type: string
+     *                   format: binary
+     *     responses:
+     *       201: { description: 'Đăng ký thành công' }
+     */
     this.router.post(
-      '/register',
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.USER]),
-      this.faceController.uploadMiddleware,
-      this.faceController.register
+      `${this.path}/register`,
+      upload.array('files', 5),
+      this.controller.register,
     );
 
-    // Route for face-based check-in.
-    // Accessible by ADMIN and USER roles.
-    this.router.post(
-      '/check-in',
-      checkRole([UserAccountRole.ADMIN, UserAccountRole.USER]),
-      this.faceController.uploadMiddleware,
-      this.faceController.checkIn
+    /**
+     * @openapi
+     * /face/subject/{subjectId}:
+     *   get:
+     *     summary: Lấy tất cả dữ liệu khuôn mặt của một subject
+     *     tags: [Face]
+     *     parameters:
+     *       - in: path
+     *         name: subjectId
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200: { description: 'Thành công' }
+     */
+    this.router.get(
+      `${this.path}/me`,
+      this.controller.getFaceData,
     );
   }
 }
-
-export default FaceRoute;

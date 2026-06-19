@@ -1,120 +1,64 @@
+
 import { NextFunction, Response } from 'express';
-import multer from 'multer';
-import faceService from '../services/face.service';
-import { Prisma } from '../../generated/prisma/client';
-import { prisma } from '../configs/prisma';
-import { RequestWithUser } from '../types/data';
-import { faceVerificationQueue } from '../queues/face-verification.queue';
+import { FaceService } from '@/services/face.service';
+import { RequestWithUser } from '@/interfaces/auth.interface';
+import { HttpException } from '@/exceptions/http-exception';
+import { prisma } from '@/configs/prisma';
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage, limits: { files: 5, fileSize: 10 * 1024 * 1024 } });
+export class FaceController {
+  constructor(private readonly faceService: FaceService) {}
 
-class FaceController {
-  public uploadMiddleware = upload.array('files', 5);
-
-  public register = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
+  /**
+   * Đăng ký khuôn mặt cho subject.
+   */
+  public register = async (
+    req: RequestWithUser,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     try {
       const files = req.files as Express.Multer.File[];
-      if (!files || files.length < 3) {
-        res.status(400).json({ message: 'At least 3 images are required.' });
-        return;
-      }
-
       const accountId = req.account?.id;
-      if (!accountId) {
-        res.status(401).json({ message: 'Unauthorized: Account ID not found.' });
-        return;
-      }
+
+      if (!accountId) throw new HttpException(401, 'Unauthorized');
 
       const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
+      if (!subject) throw new HttpException(403, 'Forbidden: User is not a subject');
 
-      if (!subject) {
-        res.status(403).json({ message: 'Forbidden: User is not a subject.' });
-        return;
-      }
+      const newFaceData = await this.faceService.registerFace(subject.id, files);
 
-      const embedding = await faceService.registerFace(files);
-      
-      await prisma.$executeRaw`
-        INSERT INTO "face_data" (id, subject_id, embedding, image_url, status, created_at, update_at)
-        VALUES (gen_random_uuid(), ${subject.id}, ${JSON.stringify(embedding)}::vector, 'initial_registration', 'ACTIVE', NOW(), NOW())
-      `;
-
-      res.status(201).json({ message: 'Face registered successfully.' });
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public checkIn = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const files = req.files as Express.Multer.File[];
-      const { latitude, longitude } = req.body;
-
-      if (!files || files.length === 0 || !latitude || !longitude) {
-        res.status(400).json({ message: 'Images and location are required.' });
-        return;
-      }
-
-      const accountId = req.account?.id;
-      if (!accountId) {
-        res.status(401).json({ message: 'Unauthorized: Account ID not found.' });
-        return;
-      }
-
-      const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
-      if (!subject) {
-        res.status(403).json({ message: 'Forbidden: User is not a subject.' });
-        return;
-      }
-
-      const lat = Number(latitude);
-      const lng = Number(longitude);
-
-      if (
-        !Number.isFinite(lat) ||
-        !Number.isFinite(lng) ||
-        lat < -90 ||
-        lat > 90 ||
-        lng < -180 ||
-        lng > 180
-      ) {
-        res.status(400).json({ message: 'Invalid location coordinates.' });
-        return;
-      }
-
-      const geoJsonString = JSON.stringify({ type: 'Point', coordinates: [lng, lat] });
-      const rawQuery = Prisma.sql`ST_GeomFromGeoJSON(${geoJsonString})`;
-
-      // Thực hiện lưu bản ghi với tọa độ PostGIS
-      const checkinRecords = await prisma.$queryRaw<any[]>`
-        INSERT INTO "checkins" (subject_id, location, status, face_verified, confidence, checkin_time)
-        VALUES (${subject.id}, ${rawQuery}, 'PROCESSING', false, 0, NOW())
-        RETURNING id;
-      `;
-      const newCheckinId = checkinRecords[0].id;
-
-      const jobData = {
-        checkinId: newCheckinId.toString(),
-        subjectId: subject.id,
-        files: files.map(f => ({ 
-            buffer: f.buffer.toString('base64'),
-            originalname: f.originalname,
-            mimetype: f.mimetype
-        }))
-      };
-
-      await faceVerificationQueue.add('verify-face', jobData);
-
-      res.status(202).json({ 
-        message: 'Yêu cầu điểm danh đã được tiếp nhận và đang xử lý nhận diện.',
-        checkinId: newCheckinId.toString()
+      res.status(201).json({ 
+        message: 'Face registered successfully.',
+        data: newFaceData,
       });
 
     } catch (error) {
       next(error);
     }
   };
-}
 
-export default FaceController;
+  /**
+   * Lấy tất cả dữ liệu khuôn mặt của một subject.
+   */
+  public getFaceData = async (
+    req: RequestWithUser,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      // Lấy subjectId từ params của route
+      const { subjectId } = req.params;
+      if (!subjectId) throw new HttpException(400, 'Bad Request: Missing subjectId parameter');
+
+      const faceData = await this.faceService.getFaceDataForSubject(subjectId);
+
+      res.status(200).json({ data: faceData });
+
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // Phương thức `checkIn` đã được chuyển sang `CheckinController`
+  // và sẽ được xử lý bất đồng bộ qua hàng đợi, nên sẽ không có ở đây.
+}
