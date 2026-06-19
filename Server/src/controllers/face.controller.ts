@@ -4,12 +4,13 @@ import { FaceService } from '@/services/face.service';
 import { RequestWithUser } from '@/interfaces/auth.interface';
 import { HttpException } from '@/exceptions/http-exception';
 import { prisma } from '@/configs/prisma';
+import { RegisterFaceDto } from '@/dtos/face.dto';
 
 export class FaceController {
   constructor(private readonly faceService: FaceService) {}
 
   /**
-   * Đăng ký khuôn mặt cho subject.
+   * Đăng ký khuôn mặt bằng vector embedding.
    */
   public register = async (
     req: RequestWithUser,
@@ -17,15 +18,15 @@ export class FaceController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      const files = req.files as Express.Multer.File[];
       const accountId = req.account?.id;
+      const registerData: RegisterFaceDto = req.body;
 
       if (!accountId) throw new HttpException(401, 'Unauthorized');
 
       const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
       if (!subject) throw new HttpException(403, 'Forbidden: User is not a subject');
 
-      const newFaceData = await this.faceService.registerFace(subject.id, files);
+      const newFaceData = await this.faceService.registerFace(subject.id, registerData.embedding);
 
       res.status(201).json({ 
         message: 'Face registered successfully.',
@@ -38,19 +39,21 @@ export class FaceController {
   };
 
   /**
-   * Lấy tất cả dữ liệu khuôn mặt của một subject.
+   * Lấy dữ liệu khuôn mặt của chính user đang đăng nhập.
    */
-  public getFaceData = async (
+  public getMyFaceData = async (
     req: RequestWithUser,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
-      // Lấy subjectId từ params của route
-      const { subjectId } = req.params;
-      if (!subjectId) throw new HttpException(400, 'Bad Request: Missing subjectId parameter');
+      const accountId = req.account?.id;
+      if (!accountId) throw new HttpException(401, 'Unauthorized');
 
-      const faceData = await this.faceService.getFaceDataForSubject(subjectId);
+      const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
+      if (!subject) throw new HttpException(403, 'Forbidden: User is not a subject');
+
+      const faceData = await this.faceService.getFaceDataForSubject(subject.id);
 
       res.status(200).json({ data: faceData });
 
@@ -58,7 +61,4 @@ export class FaceController {
       next(error);
     }
   };
-
-  // Phương thức `checkIn` đã được chuyển sang `CheckinController`
-  // và sẽ được xử lý bất đồng bộ qua hàng đợi, nên sẽ không có ở đây.
 }
