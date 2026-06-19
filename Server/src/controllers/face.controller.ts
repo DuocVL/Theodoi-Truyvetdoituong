@@ -8,12 +8,12 @@
  */
 
 import { NextFunction, Response } from 'express';
-import { FaceService } from '@/services/face.service';
-import { RequestWithUser } from '@/interfaces/auth.interface';
-import { HttpException } from '@/exceptions/http-exception';
-import { prisma } from '@/configs/prisma';
+import { FaceService } from '../services/face.service';
+import { RequestWithUser } from '../types/data';
+import { HttpException } from '../exceptions/http-exception';
+import { prisma } from '../configs/prisma';
 // Import kiểu dữ liệu DTO được suy ra từ Zod schema
-import { RegisterFaceDto } from '@/dtos/face.dto';
+import { RegisterFaceDto } from '../dtos/face.dto';
 
 export class FaceController {
   constructor(private readonly faceService: FaceService) {}

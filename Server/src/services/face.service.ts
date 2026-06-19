@@ -7,8 +7,8 @@
  * liên quan đến dữ liệu khuôn mặt như lưu trữ và truy xuất.
  */
 
-import { FaceRepository } from '@/repositories/face.repository';
-import { HttpException } from '@/exceptions/http-exception';
+import { FaceRepository } from '../repositories/face.repository';
+import { HttpException } from '../exceptions/http-exception';
 import { FaceData } from '@prisma/client';
 
 export class FaceService {

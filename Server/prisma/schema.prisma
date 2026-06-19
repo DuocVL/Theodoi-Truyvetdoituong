@@ -135,7 +135,6 @@ model FaceData {
   id         String                @id @default(uuid())
   subject_id String
   embedding  Unsupported("vector")
-  image_url  String
   status     String
   created_at DateTime              @default(now())
   update_at  DateTime              @updatedAt

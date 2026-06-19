@@ -7,8 +7,8 @@
  * cung cấp các phương thức CRUD rõ ràng để lớp Service có thể sử dụng mà không cần biết chi tiết về CSDL.
  */
 
-import { prisma } from '@/configs/prisma';
-import type { FaceData } from '@prisma/client';
+import { prisma } from '../configs/prisma';
+import { FaceData } from '../../generated/prisma/client';
 
 // Type cho dữ liệu thô trả về từ CSDL, vì Prisma không tự map kiểu `vector` sang number[].
 type RawFaceDataResult = Omit<FaceData, 'embedding'> & { embedding: string };
