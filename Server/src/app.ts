@@ -31,13 +31,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(loggingMiddleware);
 
-// API Routes
-app.use('/api/v1', v1Routes);
-
 // Static file serving for uploaded images
-const uploadsPath = path.join(__dirname, '../uploads');
+const uploadsPath = path.join(__dirname, '../../uploads');
 app.use('/uploads', express.static(uploadsPath));
 
+// API Routes
+app.use('/api/v1', v1Routes);
 
 // Error handling middleware (should be last)
 app.use(errorMiddleware);

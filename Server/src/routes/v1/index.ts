@@ -1,5 +1,5 @@
 
-import { Router } from 'express';
+import { Router , static as static_ } from 'express';
 import authRoutes from './auth.route';
 import UserRoute from './users.route'; // Corrected import
 import SubjectRoute from './subjects.route';
@@ -35,5 +35,6 @@ router.use('/face', FaceRoute);
 router.use('/images', imageRouter);
 
 router.use('/checkins', CheckinRoute);
+
 
 export default router;
