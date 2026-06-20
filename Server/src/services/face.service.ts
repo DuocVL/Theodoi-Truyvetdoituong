@@ -29,6 +29,12 @@ export class FaceService {
       throw new HttpException(400, 'Invalid or empty embedding vector provided.');
     }
 
+    const isAlreadyRegistered = await this.faceRepository.existsBySubjectId(subjectId);
+    
+    if (isAlreadyRegistered) {
+      throw new HttpException(400, 'Biometric data already exists. This subject has already registered a face.');
+    }
+
     // Gọi repository để lưu vào CSDL
     const newFaceData = await this.faceRepository.create(subjectId, embedding);
     return newFaceData;
@@ -37,11 +43,16 @@ export class FaceService {
   /**
    * @description Nghiệp vụ lấy tất cả dữ liệu khuôn mặt của một subject.
    * @param {string} subjectId - ID của subject.
-   * @returns {Promise<FaceData[]>} - Một mảng các bản ghi face_data.
+   * @returns {Promise<FaceData>} - Một mảng các bản ghi face_data.
    */
-  public async getFaceDataForSubject(subjectId: string): Promise<FaceData[]> {
+  public async getFaceDataForSubject(subjectId: string): Promise<FaceData> {
     // Gọi repository để truy xuất từ CSDL
     const faceData = await this.faceRepository.findBySubjectId(subjectId);
+    // Nếu chưa đăng ký khuôn mặt (kết quả là null) -> Báo lỗi ngay lập tức
+    if (!faceData) {
+      throw new HttpException(404, 'Biometric data not found. This subject has not registered a face yet.');
+    }
+
     return faceData;
   }
 }

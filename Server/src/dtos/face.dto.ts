@@ -24,5 +24,5 @@ export const registerFaceSchema = z.object({
 
 // Export một kiểu TypeScript từ schema để sử dụng trong các lớp Controller và Service.
 // Điều này giúp đảm bảo sự nhất quán về kiểu dữ liệu trên toàn bộ ứng dụng.
-export type RegisterFaceDto = z.infer<typeof registerFaceSchema>;
+export type RegisterFaceDto = z.infer<typeof registerFaceSchema>['body'];
 

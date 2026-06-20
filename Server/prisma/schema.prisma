@@ -39,20 +39,20 @@ model ActivationToken {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  account_id String      @unique
+  id         String          @id @default(uuid())
+  account_id String          @unique
   full_name  String
   role       UserAccountRole @default(USER) // Default role is now USER
-  status     Boolean     @default(true)
-  avatar_id  String?     @unique
-  created_at DateTime    @default(now())
-  update_at  DateTime    @updatedAt
-  alerts     Alert[]     @relation("ResolvedAlerts")
-  subject    Subject[]   @relation("UserToSubject")
-  auditLogs  SystemLog[] @relation("UserToSystemLog")
-  account    Account     @relation(fields: [account_id], references: [id])
-  avatar     Image?      @relation("UserToAvatar", fields: [avatar_id], references: [id])
-  zone       Zone[]      @relation("UserToZone")
+  status     Boolean         @default(true)
+  avatar_id  String?         @unique
+  created_at DateTime        @default(now())
+  update_at  DateTime        @updatedAt
+  alerts     Alert[]         @relation("ResolvedAlerts")
+  subject    Subject[]       @relation("UserToSubject")
+  auditLogs  SystemLog[]     @relation("UserToSystemLog")
+  account    Account         @relation(fields: [account_id], references: [id])
+  avatar     Image?          @relation("UserToAvatar", fields: [avatar_id], references: [id])
+  zone       Zone[]          @relation("UserToZone")
 
   @@map("users")
 }
@@ -133,7 +133,7 @@ model Device {
 
 model FaceData {
   id         String                @id @default(uuid())
-  subject_id String
+  subject_id String                @unique
   embedding  Unsupported("vector")
   created_at DateTime              @default(now())
   update_at  DateTime              @updatedAt
@@ -143,16 +143,16 @@ model FaceData {
 }
 
 model Zone {
-  id          String                   @id @default(uuid())
+  id          String                                  @id @default(uuid())
   zone_name   String
   geom        Unsupported("geography(Polygon, 4326)")
   description String?
   created_by  String
-  is_active   Boolean                  @default(true)
-  created_at  DateTime                 @default(now())
-  update_at   DateTime                 @updatedAt
-  subjectZone SubjectZone[]            @relation("ZoneToSubjectZone")
-  creator     User                     @relation("UserToZone", fields: [created_by], references: [id])
+  is_active   Boolean                                 @default(true)
+  created_at  DateTime                                @default(now())
+  update_at   DateTime                                @updatedAt
+  subjectZone SubjectZone[]                           @relation("ZoneToSubjectZone")
+  creator     User                                    @relation("UserToZone", fields: [created_by], references: [id])
 
   @@index([geom], type: Gist)
   @@map("zones")
@@ -171,19 +171,19 @@ model SubjectZone {
 }
 
 model Checkin {
-  id            String                         @id @default(uuid())
+  id            String                                @id @default(uuid())
   subject_id    String
   location      Unsupported("geography(Point, 4326)")
   notes         String?
-  image_id      String?                        @unique
+  image_id      String?                               @unique
   device_id     String?
-  face_verified Boolean                        @default(false)
+  face_verified Boolean                               @default(false)
   confidence    Float?
-  status        String                         @default("ON_TIME") // Consider an enum for this
-  checkin_time  DateTime                       @default(now())
+  status        String                                @default("ON_TIME") // Consider an enum for this
+  checkin_time  DateTime                              @default(now())
 
-  image         Image?                         @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
-  subject       Subject                        @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
+  image   Image?  @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
+  subject Subject @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
 
   @@index([location], type: Gist)
   @@index([subject_id, checkin_time])
@@ -191,18 +191,18 @@ model Checkin {
 }
 
 model Alert {
-  id          String                    @id @default(uuid())
+  id          String                                 @id @default(uuid())
   subject_id  String
   type        String
   severity    Int
   message     String
   location    Unsupported("geography(Point, 4326)")?
-  status      String                    @default("PENDING")
+  status      String                                 @default("PENDING")
   resolved_by String?
   resolved_at DateTime?
-  created_at  DateTime                  @default(now())
-  resolver    User?                     @relation("ResolvedAlerts", fields: [resolved_by], references: [id])
-  subject     Subject                   @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
+  created_at  DateTime                               @default(now())
+  resolver    User?                                  @relation("ResolvedAlerts", fields: [resolved_by], references: [id])
+  subject     Subject                                @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
 
   @@index([location], type: Gist)
   @@index([subject_id, status])
@@ -223,7 +223,7 @@ model EventLog {
 }
 
 model SystemLog {
-  id         String    @id @default(uuid())
+  id         String   @id @default(uuid())
   user_id    String?
   action     String
   entity     String?
@@ -236,8 +236,8 @@ model SystemLog {
   request_id String?
   status     String?
   error      String?
-  created_at DateTime  @default(now())
-  user       User?     @relation("UserToSystemLog", fields: [user_id], references: [id], onDelete: SetNull)
+  created_at DateTime @default(now())
+  user       User?    @relation("UserToSystemLog", fields: [user_id], references: [id], onDelete: SetNull)
 
   @@index([user_id])
   @@index([entity, entity_id])
@@ -265,17 +265,17 @@ model RequestLog {
 }
 
 model Image {
-  id            String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  file_name     String
-  stored_name   String
-  mime_type     String
-  size          Int
-  url           String
-  alt_text      String?
+  file_name   String
+  stored_name String
+  mime_type   String
+  size        Int
+  url         String
+  alt_text    String?
 
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   checkinImage  Checkin? @relation("CheckinToImage")
   subjectAvatar Subject? @relation("SubjectToAvatar")
@@ -307,7 +307,7 @@ enum AccountStatus {
 // Simplified user roles
 enum UserAccountRole {
   ADMIN // Can do everything
-  USER  // Can manage subjects and related entities
+  USER // Can manage subjects and related entities
 }
 
 enum SubjectStatus {

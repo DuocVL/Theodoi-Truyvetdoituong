@@ -187,14 +187,14 @@ export type FaceDataOrderByWithRelationInput = {
 
 export type FaceDataWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  subject_id?: string
   AND?: Prisma.FaceDataWhereInput | Prisma.FaceDataWhereInput[]
   OR?: Prisma.FaceDataWhereInput[]
   NOT?: Prisma.FaceDataWhereInput | Prisma.FaceDataWhereInput[]
-  subject_id?: Prisma.StringFilter<"FaceData"> | string
   created_at?: Prisma.DateTimeFilter<"FaceData"> | Date | string
   update_at?: Prisma.DateTimeFilter<"FaceData"> | Date | string
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
-}, "id">
+}, "id" | "subject_id">
 
 export type FaceDataOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
