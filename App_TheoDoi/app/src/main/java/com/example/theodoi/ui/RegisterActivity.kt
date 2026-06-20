@@ -1,10 +1,12 @@
 package com.example.theodoi
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -13,17 +15,18 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.facerecog.analyzer.FaceRecognitionAnalyzer
 import com.example.theodoi.data.AppDatabase
+import com.example.theodoi.data.FaceRepository
+import com.example.theodoi.data.SessionManager
 import com.example.theodoi.data.UserEntity
 import com.example.theodoi.databinding.ActivityRegisterBinding
 import com.example.theodoi.security.CryptoManager
 import com.example.theodoi.utils.FaceMath
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.random.Random
@@ -31,9 +34,11 @@ import kotlin.random.Random
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
+    private lateinit var sessionManager: SessionManager
     private lateinit var cameraExecutor: ExecutorService
     private val cryptoManager = CryptoManager()
     private lateinit var database: AppDatabase
+    private val faceRepository = FaceRepository()
 
     private var isActive = false
     private var isLivenessPassed = false
@@ -44,11 +49,16 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sessionManager = SessionManager(this)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         database = AppDatabase.getDatabase(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        binding.btnRetry.setOnClickListener {
+            triggerChallenge()
+        }
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -59,6 +69,11 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun triggerChallenge() {
+        // CẬP NHẬT: Hủy bộ đếm cũ nếu có trước khi bắt đầu lượt mới để tránh chồng chéo bộ nhớ
+        challengeTimer?.cancel()
+
+        binding.btnRetry.visibility = View.GONE
+
         isActive = true
         isLivenessPassed = false
         currentChallenge = if (Random.nextBoolean()) ChallengeType.BLINK_EYES else ChallengeType.SMILE_FACE
@@ -90,6 +105,8 @@ class RegisterActivity : AppCompatActivity() {
                     binding.txtChallenge.text = "THỬ THÁCH THẤT BẠI ❌"
                     binding.txtChallenge.setTextColor(ContextCompat.getColor(this@RegisterActivity, android.R.color.holo_red_dark))
                     binding.txtStatus.text = "Quá thời gian tương tác (Timeout)!"
+
+                    binding.btnRetry.visibility = View.VISIBLE
                 }
             }
         }.start()
@@ -108,7 +125,6 @@ class RegisterActivity : AppCompatActivity() {
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, FaceRecognitionAnalyzer(this) { vector, smile, leftEye, rightEye, faceCount, yaw, roll ->
-
                         // ĐIỀU PHỐI PIPELINE BẢO MẬT CHÍNH
                         handleRegisterPipeline(vector, smile, leftEye, rightEye, faceCount, yaw, roll)
                     })
@@ -172,17 +188,54 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun saveFaceToDatabase(vector: FloatArray) {
         isActive = false
-        val rawBytes = FaceMath.floatArrayToByteArray(vector)
-        val (encryptedBytes, iv) = cryptoManager.encrypt(rawBytes)
+        val token = sessionManager.getAccessToken()
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val userId = UUID.randomUUID().toString().substring(0, 6)
-            val newUser = UserEntity(userId, "User_$userId", encryptedBytes, iv)
-            database.userDao().insertUser(newUser)
+        if (token == null) {
+            Toast.makeText(this, "Không tìm thấy token xác thực!", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-            withContext(Dispatchers.Main) {
-                binding.txtStatus.text = "Đã lưu FaceID thành công (ID: $userId)"
-                Toast.makeText(this@RegisterActivity, "Hoàn tất đăng ký!", Toast.LENGTH_SHORT).show()
+        val embeddingList = vector.toList()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // 1. Đồng bộ lên Server trước
+                val response = faceRepository.registerFaceToServer(token, embeddingList)
+
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val serverData = response.body()!!.data
+
+                    // 2. Server chấp thuận -> Tiến hành mã hóa dữ liệu cục bộ dưới máy Client
+                    val rawBytes = FaceMath.floatArrayToByteArray(vector)
+                    val (encryptedBytes, iv) = cryptoManager.encrypt(rawBytes)
+
+                    val newUser = UserEntity(
+                        userId = serverData!!.subject_id,
+                        name = "User_${serverData.subject_id.substring(0, 6)}",
+                        encryptedVector = encryptedBytes,
+                        iv = iv
+                    )
+                    database.userDao().insertUser(newUser)
+
+                    withContext(Dispatchers.Main) {
+                        binding.txtStatus.text = "Đăng ký thành công và đã đồng bộ lên hệ thống!"
+                        Toast.makeText(this@RegisterActivity, "Hoàn tất đăng ký khuôn mặt!", Toast.LENGTH_SHORT).show()
+
+                        // Đăng ký xong tự động mở lối vào MainActivity
+                        startActivity(Intent(this@RegisterActivity, MainActivity::class.java))
+                        finish()
+                    }
+                } else {
+                    val errorMsg = response.errorBody()?.string() ?: "Lỗi hệ thống từ chối"
+                    withContext(Dispatchers.Main) {
+                        binding.txtStatus.text = "Đăng ký thất bại: $errorMsg"
+                        Toast.makeText(this@RegisterActivity, "Thử lại sau!", Toast.LENGTH_LONG).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@RegisterActivity, "Lỗi kết nối Server: ${e.message}", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

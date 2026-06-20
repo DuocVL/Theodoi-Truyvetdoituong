@@ -5,7 +5,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
-import android.widget.Toast
+import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -49,6 +50,10 @@ class VerifyActivity : AppCompatActivity() {
         database = AppDatabase.getDatabase(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+        binding.btnRetry.setOnClickListener {
+            triggerChallenge()
+        }
+
         if (allPermissionsGranted()) {
             startCamera()
             triggerChallenge()
@@ -58,6 +63,11 @@ class VerifyActivity : AppCompatActivity() {
     }
 
     private fun triggerChallenge() {
+
+        challengeTimer?.cancel()
+
+        binding.btnRetry.visibility = View.GONE
+
         isActive = true
         isLivenessPassed = false
         currentChallenge = if (Random.nextBoolean()) ChallengeType.BLINK_EYES else ChallengeType.SMILE_FACE
@@ -89,6 +99,8 @@ class VerifyActivity : AppCompatActivity() {
                     binding.txtChallenge.text = "QUÁ THỜI GIAN ❌"
                     binding.txtChallenge.setTextColor(ContextCompat.getColor(this@VerifyActivity, android.R.color.holo_red_dark))
                     binding.txtStatus.text = "Xác thực không thành công do không tương tác!"
+
+                    binding.btnRetry.visibility = View.VISIBLE
                 }
             }
         }.start()
