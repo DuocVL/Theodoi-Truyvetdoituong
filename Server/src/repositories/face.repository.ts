@@ -1,5 +1,6 @@
 import { prisma } from '../configs/prisma';
 import { FaceData as PrismaFaceData } from '../../generated/prisma/client';
+import { v4 as uuidv4 } from 'uuid'
 
 // 1. Định nghĩa Type chuẩn mong muốn ở Application Layer (Service/Controller)
 export type CustomFaceData = Omit<PrismaFaceData, 'embedding'> & {
@@ -29,12 +30,15 @@ export class FaceRepository {
    * Tạo một bản ghi face_data mới bằng câu lệnh SQL Raw
    */
   public async create(subject_id: string, embedding: number[]): Promise<CustomFaceData> {
+    // 2. Chủ động tạo một UUID mới cho bản ghi
+    const newId = uuidv4();
     const embeddingString = `[${embedding.join(',')}]`;
+    const now = new Date()
 
-    // Ép kiểu embedding thành ::text ở mệnh đề RETURNING để Node.js nhận dạng được chuỗi
+    // 3. Đưa biến ${newId} vào danh sách các cột cần INSERT
     const result = await prisma.$queryRaw<RawFaceDataResult[]>`
-      INSERT INTO "face_data" (subject_id, embedding)
-      VALUES (${subject_id}, ${embeddingString}::vector)
+      INSERT INTO "face_data" (id, subject_id, embedding,created_at,update_at)
+      VALUES (${newId}, ${subject_id}, ${embeddingString}::vector, ${now}, ${now})
       RETURNING id, subject_id, created_at, update_at, embedding::text as embedding;
     `;
 

@@ -17,12 +17,9 @@ import { z } from 'zod';
  * không được rỗng, và tất cả phần tử bên trong đều là số.
  */
 export const registerFaceSchema = z.object({
-  embedding: z.array(z.number(), {
-    required_error: 'Embedding is required',
-    invalid_type_error: 'Embedding must be an array of numbers',
-  }).nonempty({
-    message: 'Embedding array cannot be empty',
-  }),
+  body: z.object({
+    embedding: z.array(z.number())
+  })
 });
 
 // Export một kiểu TypeScript từ schema để sử dụng trong các lớp Controller và Service.
