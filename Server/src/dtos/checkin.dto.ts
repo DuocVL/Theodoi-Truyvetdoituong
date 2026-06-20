@@ -13,10 +13,13 @@ import { z } from 'zod';
  * Lưu ý: 'image' sẽ được xử lý riêng bởi middleware upload.
  */
 export const createCheckinSchema = z.object({
-  // Biến đổi và ép kiểu latitude và longitude từ string (trong form-data) sang number.
-  latitude: z.preprocess((val) => Number(val), z.number().min(-90).max(90)),
-  longitude: z.preprocess((val) => Number(val), z.number().min(-180).max(180)),
-  notes: z.string().optional(),
+  body: z.object({
+    // Biến đổi và ép kiểu latitude và longitude từ string (trong form-data) sang number.
+    latitude: z.preprocess((val) => Number(val), z.number().min(-90).max(90)),
+    longitude: z.preprocess((val) => Number(val), z.number().min(-180).max(180)),
+    notes: z.string().optional(),
+  })
+
 });
 
 /**
@@ -24,10 +27,13 @@ export const createCheckinSchema = z.object({
  * @description Schema để xác thực dữ liệu body khi cập nhật 'notes' cho một check-in.
  */
 export const updateCheckinSchema = z.object({
-  notes: z.string().optional(),
+  body: z.object({
+    notes: z.string().optional(),
+  })
+  
 });
 
 // Export các kiểu TypeScript được suy ra từ Zod schemas để đảm bảo type-safety
-export type CreateCheckinDto = z.infer<typeof createCheckinSchema>;
-export type UpdateCheckinDto = z.infer<typeof updateCheckinSchema>;
+export type CreateCheckinDto = z.infer<typeof createCheckinSchema>['body'];
+export type UpdateCheckinDto = z.infer<typeof updateCheckinSchema>['body'];
 

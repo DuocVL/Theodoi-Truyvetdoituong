@@ -14,7 +14,6 @@ declare global{
         interface Request{
             account?: AccountPayload;
             role?: string;
-            roles?: string[];
             requestId: string;
         }
     }

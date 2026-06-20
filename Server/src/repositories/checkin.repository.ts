@@ -4,9 +4,9 @@
  * @description Lớp Repository chịu trách nhiệm giao tiếp trực tiếp với DB cho model `Checkin`.
  */
 
-import { prisma } from '@/configs/prisma';
-import type { Checkin } from '@prisma/client';
-import type { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
+import { prisma } from '../configs/prisma';
+import type { Checkin } from '../../generated/prisma/client';
+import type { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
 
 // Tạo một kiểu dữ liệu mở rộng để bao gồm cả image_id, vì nó là tùy chọn trong DTO
 type CheckinCreationData = CreateCheckinDto & { subject_id: string; image_id?: string };

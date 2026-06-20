@@ -5,10 +5,10 @@
  */
 
 import { NextFunction, Response } from 'express';
-import { CheckinService } from '@/services/checkin.service';
-import { RequestWithUser } from '@/interfaces/auth.interface';
-import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
-import { HttpException } from '@/exceptions/http-exception';
+import { CheckinService } from '../services/checkin.service';
+import { RequestWithUser } from '../types/data';
+import { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
+import { HttpException } from '../exceptions/http-exception';
 import type { UploadedFile } from 'express-fileupload';
 
 export class CheckinController {

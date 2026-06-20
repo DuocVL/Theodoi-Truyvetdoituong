@@ -4,13 +4,13 @@
  * @description Service chứa logic nghiệp vụ cho module Checkin.
  */
 
-import { CheckinRepository } from '@/repositories/checkin.repository';
-import { ImageService } from '@/services/image.service'; // Giả sử đã có ImageService
-import { HttpException } from '@/exceptions/http-exception';
-import type { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
+import { CheckinRepository } from '../repositories/checkin.repository';
+import { ImageService } from '../services/image.service'; // Giả sử đã có ImageService
+import { HttpException } from '../exceptions/http-exception';
+import type { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
 import type { UploadedFile } from 'express-fileupload';
 import type { Checkin } from '@prisma/client';
-import { prisma } from '@/configs/prisma';
+import { prisma } from '../configs/prisma';
 
 export class CheckinService {
   // Service khởi tạo các dependency của nó
