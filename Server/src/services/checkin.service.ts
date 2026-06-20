@@ -8,8 +8,7 @@ import { CheckinRepository } from '../repositories/checkin.repository';
 import { ImageService } from '../services/image.service'; // Giả sử đã có ImageService
 import { HttpException } from '../exceptions/http-exception';
 import type { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
-import type { UploadedFile } from 'express-fileupload';
-import type { Checkin, Image } from '@prisma/client'; // Import Image type
+import type { Checkin, Image } from '../../generated/prisma/client'; // Import Image type
 import { prisma } from '../configs/prisma';
 
 export class CheckinService {
@@ -24,7 +23,7 @@ export class CheckinService {
   public async createCheckin(
     accountId: string,
     checkinData: CreateCheckinDto,
-    imageFile: UploadedFile
+    imageFile: Express.Multer.File
   ): Promise<Checkin> {
     // 1. Xác định subject từ accountId
     const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
@@ -33,7 +32,6 @@ export class CheckinService {
     }
 
     // 2. Upload ảnh và lấy ID
-    // FIX: Giả định rằng imageService.uploadImage trả về một đối tượng Image từ Prisma
     const image: Image = await this.imageService.uploadImage(imageFile, 'checkins');
 
     // 3. Tạo bản ghi checkin trong DB

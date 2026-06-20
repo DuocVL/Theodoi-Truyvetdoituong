@@ -19,11 +19,11 @@ export class CheckinController {
       const accountId = req.account?.id;
       if (!accountId) throw new HttpException(401, 'Unauthorized');
 
-      // FIX: Kiểm tra và ép kiểu file an toàn
-      if (!req.files || Object.keys(req.files).length === 0 || !req.files.image) {
+      const imageFile = req.file
+      if (!imageFile) {
         throw new HttpException(400, 'Image file is missing');
       }
-      const imageFile = req.files.image as UploadedFile;
+      
       const checkinData: CreateCheckinDto = req.body;
 
       const newCheckin = await this.checkinService.createCheckin(accountId, checkinData, imageFile);

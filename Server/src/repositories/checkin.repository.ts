@@ -19,7 +19,6 @@ export class CheckinRepository {
     // FIX: Thêm `include: { image: true }` để đảm bảo dữ liệu trả về nhất quán
     return prisma.checkin.create({ 
       data,
-      include: { image: true }, 
     });
   }
 
@@ -39,8 +38,7 @@ export class CheckinRepository {
   public async findBySubjectId(subjectId: string): Promise<Checkin[]> {
     return prisma.checkin.findMany({
       where: { subject_id: subjectId },
-      orderBy: { checkin_time: 'desc' },
-      include: { image: true },
+      orderBy: { checkin_time: 'desc' }
     });
   }
 
@@ -51,7 +49,6 @@ export class CheckinRepository {
     return prisma.checkin.update({
       where: { id },
       data,
-      include: { image: true }, // Thêm include để nhất quán
     });
   }
 }

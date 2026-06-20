@@ -8,6 +8,7 @@ import logRoutes from './log.route';
 import trackingRoutes from './tracking.route';
 import FaceRoute from './face.route';
 import imageRouter from './image.route'; // Import the new image router
+import CheckinRoute from './checkin.route';
 
 const router = Router();
 
@@ -32,5 +33,7 @@ router.use('/face', FaceRoute);
 
 // Add the image routes
 router.use('/images', imageRouter);
+
+router.use('/checkins', CheckinRoute);
 
 export default router;
