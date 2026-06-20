@@ -28,10 +28,14 @@ export type AggregateCheckin = {
 
 export type CheckinAvgAggregateOutputType = {
   confidence: number | null
+  latitude: number | null
+  longitude: number | null
 }
 
 export type CheckinSumAggregateOutputType = {
   confidence: number | null
+  latitude: number | null
+  longitude: number | null
 }
 
 export type CheckinMinAggregateOutputType = {
@@ -39,9 +43,10 @@ export type CheckinMinAggregateOutputType = {
   subject_id: string | null
   notes: string | null
   image_id: string | null
-  device_id: string | null
   face_verified: boolean | null
   confidence: number | null
+  latitude: number | null
+  longitude: number | null
   status: string | null
   checkin_time: Date | null
 }
@@ -51,9 +56,10 @@ export type CheckinMaxAggregateOutputType = {
   subject_id: string | null
   notes: string | null
   image_id: string | null
-  device_id: string | null
   face_verified: boolean | null
   confidence: number | null
+  latitude: number | null
+  longitude: number | null
   status: string | null
   checkin_time: Date | null
 }
@@ -63,9 +69,10 @@ export type CheckinCountAggregateOutputType = {
   subject_id: number
   notes: number
   image_id: number
-  device_id: number
   face_verified: number
   confidence: number
+  latitude: number
+  longitude: number
   status: number
   checkin_time: number
   _all: number
@@ -74,10 +81,14 @@ export type CheckinCountAggregateOutputType = {
 
 export type CheckinAvgAggregateInputType = {
   confidence?: true
+  latitude?: true
+  longitude?: true
 }
 
 export type CheckinSumAggregateInputType = {
   confidence?: true
+  latitude?: true
+  longitude?: true
 }
 
 export type CheckinMinAggregateInputType = {
@@ -85,9 +96,10 @@ export type CheckinMinAggregateInputType = {
   subject_id?: true
   notes?: true
   image_id?: true
-  device_id?: true
   face_verified?: true
   confidence?: true
+  latitude?: true
+  longitude?: true
   status?: true
   checkin_time?: true
 }
@@ -97,9 +109,10 @@ export type CheckinMaxAggregateInputType = {
   subject_id?: true
   notes?: true
   image_id?: true
-  device_id?: true
   face_verified?: true
   confidence?: true
+  latitude?: true
+  longitude?: true
   status?: true
   checkin_time?: true
 }
@@ -109,9 +122,10 @@ export type CheckinCountAggregateInputType = {
   subject_id?: true
   notes?: true
   image_id?: true
-  device_id?: true
   face_verified?: true
   confidence?: true
+  latitude?: true
+  longitude?: true
   status?: true
   checkin_time?: true
   _all?: true
@@ -208,9 +222,10 @@ export type CheckinGroupByOutputType = {
   subject_id: string
   notes: string | null
   image_id: string | null
-  device_id: string | null
   face_verified: boolean
   confidence: number | null
+  latitude: number | null
+  longitude: number | null
   status: string
   checkin_time: Date
   _count: CheckinCountAggregateOutputType | null
@@ -243,9 +258,10 @@ export type CheckinWhereInput = {
   subject_id?: Prisma.StringFilter<"Checkin"> | string
   notes?: Prisma.StringNullableFilter<"Checkin"> | string | null
   image_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
-  device_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   confidence?: Prisma.FloatNullableFilter<"Checkin"> | number | null
+  latitude?: Prisma.FloatNullableFilter<"Checkin"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"Checkin"> | number | null
   status?: Prisma.StringFilter<"Checkin"> | string
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
   image?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
@@ -257,9 +273,10 @@ export type CheckinOrderByWithRelationInput = {
   subject_id?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   image_id?: Prisma.SortOrderInput | Prisma.SortOrder
-  device_id?: Prisma.SortOrderInput | Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrderInput | Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   checkin_time?: Prisma.SortOrder
   image?: Prisma.ImageOrderByWithRelationInput
@@ -274,9 +291,10 @@ export type CheckinWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CheckinWhereInput | Prisma.CheckinWhereInput[]
   subject_id?: Prisma.StringFilter<"Checkin"> | string
   notes?: Prisma.StringNullableFilter<"Checkin"> | string | null
-  device_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   confidence?: Prisma.FloatNullableFilter<"Checkin"> | number | null
+  latitude?: Prisma.FloatNullableFilter<"Checkin"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"Checkin"> | number | null
   status?: Prisma.StringFilter<"Checkin"> | string
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
   image?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
@@ -288,9 +306,10 @@ export type CheckinOrderByWithAggregationInput = {
   subject_id?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   image_id?: Prisma.SortOrderInput | Prisma.SortOrder
-  device_id?: Prisma.SortOrderInput | Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrderInput | Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   checkin_time?: Prisma.SortOrder
   _count?: Prisma.CheckinCountOrderByAggregateInput
@@ -308,19 +327,47 @@ export type CheckinScalarWhereWithAggregatesInput = {
   subject_id?: Prisma.StringWithAggregatesFilter<"Checkin"> | string
   notes?: Prisma.StringNullableWithAggregatesFilter<"Checkin"> | string | null
   image_id?: Prisma.StringNullableWithAggregatesFilter<"Checkin"> | string | null
-  device_id?: Prisma.StringNullableWithAggregatesFilter<"Checkin"> | string | null
   face_verified?: Prisma.BoolWithAggregatesFilter<"Checkin"> | boolean
   confidence?: Prisma.FloatNullableWithAggregatesFilter<"Checkin"> | number | null
+  latitude?: Prisma.FloatNullableWithAggregatesFilter<"Checkin"> | number | null
+  longitude?: Prisma.FloatNullableWithAggregatesFilter<"Checkin"> | number | null
   status?: Prisma.StringWithAggregatesFilter<"Checkin"> | string
   checkin_time?: Prisma.DateTimeWithAggregatesFilter<"Checkin"> | Date | string
+}
+
+export type CheckinCreateInput = {
+  id?: string
+  notes?: string | null
+  face_verified?: boolean
+  confidence?: number | null
+  latitude?: number | null
+  longitude?: number | null
+  status?: string
+  checkin_time?: Date | string
+  image?: Prisma.ImageCreateNestedOneWithoutCheckinImageInput
+  subject: Prisma.SubjectCreateNestedOneWithoutCheckinsInput
+}
+
+export type CheckinUncheckedCreateInput = {
+  id?: string
+  subject_id: string
+  notes?: string | null
+  image_id?: string | null
+  face_verified?: boolean
+  confidence?: number | null
+  latitude?: number | null
+  longitude?: number | null
+  status?: string
+  checkin_time?: Date | string
 }
 
 export type CheckinUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   image?: Prisma.ImageUpdateOneWithoutCheckinImageNestedInput
@@ -332,19 +379,34 @@ export type CheckinUncheckedUpdateInput = {
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type CheckinCreateManyInput = {
+  id?: string
+  subject_id: string
+  notes?: string | null
+  image_id?: string | null
+  face_verified?: boolean
+  confidence?: number | null
+  latitude?: number | null
+  longitude?: number | null
+  status?: string
+  checkin_time?: Date | string
 }
 
 export type CheckinUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -354,9 +416,10 @@ export type CheckinUncheckedUpdateManyInput = {
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -376,15 +439,18 @@ export type CheckinCountOrderByAggregateInput = {
   subject_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   image_id?: Prisma.SortOrder
-  device_id?: Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
   status?: Prisma.SortOrder
   checkin_time?: Prisma.SortOrder
 }
 
 export type CheckinAvgOrderByAggregateInput = {
   confidence?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
 }
 
 export type CheckinMaxOrderByAggregateInput = {
@@ -392,9 +458,10 @@ export type CheckinMaxOrderByAggregateInput = {
   subject_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   image_id?: Prisma.SortOrder
-  device_id?: Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
   status?: Prisma.SortOrder
   checkin_time?: Prisma.SortOrder
 }
@@ -404,15 +471,18 @@ export type CheckinMinOrderByAggregateInput = {
   subject_id?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   image_id?: Prisma.SortOrder
-  device_id?: Prisma.SortOrder
   face_verified?: Prisma.SortOrder
   confidence?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
   status?: Prisma.SortOrder
   checkin_time?: Prisma.SortOrder
 }
 
 export type CheckinSumOrderByAggregateInput = {
   confidence?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
 }
 
 export type CheckinNullableScalarRelationFilter = {
@@ -421,14 +491,24 @@ export type CheckinNullableScalarRelationFilter = {
 }
 
 export type CheckinCreateNestedManyWithoutSubjectInput = {
+  create?: Prisma.XOR<Prisma.CheckinCreateWithoutSubjectInput, Prisma.CheckinUncheckedCreateWithoutSubjectInput> | Prisma.CheckinCreateWithoutSubjectInput[] | Prisma.CheckinUncheckedCreateWithoutSubjectInput[]
+  connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutSubjectInput | Prisma.CheckinCreateOrConnectWithoutSubjectInput[]
+  createMany?: Prisma.CheckinCreateManySubjectInputEnvelope
   connect?: Prisma.CheckinWhereUniqueInput | Prisma.CheckinWhereUniqueInput[]
 }
 
 export type CheckinUncheckedCreateNestedManyWithoutSubjectInput = {
+  create?: Prisma.XOR<Prisma.CheckinCreateWithoutSubjectInput, Prisma.CheckinUncheckedCreateWithoutSubjectInput> | Prisma.CheckinCreateWithoutSubjectInput[] | Prisma.CheckinUncheckedCreateWithoutSubjectInput[]
+  connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutSubjectInput | Prisma.CheckinCreateOrConnectWithoutSubjectInput[]
+  createMany?: Prisma.CheckinCreateManySubjectInputEnvelope
   connect?: Prisma.CheckinWhereUniqueInput | Prisma.CheckinWhereUniqueInput[]
 }
 
 export type CheckinUpdateManyWithoutSubjectNestedInput = {
+  create?: Prisma.XOR<Prisma.CheckinCreateWithoutSubjectInput, Prisma.CheckinUncheckedCreateWithoutSubjectInput> | Prisma.CheckinCreateWithoutSubjectInput[] | Prisma.CheckinUncheckedCreateWithoutSubjectInput[]
+  connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutSubjectInput | Prisma.CheckinCreateOrConnectWithoutSubjectInput[]
+  upsert?: Prisma.CheckinUpsertWithWhereUniqueWithoutSubjectInput | Prisma.CheckinUpsertWithWhereUniqueWithoutSubjectInput[]
+  createMany?: Prisma.CheckinCreateManySubjectInputEnvelope
   set?: Prisma.CheckinWhereUniqueInput | Prisma.CheckinWhereUniqueInput[]
   disconnect?: Prisma.CheckinWhereUniqueInput | Prisma.CheckinWhereUniqueInput[]
   delete?: Prisma.CheckinWhereUniqueInput | Prisma.CheckinWhereUniqueInput[]
@@ -439,6 +519,10 @@ export type CheckinUpdateManyWithoutSubjectNestedInput = {
 }
 
 export type CheckinUncheckedUpdateManyWithoutSubjectNestedInput = {
+  create?: Prisma.XOR<Prisma.CheckinCreateWithoutSubjectInput, Prisma.CheckinUncheckedCreateWithoutSubjectInput> | Prisma.CheckinCreateWithoutSubjectInput[] | Prisma.CheckinUncheckedCreateWithoutSubjectInput[]
+  connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutSubjectInput | Prisma.CheckinCreateOrConnectWithoutSubjectInput[]
+  upsert?: Prisma.CheckinUpsertWithWhereUniqueWithoutSubjectInput | Prisma.CheckinUpsertWithWhereUniqueWithoutSubjectInput[]
+  createMany?: Prisma.CheckinCreateManySubjectInputEnvelope
   set?: Prisma.CheckinWhereUniqueInput | Prisma.CheckinWhereUniqueInput[]
   disconnect?: Prisma.CheckinWhereUniqueInput | Prisma.CheckinWhereUniqueInput[]
   delete?: Prisma.CheckinWhereUniqueInput | Prisma.CheckinWhereUniqueInput[]
@@ -457,14 +541,21 @@ export type NullableFloatFieldUpdateOperationsInput = {
 }
 
 export type CheckinCreateNestedOneWithoutImageInput = {
+  create?: Prisma.XOR<Prisma.CheckinCreateWithoutImageInput, Prisma.CheckinUncheckedCreateWithoutImageInput>
+  connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutImageInput
   connect?: Prisma.CheckinWhereUniqueInput
 }
 
 export type CheckinUncheckedCreateNestedOneWithoutImageInput = {
+  create?: Prisma.XOR<Prisma.CheckinCreateWithoutImageInput, Prisma.CheckinUncheckedCreateWithoutImageInput>
+  connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutImageInput
   connect?: Prisma.CheckinWhereUniqueInput
 }
 
 export type CheckinUpdateOneWithoutImageNestedInput = {
+  create?: Prisma.XOR<Prisma.CheckinCreateWithoutImageInput, Prisma.CheckinUncheckedCreateWithoutImageInput>
+  connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutImageInput
+  upsert?: Prisma.CheckinUpsertWithoutImageInput
   disconnect?: Prisma.CheckinWhereInput | boolean
   delete?: Prisma.CheckinWhereInput | boolean
   connect?: Prisma.CheckinWhereUniqueInput
@@ -472,10 +563,53 @@ export type CheckinUpdateOneWithoutImageNestedInput = {
 }
 
 export type CheckinUncheckedUpdateOneWithoutImageNestedInput = {
+  create?: Prisma.XOR<Prisma.CheckinCreateWithoutImageInput, Prisma.CheckinUncheckedCreateWithoutImageInput>
+  connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutImageInput
+  upsert?: Prisma.CheckinUpsertWithoutImageInput
   disconnect?: Prisma.CheckinWhereInput | boolean
   delete?: Prisma.CheckinWhereInput | boolean
   connect?: Prisma.CheckinWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.CheckinUpdateToOneWithWhereWithoutImageInput, Prisma.CheckinUpdateWithoutImageInput>, Prisma.CheckinUncheckedUpdateWithoutImageInput>
+}
+
+export type CheckinCreateWithoutSubjectInput = {
+  id?: string
+  notes?: string | null
+  face_verified?: boolean
+  confidence?: number | null
+  latitude?: number | null
+  longitude?: number | null
+  status?: string
+  checkin_time?: Date | string
+  image?: Prisma.ImageCreateNestedOneWithoutCheckinImageInput
+}
+
+export type CheckinUncheckedCreateWithoutSubjectInput = {
+  id?: string
+  notes?: string | null
+  image_id?: string | null
+  face_verified?: boolean
+  confidence?: number | null
+  latitude?: number | null
+  longitude?: number | null
+  status?: string
+  checkin_time?: Date | string
+}
+
+export type CheckinCreateOrConnectWithoutSubjectInput = {
+  where: Prisma.CheckinWhereUniqueInput
+  create: Prisma.XOR<Prisma.CheckinCreateWithoutSubjectInput, Prisma.CheckinUncheckedCreateWithoutSubjectInput>
+}
+
+export type CheckinCreateManySubjectInputEnvelope = {
+  data: Prisma.CheckinCreateManySubjectInput | Prisma.CheckinCreateManySubjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type CheckinUpsertWithWhereUniqueWithoutSubjectInput = {
+  where: Prisma.CheckinWhereUniqueInput
+  update: Prisma.XOR<Prisma.CheckinUpdateWithoutSubjectInput, Prisma.CheckinUncheckedUpdateWithoutSubjectInput>
+  create: Prisma.XOR<Prisma.CheckinCreateWithoutSubjectInput, Prisma.CheckinUncheckedCreateWithoutSubjectInput>
 }
 
 export type CheckinUpdateWithWhereUniqueWithoutSubjectInput = {
@@ -496,11 +630,47 @@ export type CheckinScalarWhereInput = {
   subject_id?: Prisma.StringFilter<"Checkin"> | string
   notes?: Prisma.StringNullableFilter<"Checkin"> | string | null
   image_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
-  device_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   confidence?: Prisma.FloatNullableFilter<"Checkin"> | number | null
+  latitude?: Prisma.FloatNullableFilter<"Checkin"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"Checkin"> | number | null
   status?: Prisma.StringFilter<"Checkin"> | string
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
+}
+
+export type CheckinCreateWithoutImageInput = {
+  id?: string
+  notes?: string | null
+  face_verified?: boolean
+  confidence?: number | null
+  latitude?: number | null
+  longitude?: number | null
+  status?: string
+  checkin_time?: Date | string
+  subject: Prisma.SubjectCreateNestedOneWithoutCheckinsInput
+}
+
+export type CheckinUncheckedCreateWithoutImageInput = {
+  id?: string
+  subject_id: string
+  notes?: string | null
+  face_verified?: boolean
+  confidence?: number | null
+  latitude?: number | null
+  longitude?: number | null
+  status?: string
+  checkin_time?: Date | string
+}
+
+export type CheckinCreateOrConnectWithoutImageInput = {
+  where: Prisma.CheckinWhereUniqueInput
+  create: Prisma.XOR<Prisma.CheckinCreateWithoutImageInput, Prisma.CheckinUncheckedCreateWithoutImageInput>
+}
+
+export type CheckinUpsertWithoutImageInput = {
+  update: Prisma.XOR<Prisma.CheckinUpdateWithoutImageInput, Prisma.CheckinUncheckedUpdateWithoutImageInput>
+  create: Prisma.XOR<Prisma.CheckinCreateWithoutImageInput, Prisma.CheckinUncheckedCreateWithoutImageInput>
+  where?: Prisma.CheckinWhereInput
 }
 
 export type CheckinUpdateToOneWithWhereWithoutImageInput = {
@@ -511,9 +681,10 @@ export type CheckinUpdateToOneWithWhereWithoutImageInput = {
 export type CheckinUpdateWithoutImageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneRequiredWithoutCheckinsNestedInput
@@ -523,19 +694,33 @@ export type CheckinUncheckedUpdateWithoutImageInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   subject_id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type CheckinCreateManySubjectInput = {
+  id?: string
+  notes?: string | null
+  image_id?: string | null
+  face_verified?: boolean
+  confidence?: number | null
+  latitude?: number | null
+  longitude?: number | null
+  status?: string
+  checkin_time?: Date | string
 }
 
 export type CheckinUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   image?: Prisma.ImageUpdateOneWithoutCheckinImageNestedInput
@@ -545,9 +730,10 @@ export type CheckinUncheckedUpdateWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -556,9 +742,10 @@ export type CheckinUncheckedUpdateManyWithoutSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  device_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confidence?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -570,24 +757,40 @@ export type CheckinSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   subject_id?: boolean
   notes?: boolean
   image_id?: boolean
-  device_id?: boolean
   face_verified?: boolean
   confidence?: boolean
+  latitude?: boolean
+  longitude?: boolean
   status?: boolean
   checkin_time?: boolean
   image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["checkin"]>
 
+export type CheckinSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  id?: boolean
+  subject_id?: boolean
+  notes?: boolean
+  image_id?: boolean
+  face_verified?: boolean
+  confidence?: boolean
+  latitude?: boolean
+  longitude?: boolean
+  status?: boolean
+  checkin_time?: boolean
+  image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
+  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
+}, ExtArgs["result"]["checkin"]>
 
 export type CheckinSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   subject_id?: boolean
   notes?: boolean
   image_id?: boolean
-  device_id?: boolean
   face_verified?: boolean
   confidence?: boolean
+  latitude?: boolean
+  longitude?: boolean
   status?: boolean
   checkin_time?: boolean
   image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
@@ -599,15 +802,20 @@ export type CheckinSelectScalar = {
   subject_id?: boolean
   notes?: boolean
   image_id?: boolean
-  device_id?: boolean
   face_verified?: boolean
   confidence?: boolean
+  latitude?: boolean
+  longitude?: boolean
   status?: boolean
   checkin_time?: boolean
 }
 
-export type CheckinOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "notes" | "image_id" | "device_id" | "face_verified" | "confidence" | "status" | "checkin_time", ExtArgs["result"]["checkin"]>
+export type CheckinOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "notes" | "image_id" | "face_verified" | "confidence" | "latitude" | "longitude" | "status" | "checkin_time", ExtArgs["result"]["checkin"]>
 export type CheckinInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
+  subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
+}
+export type CheckinIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   image?: boolean | Prisma.Checkin$imageArgs<ExtArgs>
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
 }
@@ -627,9 +835,10 @@ export type $CheckinPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     subject_id: string
     notes: string | null
     image_id: string | null
-    device_id: string | null
     face_verified: boolean
     confidence: number | null
+    latitude: number | null
+    longitude: number | null
     status: string
     checkin_time: Date
   }, ExtArgs["result"]["checkin"]>
@@ -720,6 +929,58 @@ export interface CheckinDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    * 
    */
   findMany<T extends CheckinFindManyArgs>(args?: Prisma.SelectSubset<T, CheckinFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CheckinPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+  /**
+   * Create a Checkin.
+   * @param {CheckinCreateArgs} args - Arguments to create a Checkin.
+   * @example
+   * // Create one Checkin
+   * const Checkin = await prisma.checkin.create({
+   *   data: {
+   *     // ... data to create a Checkin
+   *   }
+   * })
+   * 
+   */
+  create<T extends CheckinCreateArgs>(args: Prisma.SelectSubset<T, CheckinCreateArgs<ExtArgs>>): Prisma.Prisma__CheckinClient<runtime.Types.Result.GetResult<Prisma.$CheckinPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+  /**
+   * Create many Checkins.
+   * @param {CheckinCreateManyArgs} args - Arguments to create many Checkins.
+   * @example
+   * // Create many Checkins
+   * const checkin = await prisma.checkin.createMany({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   *     
+   */
+  createMany<T extends CheckinCreateManyArgs>(args?: Prisma.SelectSubset<T, CheckinCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>
+
+  /**
+   * Create many Checkins and returns the data saved in the database.
+   * @param {CheckinCreateManyAndReturnArgs} args - Arguments to create many Checkins.
+   * @example
+   * // Create many Checkins
+   * const checkin = await prisma.checkin.createManyAndReturn({
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * 
+   * // Create many Checkins and only return the `id`
+   * const checkinWithIdOnly = await prisma.checkin.createManyAndReturn({
+   *   select: { id: true },
+   *   data: [
+   *     // ... provide data here
+   *   ]
+   * })
+   * Note, that providing `undefined` is treated as the value not being there.
+   * Read more here: https://pris.ly/d/null-undefined
+   * 
+   */
+  createManyAndReturn<T extends CheckinCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, CheckinCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CheckinPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
   /**
    * Delete a Checkin.
@@ -814,6 +1075,25 @@ export interface CheckinDelegate<ExtArgs extends runtime.Types.Extensions.Intern
    * 
    */
   updateManyAndReturn<T extends CheckinUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, CheckinUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CheckinPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+  /**
+   * Create or update one Checkin.
+   * @param {CheckinUpsertArgs} args - Arguments to update or create a Checkin.
+   * @example
+   * // Update or create a Checkin
+   * const checkin = await prisma.checkin.upsert({
+   *   create: {
+   *     // ... data to create a Checkin
+   *   },
+   *   update: {
+   *     // ... in case it already exists, update
+   *   },
+   *   where: {
+   *     // ... the filter for the Checkin we want to update
+   *   }
+   * })
+   */
+  upsert<T extends CheckinUpsertArgs>(args: Prisma.SelectSubset<T, CheckinUpsertArgs<ExtArgs>>): Prisma.Prisma__CheckinClient<runtime.Types.Result.GetResult<Prisma.$CheckinPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
   /**
@@ -990,9 +1270,10 @@ export interface CheckinFieldRefs {
   readonly subject_id: Prisma.FieldRef<"Checkin", 'String'>
   readonly notes: Prisma.FieldRef<"Checkin", 'String'>
   readonly image_id: Prisma.FieldRef<"Checkin", 'String'>
-  readonly device_id: Prisma.FieldRef<"Checkin", 'String'>
   readonly face_verified: Prisma.FieldRef<"Checkin", 'Boolean'>
   readonly confidence: Prisma.FieldRef<"Checkin", 'Float'>
+  readonly latitude: Prisma.FieldRef<"Checkin", 'Float'>
+  readonly longitude: Prisma.FieldRef<"Checkin", 'Float'>
   readonly status: Prisma.FieldRef<"Checkin", 'String'>
   readonly checkin_time: Prisma.FieldRef<"Checkin", 'DateTime'>
 }
@@ -1200,6 +1481,62 @@ export type CheckinFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
+ * Checkin create
+ */
+export type CheckinCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Checkin
+   */
+  select?: Prisma.CheckinSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Checkin
+   */
+  omit?: Prisma.CheckinOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CheckinInclude<ExtArgs> | null
+  /**
+   * The data needed to create a Checkin.
+   */
+  data: Prisma.XOR<Prisma.CheckinCreateInput, Prisma.CheckinUncheckedCreateInput>
+}
+
+/**
+ * Checkin createMany
+ */
+export type CheckinCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * The data used to create many Checkins.
+   */
+  data: Prisma.CheckinCreateManyInput | Prisma.CheckinCreateManyInput[]
+  skipDuplicates?: boolean
+}
+
+/**
+ * Checkin createManyAndReturn
+ */
+export type CheckinCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Checkin
+   */
+  select?: Prisma.CheckinSelectCreateManyAndReturn<ExtArgs> | null
+  /**
+   * Omit specific fields from the Checkin
+   */
+  omit?: Prisma.CheckinOmit<ExtArgs> | null
+  /**
+   * The data used to create many Checkins.
+   */
+  data: Prisma.CheckinCreateManyInput | Prisma.CheckinCreateManyInput[]
+  skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CheckinIncludeCreateManyAndReturn<ExtArgs> | null
+}
+
+/**
  * Checkin update
  */
 export type CheckinUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1271,6 +1608,36 @@ export type CheckinUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensi
    * Choose, which related nodes to fetch as well
    */
   include?: Prisma.CheckinIncludeUpdateManyAndReturn<ExtArgs> | null
+}
+
+/**
+ * Checkin upsert
+ */
+export type CheckinUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Checkin
+   */
+  select?: Prisma.CheckinSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Checkin
+   */
+  omit?: Prisma.CheckinOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CheckinInclude<ExtArgs> | null
+  /**
+   * The filter to search for the Checkin to update in case it exists.
+   */
+  where: Prisma.CheckinWhereUniqueInput
+  /**
+   * In case the Checkin found by the `where` argument doesn't exist, create a new Checkin with this data.
+   */
+  create: Prisma.XOR<Prisma.CheckinCreateInput, Prisma.CheckinUncheckedCreateInput>
+  /**
+   * In case the Checkin was found with the provided `where` argument, update it with this data.
+   */
+  update: Prisma.XOR<Prisma.CheckinUpdateInput, Prisma.CheckinUncheckedUpdateInput>
 }
 
 /**

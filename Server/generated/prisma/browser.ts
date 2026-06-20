@@ -73,11 +73,6 @@ export type SubjectZone = Prisma.SubjectZoneModel
  */
 export type Checkin = Prisma.CheckinModel
 /**
- * Model Alert
- * 
- */
-export type Alert = Prisma.AlertModel
-/**
  * Model EventLog
  * 
  */

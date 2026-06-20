@@ -62,7 +62,6 @@ export const ModelName = {
   Zone: 'Zone',
   SubjectZone: 'SubjectZone',
   Checkin: 'Checkin',
-  Alert: 'Alert',
   EventLog: 'EventLog',
   SystemLog: 'SystemLog',
   RequestLog: 'RequestLog',
@@ -225,29 +224,15 @@ export const CheckinScalarFieldEnum = {
   subject_id: 'subject_id',
   notes: 'notes',
   image_id: 'image_id',
-  device_id: 'device_id',
   face_verified: 'face_verified',
   confidence: 'confidence',
+  latitude: 'latitude',
+  longitude: 'longitude',
   status: 'status',
   checkin_time: 'checkin_time'
 } as const
 
 export type CheckinScalarFieldEnum = (typeof CheckinScalarFieldEnum)[keyof typeof CheckinScalarFieldEnum]
-
-
-export const AlertScalarFieldEnum = {
-  id: 'id',
-  subject_id: 'subject_id',
-  type: 'type',
-  severity: 'severity',
-  message: 'message',
-  status: 'status',
-  resolved_by: 'resolved_by',
-  resolved_at: 'resolved_at',
-  created_at: 'created_at'
-} as const
-
-export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
 
 
 export const EventLogScalarFieldEnum = {

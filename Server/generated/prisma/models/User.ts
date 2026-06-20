@@ -206,7 +206,6 @@ export type UserWhereInput = {
   avatar_id?: Prisma.StringNullableFilter<"User"> | string | null
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   update_at?: Prisma.DateTimeFilter<"User"> | Date | string
-  alerts?: Prisma.AlertListRelationFilter
   subject?: Prisma.SubjectListRelationFilter
   auditLogs?: Prisma.SystemLogListRelationFilter
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
@@ -223,7 +222,6 @@ export type UserOrderByWithRelationInput = {
   avatar_id?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
-  alerts?: Prisma.AlertOrderByRelationAggregateInput
   subject?: Prisma.SubjectOrderByRelationAggregateInput
   auditLogs?: Prisma.SystemLogOrderByRelationAggregateInput
   account?: Prisma.AccountOrderByWithRelationInput
@@ -243,7 +241,6 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.BoolFilter<"User"> | boolean
   created_at?: Prisma.DateTimeFilter<"User"> | Date | string
   update_at?: Prisma.DateTimeFilter<"User"> | Date | string
-  alerts?: Prisma.AlertListRelationFilter
   subject?: Prisma.SubjectListRelationFilter
   auditLogs?: Prisma.SystemLogListRelationFilter
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
@@ -286,7 +283,6 @@ export type UserCreateInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
   account: Prisma.AccountCreateNestedOneWithoutUserInput
@@ -303,7 +299,6 @@ export type UserUncheckedCreateInput = {
   avatar_id?: string | null
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
   zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
@@ -316,7 +311,6 @@ export type UserUpdateInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
@@ -333,7 +327,6 @@ export type UserUncheckedUpdateInput = {
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
   zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
@@ -475,22 +468,6 @@ export type UserUpdateOneRequiredWithoutZoneNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutZoneInput, Prisma.UserUpdateWithoutZoneInput>, Prisma.UserUncheckedUpdateWithoutZoneInput>
 }
 
-export type UserCreateNestedOneWithoutAlertsInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAlertsInput, Prisma.UserUncheckedCreateWithoutAlertsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAlertsInput
-  connect?: Prisma.UserWhereUniqueInput
-}
-
-export type UserUpdateOneWithoutAlertsNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutAlertsInput, Prisma.UserUncheckedCreateWithoutAlertsInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAlertsInput
-  upsert?: Prisma.UserUpsertWithoutAlertsInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAlertsInput, Prisma.UserUpdateWithoutAlertsInput>, Prisma.UserUncheckedUpdateWithoutAlertsInput>
-}
-
 export type UserCreateNestedOneWithoutAuditLogsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
@@ -546,7 +523,6 @@ export type UserCreateWithoutAccountInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
   avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
@@ -561,7 +537,6 @@ export type UserUncheckedCreateWithoutAccountInput = {
   avatar_id?: string | null
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
   zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
@@ -590,7 +565,6 @@ export type UserUpdateWithoutAccountInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
@@ -605,7 +579,6 @@ export type UserUncheckedUpdateWithoutAccountInput = {
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
   zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
@@ -618,7 +591,6 @@ export type UserCreateWithoutSubjectInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
   account: Prisma.AccountCreateNestedOneWithoutUserInput
   avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
@@ -634,7 +606,6 @@ export type UserUncheckedCreateWithoutSubjectInput = {
   avatar_id?: string | null
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
   zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
 }
@@ -662,7 +633,6 @@ export type UserUpdateWithoutSubjectInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
@@ -678,7 +648,6 @@ export type UserUncheckedUpdateWithoutSubjectInput = {
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
   zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
@@ -690,7 +659,6 @@ export type UserCreateWithoutZoneInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
   account: Prisma.AccountCreateNestedOneWithoutUserInput
@@ -706,7 +674,6 @@ export type UserUncheckedCreateWithoutZoneInput = {
   avatar_id?: string | null
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
 }
@@ -734,7 +701,6 @@ export type UserUpdateWithoutZoneInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
@@ -750,81 +716,8 @@ export type UserUncheckedUpdateWithoutZoneInput = {
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
-}
-
-export type UserCreateWithoutAlertsInput = {
-  id?: string
-  full_name: string
-  role?: $Enums.UserAccountRole
-  status?: boolean
-  created_at?: Date | string
-  update_at?: Date | string
-  subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
-  auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
-  account: Prisma.AccountCreateNestedOneWithoutUserInput
-  avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
-  zone?: Prisma.ZoneCreateNestedManyWithoutCreatorInput
-}
-
-export type UserUncheckedCreateWithoutAlertsInput = {
-  id?: string
-  account_id: string
-  full_name: string
-  role?: $Enums.UserAccountRole
-  status?: boolean
-  avatar_id?: string | null
-  created_at?: Date | string
-  update_at?: Date | string
-  subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
-  auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
-  zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
-}
-
-export type UserCreateOrConnectWithoutAlertsInput = {
-  where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutAlertsInput, Prisma.UserUncheckedCreateWithoutAlertsInput>
-}
-
-export type UserUpsertWithoutAlertsInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutAlertsInput, Prisma.UserUncheckedUpdateWithoutAlertsInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutAlertsInput, Prisma.UserUncheckedCreateWithoutAlertsInput>
-  where?: Prisma.UserWhereInput
-}
-
-export type UserUpdateToOneWithWhereWithoutAlertsInput = {
-  where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutAlertsInput, Prisma.UserUncheckedUpdateWithoutAlertsInput>
-}
-
-export type UserUpdateWithoutAlertsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  full_name?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumUserAccountRoleFieldUpdateOperationsInput | $Enums.UserAccountRole
-  status?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
-  auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
-  account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
-  avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
-  zone?: Prisma.ZoneUpdateManyWithoutCreatorNestedInput
-}
-
-export type UserUncheckedUpdateWithoutAlertsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  full_name?: Prisma.StringFieldUpdateOperationsInput | string
-  role?: Prisma.EnumUserAccountRoleFieldUpdateOperationsInput | $Enums.UserAccountRole
-  status?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
-  auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
-  zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -834,7 +727,6 @@ export type UserCreateWithoutAuditLogsInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   account: Prisma.AccountCreateNestedOneWithoutUserInput
   avatar?: Prisma.ImageCreateNestedOneWithoutUserAvatarInput
@@ -850,7 +742,6 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   avatar_id?: string | null
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
 }
@@ -878,7 +769,6 @@ export type UserUpdateWithoutAuditLogsInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutUserAvatarNestedInput
@@ -894,7 +784,6 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
 }
@@ -906,7 +795,6 @@ export type UserCreateWithoutAvatarInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogCreateNestedManyWithoutUserInput
   account: Prisma.AccountCreateNestedOneWithoutUserInput
@@ -921,7 +809,6 @@ export type UserUncheckedCreateWithoutAvatarInput = {
   status?: boolean
   created_at?: Date | string
   update_at?: Date | string
-  alerts?: Prisma.AlertUncheckedCreateNestedManyWithoutResolverInput
   subject?: Prisma.SubjectUncheckedCreateNestedManyWithoutCreatorInput
   auditLogs?: Prisma.SystemLogUncheckedCreateNestedManyWithoutUserInput
   zone?: Prisma.ZoneUncheckedCreateNestedManyWithoutCreatorInput
@@ -950,7 +837,6 @@ export type UserUpdateWithoutAvatarInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUpdateManyWithoutUserNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutUserNestedInput
@@ -965,7 +851,6 @@ export type UserUncheckedUpdateWithoutAvatarInput = {
   status?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  alerts?: Prisma.AlertUncheckedUpdateManyWithoutResolverNestedInput
   subject?: Prisma.SubjectUncheckedUpdateManyWithoutCreatorNestedInput
   auditLogs?: Prisma.SystemLogUncheckedUpdateManyWithoutUserNestedInput
   zone?: Prisma.ZoneUncheckedUpdateManyWithoutCreatorNestedInput
@@ -977,14 +862,12 @@ export type UserUncheckedUpdateWithoutAvatarInput = {
  */
 
 export type UserCountOutputType = {
-  alerts: number
   subject: number
   auditLogs: number
   zone: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  alerts?: boolean | UserCountOutputTypeCountAlertsArgs
   subject?: boolean | UserCountOutputTypeCountSubjectArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
   zone?: boolean | UserCountOutputTypeCountZoneArgs
@@ -998,13 +881,6 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
    * Select specific fields to fetch from the UserCountOutputType
    */
   select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
-}
-
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountAlertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AlertWhereInput
 }
 
 /**
@@ -1038,7 +914,6 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   avatar_id?: boolean
   created_at?: boolean
   update_at?: boolean
-  alerts?: boolean | Prisma.User$alertsArgs<ExtArgs>
   subject?: boolean | Prisma.User$subjectArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
@@ -1086,7 +961,6 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "full_name" | "role" | "status" | "avatar_id" | "created_at" | "update_at", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  alerts?: boolean | Prisma.User$alertsArgs<ExtArgs>
   subject?: boolean | Prisma.User$subjectArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
@@ -1106,7 +980,6 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    alerts: Prisma.$AlertPayload<ExtArgs>[]
     subject: Prisma.$SubjectPayload<ExtArgs>[]
     auditLogs: Prisma.$SystemLogPayload<ExtArgs>[]
     account: Prisma.$AccountPayload<ExtArgs>
@@ -1516,7 +1389,6 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  alerts<T extends Prisma.User$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   subject<T extends Prisma.User$subjectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$subjectArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SystemLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   account<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
@@ -1957,30 +1829,6 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Users to delete.
    */
   limit?: number
-}
-
-/**
- * User.alerts
- */
-export type User$alertsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Alert
-   */
-  select?: Prisma.AlertSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Alert
-   */
-  omit?: Prisma.AlertOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.AlertInclude<ExtArgs> | null
-  where?: Prisma.AlertWhereInput
-  orderBy?: Prisma.AlertOrderByWithRelationInput | Prisma.AlertOrderByWithRelationInput[]
-  cursor?: Prisma.AlertWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.AlertScalarFieldEnum | Prisma.AlertScalarFieldEnum[]
 }
 
 /**
