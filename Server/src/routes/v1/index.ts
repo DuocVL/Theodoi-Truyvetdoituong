@@ -15,7 +15,6 @@ const router = Router();
 const userRoute = new UserRoute();
 const subjectRoute = new SubjectRoute();
 const zoneRoute = new ZoneRoute();
-const faceRoute = new FaceRoute();
 
 router.use('/auth', authRoutes);
 // Quản lý cán bộ hệ thống
@@ -29,7 +28,7 @@ router.use('/logs', logRoutes);
 // Truy xuất dữ liệu theo dõi/vị trí
 router.use('/tracking', trackingRoutes);
 // Xử lý nhận diện/đăng ký khuôn mặt
-router.use(faceRoute.path, faceRoute.router);
+router.use('/face', FaceRoute);
 
 // Add the image routes
 router.use('/images', imageRouter);

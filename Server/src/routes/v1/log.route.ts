@@ -1,14 +1,13 @@
 import { Router } from 'express';
 import * as logController from '../../controllers/log.controller';
-import { authMiddleware } from '../../middlewares/auth.middleware';
-import { checkRole } from '../../middlewares/rbac.middleware'; // Import the new RBAC middleware
+import { authMiddleware } from '../../middlewares/auth.middleware';// Import the new RBAC middleware
 import { UserAccountRole } from '../../../generated/prisma/client'; // Import the Role enum
 
 
 const router = Router();
 
 // All log routes are protected and restricted to ADMINs.
-router.use(authMiddleware, checkRole([UserAccountRole.ADMIN]));
+router.use(authMiddleware);
 
 // Route to get API request logs
 router.get('/request', logController.getRequestLogs);

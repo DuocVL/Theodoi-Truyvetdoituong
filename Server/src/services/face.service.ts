@@ -9,11 +9,11 @@
 
 import { FaceRepository } from '../repositories/face.repository';
 import { HttpException } from '../exceptions/http-exception';
-import { FaceData } from '@prisma/client';
+import { FaceData } from '../../generated/prisma/client';
 
 export class FaceService {
   // Tiêm FaceRepository vào qua constructor
-  constructor(private readonly faceRepository: FaceRepository) {}
+  private faceRepository = new FaceRepository()
 
   /**
    * @description Nghiệp vụ lưu một vector embedding mới cho một subject.

@@ -190,8 +190,6 @@ export type DeviceScalarFieldEnum = (typeof DeviceScalarFieldEnum)[keyof typeof 
 export const FaceDataScalarFieldEnum = {
   id: 'id',
   subject_id: 'subject_id',
-  image_url: 'image_url',
-  status: 'status',
   created_at: 'created_at',
   update_at: 'update_at'
 } as const

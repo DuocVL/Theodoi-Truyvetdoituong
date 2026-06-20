@@ -1,59 +1,54 @@
-
-/**
- * @file face.repository.ts
- * @description
- * Lớp Repository chịu trách nhiệm giao tiếp trực tiếp với cơ sở dữ liệu cho bảng `face_data`.
- * Nó đóng gói tất cả các truy vấn SQL (bao gồm cả các truy vấn raw cho kiểu `vector`),
- * cung cấp các phương thức CRUD rõ ràng để lớp Service có thể sử dụng mà không cần biết chi tiết về CSDL.
- */
-
 import { prisma } from '../configs/prisma';
-import { FaceData } from '../../generated/prisma/client';
+import { FaceData as PrismaFaceData } from '../../generated/prisma/client';
 
-// Type cho dữ liệu thô trả về từ CSDL, vì Prisma không tự map kiểu `vector` sang number[].
-type RawFaceDataResult = Omit<FaceData, 'embedding'> & { embedding: string };
+// 1. Định nghĩa Type chuẩn mong muốn ở Application Layer (Service/Controller)
+export type CustomFaceData = Omit<PrismaFaceData, 'embedding'> & {
+  embedding: number[];
+};
+
+// 2. Định nghĩa Type thô trả về từ câu lệnh SQL raw query
+type RawFaceDataResult = Omit<PrismaFaceData, 'embedding'> & {
+  embedding: string; // pgvector trả về chuỗi "[1,2,3...]" khi cast sang text
+};
 
 /**
- * @description Hàm tiện ích để chuyển đổi dữ liệu thô từ CSDL (embedding dạng string) 
- * sang dạng FaceData chuẩn (embedding dạng number[]).
+ * Hàm tiện ích chuyển đổi dữ liệu thô từ CSDL sang kiểu dữ liệu ứng dụng nhận diện được
  */
-const toFaceData = (raw: RawFaceDataResult): FaceData => {
+const toFaceData = (raw: RawFaceDataResult): CustomFaceData => {
   return {
-    ...raw,
-    embedding: JSON.parse(raw.embedding), // Chuyển đổi chuỗi vector thành mảng số
+    id: raw.id,
+    subject_id: raw.subject_id,
+    created_at: raw.created_at,
+    update_at: raw.update_at,
+    embedding: JSON.parse(raw.embedding), // Chuyển chuỗi "[1,2...]" thành number[]
   };
 };
 
 export class FaceRepository {
   /**
-   * @description Tạo một bản ghi face_data mới bằng raw query để hỗ trợ kiểu `vector`.
-   * @param {string} subject_id - ID của subject liên quan.
-   * @param {number[]} embedding - Vector embedding khuôn mặt.
-   * @returns {Promise<FaceData>} - Bản ghi FaceData vừa được tạo.
+   * Tạo một bản ghi face_data mới bằng câu lệnh SQL Raw
    */
-  public async create(subject_id: string, embedding: number[]): Promise<FaceData> {
-    // Chuyển mảng embedding thành chuỗi định dạng vector của pgvector: '[1,2,3]'
+  public async create(subject_id: string, embedding: number[]): Promise<CustomFaceData> {
     const embeddingString = `[${embedding.join(',')}]`;
 
-    // Sử dụng $queryRaw để thực thi câu lệnh SQL gốc
+    // Ép kiểu embedding thành ::text ở mệnh đề RETURNING để Node.js nhận dạng được chuỗi
     const result = await prisma.$queryRaw<RawFaceDataResult[]>`
-      INSERT INTO "face_data" (subject_id, embedding, status)
-      VALUES (${subject_id}, ${embeddingString}::vector, 'ACTIVE')
-      RETURNING *;
+      INSERT INTO "face_data" (subject_id, embedding)
+      VALUES (${subject_id}, ${embeddingString}::vector)
+      RETURNING id, subject_id, created_at, update_at, embedding::text as embedding;
     `;
 
     return toFaceData(result[0]);
   }
 
   /**
-   * @description Lấy tất cả các bản ghi face_data của một subject.
-   * @param {string} subject_id - ID của subject.
-   * @returns {Promise<FaceData[]>} - Mảng các bản ghi FaceData, sắp xếp theo ngày tạo mới nhất.
+   * Lấy toàn bộ bản ghi face_data của một subject
    */
-  public async findBySubjectId(subject_id: string): Promise<FaceData[]> {
+  public async findBySubjectId(subject_id: string): Promise<CustomFaceData[]> {
     const results = await prisma.$queryRaw<RawFaceDataResult[]>`
-      SELECT *
-      FROM "face_data" WHERE subject_id = ${subject_id}
+      SELECT id, subject_id, created_at, update_at, embedding::text as embedding
+      FROM "face_data" 
+      WHERE subject_id = ${subject_id}
       ORDER BY created_at DESC;
     `;
 
@@ -61,24 +56,18 @@ export class FaceRepository {
   }
 
   /**
-   * @description Lấy bản ghi face_data active gần nhất của một subject.
-   * Thường được dùng cho các tác vụ so sánh, nhận dạng.
-   * @param {string} subject_id - ID của subject.
-   * @returns {Promise<FaceData | null>} - Bản ghi FaceData hoặc null nếu không tìm thấy.
+   * Lấy bản ghi face_data mới nhất của một subject
    */
-  public async findLatestActiveBySubjectId(subject_id: string): Promise<FaceData | null> {
+  public async findLatestActiveBySubjectId(subject_id: string): Promise<CustomFaceData | null> {
     const result = await prisma.$queryRaw<RawFaceDataResult[]>`
-      SELECT *
+      SELECT id, subject_id, created_at, update_at, embedding::text as embedding
       FROM "face_data" 
-      WHERE subject_id = ${subject_id} AND status = 'ACTIVE'
+      WHERE subject_id = ${subject_id}
       ORDER BY created_at DESC
       LIMIT 1;
     `;
 
-    if (result.length === 0) {
-      return null;
-    }
-
+    if (result.length === 0) return null;
     return toFaceData(result[0]);
   }
 }

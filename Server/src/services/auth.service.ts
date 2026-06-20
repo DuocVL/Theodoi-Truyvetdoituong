@@ -8,10 +8,8 @@ import { compareData, hashData } from '../utils/hash';
 import { AccountPayload  } from "../types/data";
 import { HttpException } from "../exceptions/http-exception";
 import { sendPasswordResetEmail } from '../utils/email';
-import { env } from '../configs/env';
 import { Prisma } from '../../generated/prisma/client';
 import crypto from 'crypto';
-import jwt  from "jsonwebtoken";
 
 export const login = async (data: LoginDto) => {
     const account = await accountRepository.findByUsername(data.username);

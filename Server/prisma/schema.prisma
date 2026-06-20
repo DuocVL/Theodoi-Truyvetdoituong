@@ -135,7 +135,6 @@ model FaceData {
   id         String                @id @default(uuid())
   subject_id String
   embedding  Unsupported("vector")
-  status     String
   created_at DateTime              @default(now())
   update_at  DateTime              @updatedAt
   subject    Subject               @relation("SubjectToFaceData", fields: [subject_id], references: [id], onDelete: Cascade)
@@ -272,9 +271,7 @@ model Image {
   stored_name   String
   mime_type     String
   size          Int
-
   url           String
-
   alt_text      String?
 
   created_at    DateTime @default(now())

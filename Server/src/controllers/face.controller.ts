@@ -16,7 +16,7 @@ import { prisma } from '../configs/prisma';
 import { RegisterFaceDto } from '../dtos/face.dto';
 
 export class FaceController {
-  constructor(private readonly faceService: FaceService) {}
+  private faceService = new FaceService()
 
   /**
    * @method POST /face/register
