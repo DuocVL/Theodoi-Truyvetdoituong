@@ -1,75 +1,90 @@
 
+/**
+ * @file checkin.service.ts
+ * @description Service chứa logic nghiệp vụ cho module Checkin.
+ */
+
 import { CheckinRepository } from '@/repositories/checkin.repository';
-import { ImageService } from '@/services/image.service'; // Service mới
-import { FaceService } from '@/services/face.service';   // Service mới
-import { CreateCheckinDto } from '@/dtos/checkin.dto';
+import { ImageService } from '@/services/image.service'; // Giả sử đã có ImageService
 import { HttpException } from '@/exceptions/http-exception';
-import { Checkin } from '@prisma/client';
-import { UploadedFile } from 'express-fileupload'; // Giả định sử dụng express-fileupload
+import type { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
+import type { UploadedFile } from 'express-fileupload';
+import type { Checkin } from '@prisma/client';
+import { prisma } from '@/configs/prisma';
 
 export class CheckinService {
-  // 1. Service giờ đây phụ thuộc vào 3 thành phần
-  constructor(
-    private readonly checkinRepository: CheckinRepository,
-    private readonly imageService: ImageService,
-    private readonly faceService: FaceService,
-  ) {}
+  // Service khởi tạo các dependency của nó
+  private checkinRepository = new CheckinRepository();
+  private imageService = new ImageService();
 
   /**
-   * Điều phối toàn bộ quy trình check-in phức tạp.
-   *
-   * @param checkinDto Dữ liệu check-in từ client (location, notes...)
-   * @param checkinImage File ảnh được upload
-   * @param embedding Dữ liệu embedding khuôn mặt để xác thực
+   * @description Nghiệp vụ tạo mới một check-in.
+   * Điều phối việc upload ảnh và tạo bản ghi check-in.
    */
   public async createCheckin(
-    checkinDto: CreateCheckinDto,
-    checkinImage: UploadedFile, 
-    embedding: number[],
+    accountId: string,
+    checkinData: CreateCheckinDto,
+    imageFile: UploadedFile
   ): Promise<Checkin> {
-    // BƯỚC 1: Xác thực khuôn mặt. Nếu thất bại, sẽ có exception ném ra.
-    const isVerified = await this.faceService.verifySubjectByEmbedding(
-      checkinDto.subject_id,
-      embedding,
-    );
-
-    if (!isVerified) {
-      throw new HttpException(403, 'Face verification failed. Check-in denied.');
+    // 1. Xác định subject từ accountId
+    const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
+    if (!subject) {
+      throw new HttpException(403, 'Forbidden: User is not a subject');
     }
 
-    // BƯỚC 2: Nếu xác thực thành công, tiến hành lưu ảnh.
-    // Service ảnh sẽ xử lý việc lưu file và tạo bản ghi trong DB.
-    const imageRecord = await this.imageService.uploadAndCreateImageRecord(
-      checkinImage,
-      'checkin_images', // Thư mục lưu ảnh check-in
-    );
+    // 2. Upload ảnh và lấy ID
+    const image = await this.imageService.uploadImage(imageFile, 'checkins');
 
-    // BƯỚC 3: Gán ID ảnh vừa tạo vào DTO.
-    const fullCheckinData = {
-      ...checkinDto,
-      image_id: imageRecord.id, // Lấy ID từ bản ghi ảnh vừa tạo
-    };
-
-    // BƯỚC 4: Tạo bản ghi check-in với đầy đủ thông tin.
-    const newCheckin = await this.checkinRepository.createCheckin(fullCheckinData);
+    // 3. Tạo bản ghi checkin trong DB
+    const newCheckin = await this.checkinRepository.create({
+      ...checkinData,
+      subject_id: subject.id,
+      image_id: image.id,
+    });
 
     return newCheckin;
   }
 
-  // --- CÁC PHƯƠNG THỨC KHÁC GIỮ NGUYÊN ---
-
+  /**
+   * @description Lấy một checkin bằng ID.
+   */
   public async getCheckinById(id: string): Promise<Checkin> {
-    const checkin = await this.checkinRepository.findCheckinById(id);
+    const checkin = await this.checkinRepository.findById(id);
     if (!checkin) {
       throw new HttpException(404, 'Check-in not found');
     }
     return checkin;
   }
 
-  public async getCheckinsBySubject(subjectId: string): Promise<Checkin[]> {
-    const checkins = await this.checkinRepository.findCheckinsBySubject(subjectId);
-    return checkins;
+  /**
+   * @description Lấy tất cả checkin của một subject.
+   */
+  public async getCheckinsBySubjectId(subjectId: string): Promise<Checkin[]> {
+    return this.checkinRepository.findBySubjectId(subjectId);
   }
 
-  // ... update và delete giữ nguyên ...
+  /**
+   * @description Cập nhật ghi chú cho một checkin.
+   * Chỉ chủ sở hữu của checkin mới có quyền cập nhật.
+   */
+  public async updateCheckinNotes(
+    accountId: string,
+    checkinId: string,
+    updateData: UpdateCheckinDto
+  ): Promise<Checkin> {
+    // 1. Lấy thông tin checkin và subject của người dùng hiện tại
+    const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
+    if (!subject) throw new HttpException(403, 'Forbidden: User is not a subject');
+
+    const checkin = await this.checkinRepository.findById(checkinId);
+    if (!checkin) throw new HttpException(404, 'Check-in not found');
+
+    // 2. Kiểm tra quyền sở hữu
+    if (checkin.subject_id !== subject.id) {
+      throw new HttpException(403, 'Forbidden: You do not own this check-in');
+    }
+
+    // 3. Cập nhật
+    return this.checkinRepository.update(checkinId, updateData);
+  }
 }

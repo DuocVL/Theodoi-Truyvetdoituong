@@ -1,63 +1,88 @@
 
-import { NextFunction, Request, Response } from 'express';
+/**
+ * @file checkin.controller.ts
+ * @description Controller xử lý các request HTTP cho module Checkin.
+ */
+
+import { NextFunction, Response } from 'express';
 import { CheckinService } from '@/services/checkin.service';
-import { CreateCheckinDto } from '@/dtos/checkin.dto';
-import { Checkin } from '@prisma/client';
-import { UploadedFile } from 'express-fileupload';
+import { RequestWithUser } from '@/interfaces/auth.interface';
+import { CreateCheckinDto, UpdateCheckinDto } from '@/dtos/checkin.dto';
 import { HttpException } from '@/exceptions/http-exception';
+import type { UploadedFile } from 'express-fileupload';
 
 export class CheckinController {
-  constructor(private readonly checkinService: CheckinService) {}
+  // Controller tự khởi tạo Service
+  private checkinService = new CheckinService();
 
-  public createCheckin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  /**
+   * @method POST /checkins
+   * @description Handler tạo mới một check-in.
+   */
+  public createCheckin = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
-      // Dữ liệu từ body (form fields)
+      const accountId = req.account?.id;
+      if (!accountId) throw new HttpException(401, 'Unauthorized');
+
+      if (!req.files || !req.files.image) {
+        throw new HttpException(400, 'Image file is missing');
+      }
+      const imageFile = req.files.image as UploadedFile;
       const checkinData: CreateCheckinDto = req.body;
 
-      // Dữ liệu embedding (parse từ JSON string)
-      if (!req.body.embedding) {
-        throw new HttpException(400, 'Missing face embedding data.');
-      }
-      const embedding = JSON.parse(req.body.embedding);
+      const newCheckin = await this.checkinService.createCheckin(accountId, checkinData, imageFile);
 
-      // File ảnh từ middleware
-      if (!req.files || !req.files.checkinImage) {
-        throw new HttpException(400, 'Missing check-in image.');
-      }
-      const checkinImage = req.files.checkinImage as UploadedFile;
-      
-      // Gọi service với đầy đủ tham số
-      const newCheckin: Checkin = await this.checkinService.createCheckin(
-        checkinData,
-        checkinImage,
-        embedding
-      );
-
-      res.status(201).json({ data: newCheckin, message: 'created' });
+      res.status(201).json({ data: newCheckin, message: 'Check-in created successfully' });
     } catch (error) {
       next(error);
     }
   };
 
-  // --- CÁC PHƯƠNG THỨC KHÁC GIỮ NGUYÊN ---
+  /**
+   * @method GET /checkins/:id
+   * @description Handler lấy một check-in bằng ID.
+   */
   public getCheckinById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const checkinId: string = req.params.id;
-      const checkin: Checkin = await this.checkinService.getCheckinById(checkinId);
+      const checkinId = req.params.id;
+      const checkin = await this.checkinService.getCheckinById(checkinId);
       res.status(200).json({ data: checkin });
     } catch (error) {
       next(error);
     }
   };
 
-    public getCheckinsBySubject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  /**
+   * @method GET /checkins/subject/:subjectId
+   * @description Handler lấy tất cả check-in của một subject.
+   */
+  public getCheckinsBySubject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const subjectId: string = req.params.subjectId;
-      const checkins: Checkin[] = await this.checkinService.getCheckinsBySubject(subjectId);
+      const subjectId = req.params.subjectId;
+      const checkins = await this.checkinService.getCheckinsBySubjectId(subjectId);
       res.status(200).json({ data: checkins });
     } catch (error) {
       next(error);
     }
   };
-  // ... update và delete giữ nguyên ...
+
+  /**
+   * @method PATCH /checkins/:id
+   * @description Handler cập nhật notes của một check-in.
+   */
+  public updateCheckin = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const accountId = req.account?.id;
+      if (!accountId) throw new HttpException(401, 'Unauthorized');
+
+      const checkinId = req.params.id;
+      const updateData: UpdateCheckinDto = req.body;
+
+      const updatedCheckin = await this.checkinService.updateCheckinNotes(accountId, checkinId, updateData);
+
+      res.status(200).json({ data: updatedCheckin, message: 'Check-in updated successfully' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
