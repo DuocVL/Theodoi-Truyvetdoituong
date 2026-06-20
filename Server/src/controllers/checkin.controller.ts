@@ -6,25 +6,21 @@
 
 import { NextFunction, Response } from 'express';
 import { CheckinService } from '../services/checkin.service';
-import { RequestWithUser } from '../types/data';
+import { RequestWithUser } from '../types/data'; // Đảm bảo interface này được định nghĩa đúng
 import { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
 import { HttpException } from '../exceptions/http-exception';
-import type { UploadedFile } from 'express-fileupload';
+import { UploadedFile } from 'express-fileupload';
 
 export class CheckinController {
-  // Controller tự khởi tạo Service
   private checkinService = new CheckinService();
 
-  /**
-   * @method POST /checkins
-   * @description Handler tạo mới một check-in.
-   */
   public createCheckin = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const accountId = req.account?.id;
       if (!accountId) throw new HttpException(401, 'Unauthorized');
 
-      if (!req.files || !req.files.image) {
+      // FIX: Kiểm tra và ép kiểu file an toàn
+      if (!req.files || Object.keys(req.files).length === 0 || !req.files.image) {
         throw new HttpException(400, 'Image file is missing');
       }
       const imageFile = req.files.image as UploadedFile;
@@ -38,13 +34,10 @@ export class CheckinController {
     }
   };
 
-  /**
-   * @method GET /checkins/:id
-   * @description Handler lấy một check-in bằng ID.
-   */
-  public getCheckinById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // FIX: Sử dụng RequestWithUser để đảm bảo có req.params
+  public getCheckinById = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const checkinId = req.params.id;
+      const checkinId = req.params.id as string;
       const checkin = await this.checkinService.getCheckinById(checkinId);
       res.status(200).json({ data: checkin });
     } catch (error) {
@@ -52,13 +45,10 @@ export class CheckinController {
     }
   };
 
-  /**
-   * @method GET /checkins/subject/:subjectId
-   * @description Handler lấy tất cả check-in của một subject.
-   */
-  public getCheckinsBySubject = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  // FIX: Sử dụng RequestWithUser để đảm bảo có req.params
+  public getCheckinsBySubject = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const subjectId = req.params.subjectId;
+      const subjectId = req.params.subjectId as string;
       const checkins = await this.checkinService.getCheckinsBySubjectId(subjectId);
       res.status(200).json({ data: checkins });
     } catch (error) {
@@ -66,16 +56,12 @@ export class CheckinController {
     }
   };
 
-  /**
-   * @method PATCH /checkins/:id
-   * @description Handler cập nhật notes của một check-in.
-   */
   public updateCheckin = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const accountId = req.account?.id;
       if (!accountId) throw new HttpException(401, 'Unauthorized');
 
-      const checkinId = req.params.id;
+      const checkinId = req.params.id as string;
       const updateData: UpdateCheckinDto = req.body;
 
       const updatedCheckin = await this.checkinService.updateCheckinNotes(accountId, checkinId, updateData);

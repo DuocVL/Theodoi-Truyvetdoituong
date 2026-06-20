@@ -5,16 +5,17 @@
  */
 
 import { Router } from 'express';
+import { Routes } from '../../interfaces/routes.interface';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { validate } from '../../middlewares/validate.middleware'; // Đảm bảo bạn dùng middleware validation đã hỗ trợ Zod
+// FIX: Đổi tên validate thành validationMiddleware cho nhất quán
+import { validationMiddleware } from '../../middlewares/validation.middleware';
 import { createCheckinSchema, updateCheckinSchema } from '../../dtos/checkin.dto';
 import { CheckinController } from '../../controllers/checkin.controller';
 import fileUpload from 'express-fileupload';
 
-export class CheckinRoute {
+export class CheckinRoute implements Routes {
   public path = '/checkins';
   public router = Router();
-  // Route chỉ cần khởi tạo Controller
   public controller = new CheckinController();
 
   constructor() {
@@ -23,33 +24,34 @@ export class CheckinRoute {
 
   private initializeRoutes() {
     // Áp dụng middleware xác thực cho tất cả các route của checkin
-    this.router.use(this.path, authMiddleware);
-
-    // Route tạo mới check-in (dùng multipart/form-data)
+    // FIX: authMiddleware cần được áp dụng cho từng route để không xung đột với path
     this.router.post(
-      `${this.path}`,
-      fileUpload(), // Middleware xử lý file upload, đặt trước validation
-      validate(createCheckinSchema), // Middleware xác thực các trường text
-      this.controller.createCheckin,
+      this.path,
+      authMiddleware, // Áp dụng auth
+      fileUpload(),
+      // Middleware xác thực các trường text
+      validationMiddleware(createCheckinSchema, 'body'), 
+      this.controller.createCheckin
     );
 
-    // Route lấy check-in theo ID
     this.router.get(
       `${this.path}/:id`,
-      this.controller.getCheckinById,
+      authMiddleware, // Áp dụng auth
+      this.controller.getCheckinById
     );
 
-    // Route lấy tất cả check-in của một subject
     this.router.get(
       `${this.path}/subject/:subjectId`,
-      this.controller.getCheckinsBySubject,
+      authMiddleware, // Áp dụng auth
+      this.controller.getCheckinsBySubject
     );
 
-    // Route cập nhật ghi chú của một check-in
     this.router.patch(
       `${this.path}/:id`,
-      validate(updateCheckinSchema),
-      this.controller.updateCheckin,
+      authMiddleware, // Áp dụng auth
+      validationMiddleware(updateCheckinSchema, 'body'),
+      this.controller.updateCheckin
     );
   }
 }
+

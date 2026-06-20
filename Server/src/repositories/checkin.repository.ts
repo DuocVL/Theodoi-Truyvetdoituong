@@ -16,7 +16,11 @@ export class CheckinRepository {
    * @description Tạo một bản ghi check-in mới.
    */
   public async create(data: CheckinCreationData): Promise<Checkin> {
-    return prisma.checkin.create({ data });
+    // FIX: Thêm `include: { image: true }` để đảm bảo dữ liệu trả về nhất quán
+    return prisma.checkin.create({ 
+      data,
+      include: { image: true }, 
+    });
   }
 
   /**
@@ -47,6 +51,7 @@ export class CheckinRepository {
     return prisma.checkin.update({
       where: { id },
       data,
+      include: { image: true }, // Thêm include để nhất quán
     });
   }
 }
