@@ -14,6 +14,24 @@ import { UploadedFile } from 'express-fileupload';
 export class CheckinController {
   private checkinService = new CheckinService();
 
+  public getMyCheckins = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const accountId = req.account?.id;
+      if (!accountId) {
+        throw new HttpException(401, 'Unauthorized');
+      }
+
+      const {page = 1,limit = 10} = req.query ;
+
+      const result = await this.checkinService.getMyCheckins(accountId,Number(page),Number(limit));
+
+      res.status(200).json(result);
+    } catch(error){
+      next(error);
+    }
+
+  };
+
   public createCheckin = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const accountId = req.account?.id;
@@ -48,7 +66,15 @@ export class CheckinController {
   // FIX: Sử dụng RequestWithUser để đảm bảo có req.params
   public getCheckinsBySubject = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const role = req.role?.toUpperCase();
+      if (role !== 'ADMIN' && role !== 'USER') {
+        res.status(403).json({ message: 'Forbidden' });
+        return;
+      }
       const subjectId = req.params.subjectId as string;
+
+      const {page = 1,limit = 10} = req.query ;
+
       const checkins = await this.checkinService.getCheckinsBySubjectId(subjectId);
       res.status(200).json({ data: checkins });
     } catch (error) {

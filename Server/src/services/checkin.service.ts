@@ -44,6 +44,36 @@ export class CheckinService {
     return newCheckin;
   }
 
+  public async getMyCheckins(
+  accountId:string,
+  page:number,
+  limit:number
+){
+
+  const subject =
+    await prisma.subject.findUnique({
+      where:{
+        account_id: accountId
+      }
+    });
+
+
+  if(!subject){
+    throw new HttpException(
+      403,
+      'User is not subject'
+    );
+  }
+
+
+  return this.checkinRepository.findBySubjectIdPaginated(
+    subject.id,
+    page,
+    limit
+  );
+
+}
+
   /**
    * @description Lấy một checkin bằng ID.
    */

@@ -18,6 +18,13 @@ const checkinController = new CheckinController();
 router.use(authMiddleware);
 
 
+// Get current user's checkins
+router.get(
+  '/me',
+  checkinController.getMyCheckins
+);
+
+
 // Create checkin
 // form-data:
 // image: file

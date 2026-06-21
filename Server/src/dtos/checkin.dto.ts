@@ -30,6 +30,7 @@ export const createCheckinSchema = z.object({
 
 });
 
+
 /**
  * @const updateCheckinSchema
  * @description Schema để xác thực dữ liệu body khi cập nhật 'notes' cho một check-in.

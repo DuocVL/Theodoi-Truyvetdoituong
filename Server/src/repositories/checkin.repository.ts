@@ -17,7 +17,7 @@ export class CheckinRepository {
    */
   public async create(data: CheckinCreationData): Promise<Checkin> {
     // FIX: Thêm `include: { image: true }` để đảm bảo dữ liệu trả về nhất quán
-    return prisma.checkin.create({ 
+    return prisma.checkin.create({
       data,
     });
   }
@@ -30,6 +30,37 @@ export class CheckinRepository {
       where: { id },
       include: { image: true }, // Kèm thông tin ảnh
     });
+  }
+
+  public async findBySubjectIdPaginated(subjectId: string,page: number,limit: number) {
+    const skip = (page - 1) * limit;
+    const [ data,total ] = await Promise.all([
+    prisma.checkin.findMany({
+      where: {
+        subject_id: subjectId
+      },
+        orderBy: {
+          checkin_time: 'desc'
+        },
+        skip,
+        take: limit
+      }),
+      prisma.checkin.count({
+        where: {
+          subject_id: subjectId
+        }
+      })
+    ]);
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages:
+          Math.ceil(total / limit)
+      }
+    };
   }
 
   /**
