@@ -225,7 +225,6 @@ export const CheckinScalarFieldEnum = {
   notes: 'notes',
   image_id: 'image_id',
   face_verified: 'face_verified',
-  confidence: 'confidence',
   latitude: 'latitude',
   longitude: 'longitude',
   status: 'status',

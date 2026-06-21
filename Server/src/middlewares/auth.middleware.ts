@@ -21,7 +21,6 @@ import { AccountPayload } from '../types/data';
  */
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    console.log("authHeader:", authHeader);
 
     // 🔍 Kiểm tra Bearer token có tồn tại không
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -30,7 +29,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     // 🔪 Cắt lấy token từ "Bearer <token>"
     const token = authHeader.split(" ")[1];
-    console.log("token:", token);
 
     try {
         /**
@@ -39,7 +37,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
          * - Kết quả: decoded = { id, type, device_id, iat, exp, ... }
          */
         const decoded = jwt.verify(token, env.JWT_SECRET) as AccountPayload;
-        console.log("decoded:", decoded);
 
         // ✔️ Kiểm tra decoded là object và có id field
         if (typeof decoded !== 'object' || !decoded.id) {
@@ -52,7 +49,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
          * cần chặn user tiếp tục dùng token cũ
          */
         const account = await accountRepository.findById(decoded.id);
-        console.log("account:", account);
 
 
         if (!account) {

@@ -25,6 +25,8 @@ router.get('/subject/:subjectId/time-filter', checkinController.getCheckinsBySub
 // Lấy danh sách check-in của chính subject đang đăng nhập (có phân trang)
 router.get('/me', checkinController.getMyCheckins);
 
+router.get('/export', checkinController.exportReport)
+
 // Mới: Lấy danh sách check-in từ các subject mà USER đang quản lý (có phân trang)
 router.get('/user', checkinController.getUserManagedCheckins);
 
@@ -39,5 +41,7 @@ router.get('/subject/:subjectId', checkinController.getCheckinsBySubject);
 
 // Cập nhật một check-in
 router.patch('/:id', validate(updateCheckinSchema), checkinController.updateCheckin);
+
+
 
 export default router;

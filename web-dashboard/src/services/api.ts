@@ -411,3 +411,16 @@ export const getCheckinById = async (id: string): Promise<CheckinData> => {
     return response.data?.data;
 };
 
+// Thêm hàm export vào cuối file src/services/api.ts
+export const exportCheckinsReportExcel = async (subjectId: string, startDate: string, endDate: string): Promise<Blob> => {
+  const response = await apiClient.get('/checkins/export', {
+    params: {
+      startDate,
+      endDate,
+      subjectId
+    },
+    responseType: 'blob' // RẤT QUAN TRỌNG: Để nhận luồng dữ liệu nhị phân từ backend
+  });
+  return response.data;
+};
+

@@ -201,4 +201,27 @@ export class CheckinController {
       next(error);
     }
   };
+
+  public exportReport = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const accountId = req.account?.id;
+      const role = req.role?.toUpperCase();
+      if (!accountId || !role) throw new HttpException(401, 'Unauthorized');
+
+      const user = await getUserByAccountId(accountId);
+      if (!user?.id) throw new HttpException(401, 'Unauthorized');
+
+      const { startDate, endDate, subjectId } = req.query as any;
+
+      const buffer = await this.checkinService.exportCheckinReportExcel(user.id, role, { startDate, endDate, subjectId });
+
+      // Thiết lập Header báo hiệu cho trình duyệt tải file nhị phân
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=Bao-Cao-Checkin-${Date.now()}.xlsx`);
+      
+      res.status(200).send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

@@ -176,10 +176,9 @@ model Checkin {
   notes         String?
   image_id      String?                               @unique
   face_verified Boolean                               @default(false)
-  confidence    Float?
 
-  latitude          Float?
-  longitude         Float?
+  latitude          Float
+  longitude         Float
   status        String                                @default("ON_TIME") // Consider an enum for this
   checkin_time  DateTime                              @default(now())
 
