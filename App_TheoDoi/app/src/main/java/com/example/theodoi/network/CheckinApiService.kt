@@ -18,7 +18,8 @@ interface CheckinApiService {
         @Part("latitude") latitude: RequestBody,
         @Part("longitude") longitude: RequestBody,
         @Part("notes") notes: RequestBody,
-        @Part("face_verified") faceVerified: RequestBody, // Thêm phần này phục vụ kiểm tra từ client
+        @Part("face_verified") faceVerified: RequestBody,
+        @Part("request_uuid") requestUuid: RequestBody, // MOI: server dung de dedupe
         @Part image: MultipartBody.Part?
     ): Response<CheckinResponse>
 }

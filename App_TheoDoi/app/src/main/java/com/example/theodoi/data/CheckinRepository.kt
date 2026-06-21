@@ -20,25 +20,24 @@ class CheckinRepository {
         longitude: Double,
         notes: String,
         faceVerified: Boolean,
-        imageFile: File
+        imageFile: File,
+        requestUuid: String // MOI: dung de server dedupe neu client gui lai do timeout gia
     ): Response<CheckinResponse> {
 
-        Log.d("CheckinRepository", "submitCheckin Repository duoc goi: Lat=$latitude, Lng=$longitude, FileSize=${imageFile.length()} bytes")
+        Log.d("CheckinRepository", "submitCheckin Repository duoc goi: Lat=$latitude, Lng=$longitude, FileSize=${imageFile.length()} bytes, uuid=$requestUuid")
 
-        // 1. Khoi tao cac truong text duoi dang RequestBody
         val uploadTypeBody = "checkins".toRequestBody("text/plain".toMediaTypeOrNull())
         val latBody = latitude.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val lngBody = longitude.toString().toRequestBody("text/plain".toMediaTypeOrNull())
         val notesBody = notes.toRequestBody("text/plain".toMediaTypeOrNull())
         val faceVerifiedBody = faceVerified.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val uuidBody = requestUuid.toRequestBody("text/plain".toMediaTypeOrNull()) // MOI
 
-        // 2. Dong goi tep tin hinh anh duoi dang MultipartBody.Part
         val requestFile = RequestBody.create("image/jpeg".toMediaTypeOrNull(), imageFile)
         val imagePart = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
 
         Log.d("CheckinRepository", "Bat dau ban thong tin thong qua Retrofit Interface")
 
-        // Thu tu cac Part truyen vao day se quyet dinh thu tu gui len Server dung nhu spec yeu cau (uploadType truoc image)
         return checkinApiService.createCheckin(
             token = "Bearer $token",
             uploadType = uploadTypeBody,
@@ -46,6 +45,7 @@ class CheckinRepository {
             longitude = lngBody,
             notes = notesBody,
             faceVerified = faceVerifiedBody,
+            requestUuid = uuidBody, // MOI
             image = imagePart
         )
     }
