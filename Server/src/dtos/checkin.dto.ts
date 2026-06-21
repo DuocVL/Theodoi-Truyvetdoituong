@@ -17,6 +17,14 @@ export const createCheckinSchema = z.object({
     // Biến đổi và ép kiểu latitude và longitude từ string (trong form-data) sang number.
     latitude: z.preprocess((val) => Number(val), z.number().min(-90).max(90)),
     longitude: z.preprocess((val) => Number(val), z.number().min(-180).max(180)),
+    face_verified: z.preprocess(
+      (val) => {
+        if (val === 'true') return true;
+        if (val === 'false') return false;
+        return val;
+      },
+      z.boolean()
+    ),
     notes: z.string().optional(),
   })
 

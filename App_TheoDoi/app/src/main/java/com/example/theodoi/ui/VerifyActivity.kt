@@ -6,24 +6,26 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
-import androidx.appcompat.app.AlertDialog
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.facerecog.analyzer.FaceRecognitionAnalyzer
-import com.example.theodoi.data.AppDatabase
-import com.example.theodoi.data.UserEntity
+import com.example.theodoi.data.CheckinRepository
+import com.example.theodoi.data.GpsManager
+import com.example.theodoi.data.SessionManager
 import com.example.theodoi.databinding.ActivityVerifyBinding
-import com.example.theodoi.security.CryptoManager
-import com.example.theodoi.utils.FaceMath
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.random.Random
@@ -32,9 +34,11 @@ class VerifyActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityVerifyBinding
     private lateinit var cameraExecutor: ExecutorService
-    private val cryptoManager = CryptoManager()
-    private lateinit var database: AppDatabase
+    private lateinit var sessionManager: SessionManager
+    private lateinit var checkinRepository: CheckinRepository
+    private lateinit var gpsManager: GpsManager // Quan ly dinh vi tập trung
 
+    private var imageCapture: ImageCapture? = null
     private var isActive = false
     private var isLivenessPassed = false
     private var currentChallenge = ChallengeType.NONE
@@ -47,30 +51,35 @@ class VerifyActivity : AppCompatActivity() {
         binding = ActivityVerifyBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        database = AppDatabase.getDatabase(this)
+        Log.d("VerifyActivity", "--- OnCreate: Bat dau khoi tao Activity ---")
+        sessionManager = SessionManager(this)
         cameraExecutor = Executors.newSingleThreadExecutor()
+        checkinRepository = CheckinRepository()
+        gpsManager = GpsManager(this) // Khoi tao doi tuong GpsManager
 
         binding.btnRetry.setOnClickListener {
+            Log.d("VerifyActivity", "Nguoi dung bam nut thu lai (Retry)")
             triggerChallenge()
         }
 
         if (allPermissionsGranted()) {
+            Log.d("VerifyActivity", "Quyen Camera va GPS da duoc cap truoc do")
             startCamera()
             triggerChallenge()
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), REQUEST_CODE_PERMISSIONS)
+            Log.w("VerifyActivity", "Chua du quyen, yeu cau cap quyen tu nguoi dung")
+            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
     }
 
     private fun triggerChallenge() {
-
         challengeTimer?.cancel()
-
         binding.btnRetry.visibility = View.GONE
-
         isActive = true
         isLivenessPassed = false
         currentChallenge = if (Random.nextBoolean()) ChallengeType.BLINK_EYES else ChallengeType.SMILE_FACE
+
+        Log.d("VerifyActivity", "Trigger thu thach moi: $currentChallenge")
 
         when (currentChallenge) {
             ChallengeType.BLINK_EYES -> {
@@ -96,10 +105,10 @@ class VerifyActivity : AppCompatActivity() {
             override fun onFinish() {
                 if (!isLivenessPassed && isActive) {
                     isActive = false
+                    Log.w("VerifyActivity", "Het thoi gian 10s nhung nguoi dung khong vuot qua test")
                     binding.txtChallenge.text = "QUÁ THỜI GIAN ❌"
                     binding.txtChallenge.setTextColor(ContextCompat.getColor(this@VerifyActivity, android.R.color.holo_red_dark))
-                    binding.txtStatus.text = "Xác thực không thành công do không tương tác!"
-
+                    binding.txtStatus.text = "Check-in thất bại do không tương tác!"
                     binding.btnRetry.visibility = View.VISIBLE
                 }
             }
@@ -107,6 +116,7 @@ class VerifyActivity : AppCompatActivity() {
     }
 
     private fun startCamera() {
+        Log.d("VerifyActivity", "Bat dau cau hinh va mo CameraX")
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
@@ -114,22 +124,25 @@ class VerifyActivity : AppCompatActivity() {
                 it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
             }
 
+            imageCapture = ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                .build()
+
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, FaceRecognitionAnalyzer(this) { vector, smile, leftEye, rightEye, faceCount, yaw, roll ->
-
-                        // ĐIỀU PHỐI PIPELINE BẢO MẬT CHÍNH
                         handleVerifyPipeline(vector, smile, leftEye, rightEye, faceCount)
                     })
                 }
 
             try {
                 cameraProvider.unbindAll()
-                cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_FRONT_CAMERA, preview, imageAnalyzer)
+                cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_FRONT_CAMERA, preview, imageAnalyzer, imageCapture)
+                Log.d("VerifyActivity", "Bind CameraX vao Lifecycle thanh cong")
             } catch (exc: Exception) {
-                Log.e("VerifyActivity", "Lỗi cam", exc)
+                Log.e("VerifyActivity", "Loi bind dac ta CameraX vao Lifecycle: ${exc.message}", exc)
             }
         }, ContextCompat.getMainExecutor(this))
     }
@@ -140,23 +153,23 @@ class VerifyActivity : AppCompatActivity() {
         if (faceCount > 1) {
             challengeTimer?.cancel()
             isActive = false
+            Log.w("VerifyActivity", "Canh bao: Phat hien nhieu khuon mat trong khung hinh ($faceCount)")
             runOnUiThread {
                 binding.txtChallenge.text = "CẢNH BÁO BẢO MẬT ⚠️"
                 binding.txtChallenge.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_dark))
-                binding.txtStatus.text = "Phát hiện nhiều khuôn mặt! Huỷ phiên."
+                binding.txtStatus.text = "Phát hiện nhiều khuôn mặt!"
+                binding.btnRetry.visibility = View.VISIBLE
             }
             return
         }
         if (faceCount == 0 || vector == null) return
 
         if (!isLivenessPassed) {
-            checkLiveness(smile, leftEye, rightEye)
-        } else {
-            verifyFace(vector)
+            checkLiveness(smile, leftEye, rightEye, vector)
         }
     }
 
-    private fun checkLiveness(smile: Float, leftEye: Float, rightEye: Float) {
+    private fun checkLiveness(smile: Float, leftEye: Float, rightEye: Float, vector: FloatArray) {
         val pass = when (currentChallenge) {
             ChallengeType.BLINK_EYES -> leftEye < 0.25f && rightEye < 0.25f
             ChallengeType.SMILE_FACE -> smile > 0.80f
@@ -165,54 +178,151 @@ class VerifyActivity : AppCompatActivity() {
         if (pass) {
             isLivenessPassed = true
             challengeTimer?.cancel()
+            Log.d("VerifyActivity", "Xac minh nguoi that (Liveness Check) THANH CONG")
             runOnUiThread {
                 binding.txtChallenge.text = "XÁC MINH NGƯỜI THẬT THÀNH CÔNG ✔"
                 binding.txtChallenge.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
+                binding.txtStatus.text = "Đang tiến hành chụp ảnh bằng chứng..."
             }
+            captureImageAndProceed(vector)
         }
     }
 
-    private fun verifyFace(vector: FloatArray) {
+    private fun captureImageAndProceed(vector: FloatArray) {
+        Log.d("VerifyActivity", "Chuan bi chup anh luu vao cacheDir")
+        val tempFile = File(cacheDir, "checkin_proof.jpg")
+        if (tempFile.exists()) {
+            val deleted = tempFile.delete()
+            Log.d("VerifyActivity", "Xoa file cu trung ten: $deleted")
+        }
+
+        if (imageCapture == null) {
+            Log.e("VerifyActivity", "ImageCapture bi null, khong the ra lenh chup!")
+            runOnUiThread { binding.txtStatus.text = "Loi thiet bi: Camera bi loi chuc nang chup" }
+            return
+        }
+
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(tempFile).build()
+        Log.d("VerifyActivity", "Goi ham imageCapture.takePicture()")
+
+        imageCapture?.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(this),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    Log.d("VerifyActivity", "Chup anh hoan tat. Duong dan: ${tempFile.absolutePath}, Kich thuoc: ${tempFile.length()} bytes")
+                    runOnUiThread {
+                        binding.txtStatus.text = "Đang định vị tọa độ GPS tươi..."
+                    }
+                    executeCheckInPipeline(vector, tempFile)
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    Log.e("VerifyActivity", "Loi chup anh tu CameraX: ${exception.message}", exception)
+                    runOnUiThread {
+                        binding.txtStatus.text = "Lỗi chụp ảnh bằng chứng từ thiết bị!"
+                        binding.btnRetry.visibility = View.VISIBLE
+                    }
+                }
+            }
+        )
+    }
+
+    private fun executeCheckInPipeline(vector: FloatArray, imageFile: File) {
         isActive = false
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val allUsers = database.userDao().getAllUsers()
-            var matchedUser: UserEntity? = null
-            var maxSimilarity = 0.0f
-            val threshold = 0.76f
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.w("VerifyActivity", "Khong chay duoc pipeline do thieu quyen vi tri ACCESS_FINE_LOCATION")
+            runOnUiThread { Toast.makeText(this, "Chưa cấp quyền vị trí GPS!", Toast.LENGTH_SHORT).show() }
+            binding.btnRetry.visibility = View.VISIBLE
+            return
+        }
 
-            for (user in allUsers) {
-                val decryptedBytes = cryptoManager.decrypt(user.encryptedVector, user.iv)
-                val savedVector = FaceMath.byteArrayToFloatArray(decryptedBytes)
-                val similarity = FaceMath.cosineSimilarity(vector, savedVector)
-
-                if (similarity > maxSimilarity && similarity >= threshold) {
-                    maxSimilarity = similarity
-                    matchedUser = user
-                }
+        // --- GOI LOGIC GPS DA DUOC CO LAP TRONG GPS MANAGER ---
+        gpsManager.fetchFastLocation(lifecycleScope) { gpsResult ->
+            if (gpsResult != null) {
+                Log.d("VerifyActivity", "Lay duoc vi tri! Do sai so la: ${gpsResult.accuracy} met")
+                // Bạn có thể gửi dữ liệu này lên API nếu backend yêu cầu lưu độ sai số
+                uploadCheckInData(vector, gpsResult.latitude, gpsResult.longitude, imageFile)
+            } else {
+                // Xuất file lỗi...
             }
+        }
+    }
 
-            withContext(Dispatchers.Main) {
-                if (matchedUser != null) {
-                    binding.txtStatus.text = "Khớp danh tính: ${matchedUser.name} (${(maxSimilarity * 100).toInt()}%)"
-                } else {
-                    binding.txtStatus.text = "Không trùng khớp dữ liệu FaceID!"
+    private fun uploadCheckInData(vector: FloatArray, lat: Double, lng: Double, imageFile: File) {
+        val token = sessionManager.getAccessToken() ?: ""
+        Log.d("VerifyActivity", "Chuan bi gui thong tin len Repository. Lat=$lat, Lng=$lng, FileSize=${imageFile.length()} bytes")
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val response = checkinRepository.submitCheckin(
+                    token = token,
+                    latitude = lat,
+                    longitude = lng,
+                    notes = "Check-in tu thiet bi Android di dong",
+                    faceVerified = true,
+                    imageFile = imageFile
+                )
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val checkinResult = response.body()!!.data
+                        Log.d("VerifyActivity", "API thanh cong. ID Checkin tra ve: ${checkinResult.id}, faceVerified=${checkinResult.faceVerified}")
+                        if (checkinResult.faceVerified) {
+                            binding.txtStatus.text = "Check-in THÀNH CÔNG 🎉\nID: ${checkinResult.id}\nTrạng thái: ${checkinResult.status}"
+                        } else {
+                            binding.txtStatus.text = "Check-in thành công vị trí nhưng lỗi xác minh khuôn mặt!"
+                        }
+                    } else {
+                        val errorStr = response.errorBody()?.string()
+                        Log.e("VerifyActivity", "Server tu choi yeu cau (Error Code: ${response.code()}). Noi dung loi: $errorStr")
+                        binding.txtStatus.text = "Check-in thất bại: $errorStr"
+                        binding.btnRetry.visibility = View.VISIBLE
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("VerifyActivity", "Loi nghiem trong trong qua trinh ket noi mang: ${e.message}", e)
+                withContext(Dispatchers.Main) {
+                    binding.txtStatus.text = "Lỗi kết nối mạng: ${e.message}"
+                    binding.btnRetry.visibility = View.VISIBLE
                 }
             }
         }
     }
 
-    private fun allPermissionsGranted() = arrayOf(Manifest.permission.CAMERA).all {
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionsGranted()) {
+                Log.d("VerifyActivity", "Nguoi dung vua dong y cap quyen luc runtime")
+                startCamera()
+                triggerChallenge()
+            } else {
+                Log.e("VerifyActivity", "Nguoi dung tu choi cap quyen, close activity")
+                Toast.makeText(this, "Ứng dụng cần quyền Camera và GPS để điểm danh!", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        Log.d("VerifyActivity", "--- OnDestroy Activity ---")
         challengeTimer?.cancel()
         cameraExecutor.shutdown()
     }
 
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 10
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
     }
 }
