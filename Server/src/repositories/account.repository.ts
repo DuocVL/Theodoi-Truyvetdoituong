@@ -32,22 +32,22 @@ export const updateStatus = async (id: string, status: AccountStatus): Promise<A
     });
 };
 
-export const findByIdWithRelations = async (id: string): Promise<any> => {
-    return await prisma.account.findUnique({
-        where: { id },
-        include: {
-            subject: {
-                include: {
-                    checkin: {
-                        orderBy: { checkin_time: 'desc' },
-                        take: 10
-                    }
-                }
-            },
-            user: true
-        }
-    });
-};
+// export const findByIdWithRelations = async (id: string): Promise<any> => {
+//     return await prisma.account.findUnique({
+//         where: { id },
+//         include: {
+//             subject: {
+//                 include: {
+//                     checkin: {
+//                         orderBy: { checkin_time: 'desc' },
+//                         take: 10
+//                     }
+//                 }
+//             },
+//             user: true
+//         }
+//     });
+// };
 
 export const findMany = async (where?: Prisma.AccountWhereInput, include?: Prisma.AccountInclude): Promise<Account[]> => {
     return await prisma.account.findMany({
@@ -86,15 +86,6 @@ export const findByIdWithUserProfile = async (id: string): Promise<any> => {
                     role: true, 
                 }
             },
-            // Include the subject object for 'SUBJECT' type accounts
-            subject: {
-                include: {
-                    checkin: { // Also include recent check-ins for the subject's profile
-                        orderBy: { checkin_time: 'desc' },
-                        take: 5
-                    }
-                }
-            }
         }
     });
 };

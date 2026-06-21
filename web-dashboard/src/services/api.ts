@@ -41,43 +41,69 @@ export interface Subject {
   updatedAt: string;
 }
 
+export interface CheckinData {
+  id: string;
+  subject_id: string;
+  notes: string;
+  image_id: string;
+  face_verified: boolean;
+  confidence: number | null;
+  latitude: number;
+  longitude: number;
+  status: string;
+  checkin_time: string;
+  subject: {
+    full_name: string;
+  };
+  image?: {
+    url: string;
+  };
+}
+
+export interface TimeFilterParams {
+  startDate?: string; // Định dạng YYYY-MM-DD
+  endDate?: string;   // Định dạng YYYY-MM-DD
+  startTime?: string; // Định dạng HH:mm
+  endTime?: string;   // Định dạng HH:mm
+}
+
 // Kiểu dữ liệu thô từ server (snake_case)
 type ServerSubject = {
-    id: string;
-    account_id: string;
-    code: string;
-    full_name: string;
-    dob: string;
-    gender: string;
-    id_number: string;
-    address: string;
-    phone: string;
-    status: string;
-    monitoring_start: string;
-    monitoring_end: string | null;
-    created_by: string;
-    created_at: string;
-    update_at: string;
-    username?: string;
-    email?: string;
-  };
+  id: string;
+  account_id: string;
+  code: string;
+  full_name: string;
+  dob: string;
+  gender: string;
+  id_number: string;
+  address: string;
+  phone: string;
+  status: string;
+  monitoring_start: string;
+  monitoring_end: string | null;
+  created_by: string;
+  created_at: string;
+  update_at: string;
+  username?: string;
+  email?: string;
+};
 
 /** Hàm chuyển đổi dữ liệu từ server sang client */
 const mapServerToClientSubject = (subject: ServerSubject): Subject => ({
-    _id: subject.id,
-    fullName: subject.full_name,
-    idNumber: subject.id_number,
-    monitoringStart: subject.monitoring_start,
-    monitoringEnd: subject.monitoring_end || undefined,
-    createdAt: subject.created_at,
-    updatedAt: subject.update_at,
-    username: subject.username || '',
-    email: subject.email || '',
-    dob: subject.dob ? new Date(subject.dob).toISOString().split('T')[0] : undefined,
-    gender: subject.gender,
-    address: subject.address,
-    phone: subject.phone,
-    status: subject.status,
+  _id: subject.id,
+  fullName: subject.full_name,
+  idNumber: subject.id_number,
+  monitoringStart: subject.monitoring_start,
+  monitoringEnd: subject.monitoring_end || undefined,
+  createdAt: subject.created_at,
+  updatedAt: subject.update_at,
+  username: subject.username || '',
+  email: subject.email || '',
+  dob: subject.dob ? new Date(subject.dob).toISOString().split('T')[0] : undefined,
+  gender: subject.gender,
+  address: subject.address,
+  phone: subject.phone,
+  status: subject.status,
 });
 
 export interface TrackingPoint {
@@ -246,10 +272,8 @@ export const getSubjects = async (): Promise<Subject[]> => {
   return serverSubjects.map(mapServerToClientSubject);
 };
 
-// FIX: Cập nhật hàm getSubjectById để xử lý đúng cấu trúc dữ liệu từ server
 export const getSubjectById = async (id: string): Promise<Subject> => {
   const response = await apiClient.get<{ data: ServerSubject }>(`/subjects/${id}`);
-  // Dữ liệu chi tiết nằm trong response.data.data
   return mapServerToClientSubject(response.data.data);
 };
 
@@ -258,9 +282,7 @@ export const createSubject = async (subjectData: Partial<Omit<Subject, '_id' | '
   return response.data;
 };
 
-// FIX: Cập nhật hàm updateSubject để gửi đi dữ liệu đúng định dạng snake_case
 export const updateSubject = async (id: string, subjectData: Partial<Subject>): Promise<ApiResponse<Subject>> => {
-  // Chuyển đổi dữ liệu từ camelCase (frontend) sang snake_case (backend)
   const serverData = {
     full_name: subjectData.fullName,
     id_number: subjectData.idNumber,
@@ -289,4 +311,43 @@ export const deleteSubject = async (id: string): Promise<{ message: string }> =>
 export const getTrackingDataBySubjectId = async (subjectId: string): Promise<TrackingPoint[]> => {
   const response = await apiClient.get<{ trackingData: TrackingPoint[] }>(`/tracking/${subjectId}`);
   return response.data.trackingData;
+};
+
+// CẬP NHẬT ĐỘNG: Nếu có filter thời gian, chuyển hướng sang endpoint `/time-filter`
+export const getUserManagedCheckins = async (filters?: TimeFilterParams): Promise<CheckinData[]> => {
+    const hasTimeFilter = !!(filters?.startDate || filters?.endDate || filters?.startTime || filters?.endTime);
+    const endpoint = hasTimeFilter ? '/checkins/user/time-filter' : '/checkins/user';
+
+    const response = await apiClient.get(endpoint, {
+      params: {
+        limit: 100,
+        startDate: filters?.startDate || undefined,
+        endDate: filters?.endDate || undefined,
+        startTime: filters?.startTime || undefined,
+        endTime: filters?.endTime || undefined
+      }
+    });
+    return response.data?.data || [];
+};
+
+// CẬP NHẬT ĐỘNG: Nếu có filter thời gian, chuyển hướng sang endpoint `/time-filter`
+export const getCheckinsBySubject = async (subjectId: string, filters?: TimeFilterParams): Promise<CheckinData[]> => {
+    const hasTimeFilter = !!(filters?.startDate || filters?.endDate || filters?.startTime || filters?.endTime);
+    const endpoint = hasTimeFilter ? `/checkins/subject/${subjectId}/time-filter` : `/checkins/subject/${subjectId}`;
+
+    const response = await apiClient.get(endpoint, {
+      params: {
+        limit: 100,
+        startDate: filters?.startDate || undefined,
+        endDate: filters?.endDate || undefined,
+        startTime: filters?.startTime || undefined,
+        endTime: filters?.endTime || undefined
+      }
+    });
+    return response.data?.data || [];
+};
+
+export const getCheckinById = async (id: string): Promise<CheckinData> => {
+    const response = await apiClient.get(`/checkins/${id}`);
+    return response.data?.data;
 };

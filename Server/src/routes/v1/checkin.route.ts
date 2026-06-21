@@ -1,4 +1,3 @@
-
 /**
  * @file checkin.route.ts
  * @description Định nghĩa các API endpoints cho module Checkin.
@@ -8,11 +7,15 @@ import { Router } from 'express';
 import { CheckinController } from '../../controllers/checkin.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 import { validate } from '../../middlewares/validate.middleware';
-import { createCheckinSchema, updateCheckinSchema } from '../../dtos/checkin.dto';
+import { createCheckinSchema, updateCheckinSchema } from '../../dtos/checkin.dto'; // Đã bỏ checkinTimeFilterSchema
 import upload from '../../middlewares/upload.middleware';
 
 const router = Router();
 const checkinController = new CheckinController();
+
+// Đọc trực tiếp từ query trong controller, không đi qua middleware validate nữa
+router.get('/user/time-filter', checkinController.getUserManagedCheckinsByTime);
+router.get('/subject/:subjectId/time-filter', checkinController.getCheckinsBySubjectAndTime);
 
 // Tất cả các route trong file này đều yêu cầu xác thực
 router.use(authMiddleware);
@@ -36,4 +39,3 @@ router.get('/subject/:subjectId', checkinController.getCheckinsBySubject);
 router.patch('/:id', validate(updateCheckinSchema), checkinController.updateCheckin);
 
 export default router;
-

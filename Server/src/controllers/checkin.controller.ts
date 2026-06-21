@@ -1,4 +1,3 @@
-
 /**
  * @file checkin.controller.ts
  * @description Controller xử lý các request HTTP cho module Checkin.
@@ -27,7 +26,6 @@ export class CheckinController {
     }
   };
 
-  // Mới: Controller cho /user
   public getUserManagedCheckins = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const accountId = req.account?.id;
@@ -80,17 +78,23 @@ export class CheckinController {
     }
   };
 
-  // Cập nhật: Controller cho /subject/:subjectId
   public getCheckinsBySubject = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const accountId = req.account?.id;
       const role = req.role?.toUpperCase();
       if (!accountId || !role) throw new HttpException(401, 'Unauthorized');
       
+      const user = await getUserByAccountId(req.account?.id as string);
+      const createdByUserId = user?.id;
+      if (!createdByUserId) {
+        res.status(401).json({ message: 'Unauthorized: Account ID not found' });
+        return;
+      }
+
       const subjectId = req.params.subjectId as string;
       const { page = 1, limit = 10 } = req.query;
 
-      const result = await this.checkinService.getCheckinsBySubject(subjectId, Number(page), Number(limit), { id: accountId, role });
+      const result = await this.checkinService.getCheckinsBySubject(subjectId, Number(page), Number(limit), user.id, role);
       res.status(200).json(result);
     } catch (error) {
       next(error);
@@ -111,5 +115,90 @@ export class CheckinController {
       next(error);
     }
   };
-}
 
+  public getUserManagedCheckinsByTime = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const accountId = req.account?.id;
+      const role = req.role?.toUpperCase();
+      if (!accountId || role !== 'USER') throw new HttpException(403, 'Forbidden: This route is for users only');
+
+      const user = await getUserByAccountId(accountId);
+      if (!user?.id) throw new HttpException(401, 'Unauthorized: User record missing');
+
+      // BỔ SUNG: Đọc thêm startTime và endTime trực tiếp từ query
+      const { startDate, endDate, startTime, endTime, page = 1, limit = 10 } = req.query;
+      
+      // Kiểm tra thủ công các tham số ngày bắt buộc
+      if (!startDate || !endDate) {
+        throw new HttpException(400, 'Missing required query parameters: startDate and endDate');
+      }
+
+      // Chuẩn hóa giá trị giờ phút giây, nếu không truyền thì mặc định bao quát cả ngày
+      const finalStartTime = startTime ? String(startTime) : '00:00:00';
+      const finalEndTime = endTime ? String(endTime) : '23:59:59';
+
+      console.log(`[DEBUG - FILTER ALL] User ID: ${user.id} lọc dữ liệu từ [${startDate} ${finalStartTime}] đến [${endDate} ${finalEndTime}]`);
+
+      // Truyền thêm dữ liệu thời gian chi tiết xuống tầng Service xử lý nghiệp vụ
+      const result = await this.checkinService.getUserManagedCheckinsAndTime(
+        user.id, 
+        String(startDate), 
+        String(endDate), 
+        finalStartTime,
+        finalEndTime,
+        Number(page), 
+        Number(limit)
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Endpoint độc lập lọc thời gian cho một đối tượng cụ thể
+   * GET /api/v1/checkins/subject/:subjectId/time-filter?startDate=...&endDate=...&startTime=...&endTime=...
+   */
+  public getCheckinsBySubjectAndTime = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const accountId = req.account?.id;
+      const role = req.role?.toUpperCase();
+      if (!accountId || !role) throw new HttpException(401, 'Unauthorized');
+
+      const user = await getUserByAccountId(accountId);
+      if (!user?.id) throw new HttpException(401, 'Unauthorized: Manager account not found');
+
+      const subjectId = req.params.subjectId as string;
+      
+      // BỔ SUNG: Đọc thêm startTime và endTime trực tiếp từ query
+      const { startDate, endDate, startTime, endTime, page = 1, limit = 10 } = req.query;
+
+      // Kiểm tra thủ công các tham số ngày bắt buộc
+      if (!startDate || !endDate) {
+        throw new HttpException(400, 'Missing required query parameters: startDate and endDate');
+      }
+
+      // Chuẩn hóa giá trị giờ phút giây, nếu không truyền thì mặc định bao quát cả ngày
+      const finalStartTime = startTime ? String(startTime) : '00:00:00';
+      const finalEndTime = endTime ? String(endTime) : '23:59:59';
+
+      console.log(`[DEBUG - FILTER SINGLE] Subject ID: ${subjectId} lọc từ [${startDate} ${finalStartTime}] đến [${endDate} ${finalEndTime}] bởi User: ${user.id}`);
+
+      // Truyền thêm dữ liệu thời gian chi tiết xuống tầng Service xử lý nghiệp vụ
+      const result = await this.checkinService.getCheckinsBySubjectAndTime(
+        subjectId, 
+        String(startDate), 
+        String(endDate), 
+        finalStartTime,
+        finalEndTime,
+        Number(page), 
+        Number(limit), 
+        user.id, 
+        role
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+}
