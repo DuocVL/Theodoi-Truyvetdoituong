@@ -67,42 +67,63 @@ export interface TimeFilterParams {
   endTime?: string;   // Định dạng HH:mm
 }
 
-// Kiểu dữ liệu thô từ server (snake_case)
+// KHẮC PHỤC: Định nghĩa kiểu dữ liệu trả về mới, bao gồm cả điểm cho bản đồ và danh sách phân trang
+export interface CheckinResponse {
+  listForSidebar: CheckinData[];
+  pointsForMap: CheckinData[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  }
+}
+
 type ServerSubject = {
   id: string;
   account_id: string;
   code: string;
   full_name: string;
-  dob: string;
+  dob: string | null;
   gender: string;
-  id_number: string;
-  address: string;
-  phone: string;
+  id_number: string | null;
+  address: string | null;
+  phone: string | null;
   status: string;
-  monitoring_start: string;
+  monitoring_start: string | null;
   monitoring_end: string | null;
   created_by: string;
   created_at: string;
   update_at: string;
   username?: string;
   email?: string;
+  // BỔ SUNG: Định nghĩa object account trả về từ câu lệnh include/join của Prisma backend
+  account?: {
+    id: string;
+    email: string;
+    status: string;
+    type: string;
+  };
 };
 
 /** Hàm chuyển đổi dữ liệu từ server sang client */
 const mapServerToClientSubject = (subject: ServerSubject): Subject => ({
   _id: subject.id,
   fullName: subject.full_name,
-  idNumber: subject.id_number,
-  monitoringStart: subject.monitoring_start,
+  idNumber: subject.id_number || '',
+  monitoringStart: subject.monitoring_start || undefined,
   monitoringEnd: subject.monitoring_end || undefined,
   createdAt: subject.created_at,
   updatedAt: subject.update_at,
   username: subject.username || '',
-  email: subject.email || '',
+  
+  // SỬA TẠI ĐÂY: Lấy email ở ngoài, nếu không có thì bóc tách từ trong subject.account.email
+  email: subject.email || subject.account?.email || '', 
+  
   dob: subject.dob ? new Date(subject.dob).toISOString().split('T')[0] : undefined,
   gender: subject.gender,
-  address: subject.address,
-  phone: subject.phone,
+  address: subject.address || '',
+  phone: subject.phone || '',
   status: subject.status,
 });
 
@@ -313,41 +334,80 @@ export const getTrackingDataBySubjectId = async (subjectId: string): Promise<Tra
   return response.data.trackingData;
 };
 
-// CẬP NHẬT ĐỘNG: Nếu có filter thời gian, chuyển hướng sang endpoint `/time-filter`
-export const getUserManagedCheckins = async (filters?: TimeFilterParams): Promise<CheckinData[]> => {
+// KHẮC PHỤC: Cập nhật hàm để xử lý cấu trúc trả về mới của API
+export const getUserManagedCheckins = async (filters?: TimeFilterParams): Promise<CheckinResponse> => {
     const hasTimeFilter = !!(filters?.startDate || filters?.endDate || filters?.startTime || filters?.endTime);
     const endpoint = hasTimeFilter ? '/checkins/user/time-filter' : '/checkins/user';
 
     const response = await apiClient.get(endpoint, {
       params: {
-        limit: 100,
+        limit: 100, // Có thể tăng giới hạn để lấy nhiều dữ liệu hơn cho trường hợp không lọc
+        page: 1,
         startDate: filters?.startDate || undefined,
         endDate: filters?.endDate || undefined,
         startTime: filters?.startTime || undefined,
         endTime: filters?.endTime || undefined
       }
     });
-    return response.data?.data || [];
+
+    if (hasTimeFilter) {
+      // API /time-filter trả về { data, allPoints, pagination }
+      return {
+        listForSidebar: response.data.data || [],
+        pointsForMap: response.data.allPoints || [],
+        pagination: response.data.pagination
+      };
+    } else {
+      // API thông thường trả về { data, pagination }
+      const checkins = response.data.data || [];
+      // Sắp xếp tăng dần để vẽ polyline đúng chiều
+      const sortedPoints = [...checkins].sort((a, b) => new Date(a.checkin_time).getTime() - new Date(b.checkin_time).getTime());
+      return {
+        listForSidebar: checkins,
+        pointsForMap: sortedPoints,
+        pagination: response.data.pagination
+      };
+    }
 };
 
-// CẬP NHẬT ĐỘNG: Nếu có filter thời gian, chuyển hướng sang endpoint `/time-filter`
-export const getCheckinsBySubject = async (subjectId: string, filters?: TimeFilterParams): Promise<CheckinData[]> => {
+// KHẮC PHỤC: Cập nhật hàm để xử lý cấu trúc trả về mới của API
+export const getCheckinsBySubject = async (subjectId: string, filters?: TimeFilterParams): Promise<CheckinResponse> => {
     const hasTimeFilter = !!(filters?.startDate || filters?.endDate || filters?.startTime || filters?.endTime);
     const endpoint = hasTimeFilter ? `/checkins/subject/${subjectId}/time-filter` : `/checkins/subject/${subjectId}`;
 
     const response = await apiClient.get(endpoint, {
       params: {
         limit: 100,
+        page: 1,
         startDate: filters?.startDate || undefined,
         endDate: filters?.endDate || undefined,
         startTime: filters?.startTime || undefined,
         endTime: filters?.endTime || undefined
       }
     });
-    return response.data?.data || [];
+    
+    if (hasTimeFilter) {
+      // API /time-filter trả về { data, allPoints, pagination }
+      return {
+        listForSidebar: response.data.data || [],
+        pointsForMap: response.data.allPoints || [],
+        pagination: response.data.pagination
+      };
+    } else {
+      // API thông thường trả về { data, pagination }
+      const checkins = response.data.data || [];
+       // Sắp xếp tăng dần để vẽ polyline đúng chiều
+      const sortedPoints = [...checkins].sort((a, b) => new Date(a.checkin_time).getTime() - new Date(b.checkin_time).getTime());
+      return {
+        listForSidebar: checkins,
+        pointsForMap: sortedPoints,
+        pagination: response.data.pagination
+      };
+    }
 };
 
 export const getCheckinById = async (id: string): Promise<CheckinData> => {
     const response = await apiClient.get(`/checkins/${id}`);
     return response.data?.data;
 };
+

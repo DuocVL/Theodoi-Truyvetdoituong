@@ -231,13 +231,15 @@ const MapPage: React.FC = () => {
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [selectedSubjectId, setSelectedSubjectId] = useState<string>('');
     
-    // Thêm các State quản lý cả Ngày và Giờ lọc hành trình nâng cao
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
     const [startTime, setStartTime] = useState<string>('');
     const [endTime, setEndTime] = useState<string>('');
 
-    const [checkins, setCheckins] = useState<CheckinData[]>([]);
+    // KHẮC PHỤC: Tách state cho dữ liệu bản đồ và sidebar
+    const [sidebarCheckins, setSidebarCheckins] = useState<CheckinData[]>([]);
+    const [mapCheckins, setMapCheckins] = useState<CheckinData[]>([]);
+    
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedCheckin, setSelectedCheckin] = useState<CheckinData | null>(null);
     const [mapCenter, setMapCenter] = useState<[number, number]>([20.974639, 105.8466543]);
@@ -249,27 +251,26 @@ const MapPage: React.FC = () => {
             .catch(err => console.error("Error fetching subjects:", err));
     }, []);
 
-    // 2. Đồng bộ tải danh sách dữ liệu định vị tích hợp bộ lọc Đối tượng và Thời gian
+    // 2. Đồng bộ tải danh sách dữ liệu định vị tích hợp bộ lọc
     useEffect(() => {
         const loadCheckins = async () => {
             setLoading(true);
             try {
-                // Đóng gói đầy đủ tham số lọc ngày & giờ nâng cao
                 const filterParams = { startDate, endDate, startTime, endTime };
 
-                const data = selectedSubjectId
+                const response = selectedSubjectId
                     ? await getCheckinsBySubject(selectedSubjectId, filterParams)
                     : await getUserManagedCheckins(filterParams);
 
-                // Đảm bảo dữ liệu sắp xếp tăng dần theo thời gian để vẽ lộ trình Polyline chính xác
-                const chronologicData = [...data].sort(
-                    (a, b) => new Date(a.checkin_time).getTime() - new Date(b.checkin_time).getTime()
-                );
-                setCheckins(chronologicData);
+                // KHẮC PHỤC: Phân chia dữ liệu vào đúng state
+                const sidebarData = [...response.listForSidebar].reverse(); // Sắp xếp mới nhất lên đầu
+                const mapData = response.pointsForMap;
 
-                // Mặc định tập trung ống kính camera vào điểm check-in gần nhất nếu có dữ liệu đổ về
-                if (chronologicData.length > 0) {
-                    const latestPoint = chronologicData[chronologicData.length - 1];
+                setSidebarCheckins(sidebarData);
+                setMapCheckins(mapData);
+
+                if (mapData.length > 0) {
+                    const latestPoint = mapData[mapData.length - 1];
                     setMapCenter([latestPoint.latitude, latestPoint.longitude]);
                     handleSelectCheckin(latestPoint.id, [latestPoint.latitude, latestPoint.longitude]);
                 } else {
@@ -277,17 +278,17 @@ const MapPage: React.FC = () => {
                 }
             } catch (err) {
                 console.error("Error fetching checkin markers:", err);
-                setCheckins([]);
+                setSidebarCheckins([]);
+                setMapCheckins([]);
             } finally {
                 setLoading(false);
             }
         };
 
         loadCheckins();
-        // Theo dõi toàn bộ sự thay đổi của bộ lọc ngày và giờ để kích hoạt lại API
     }, [selectedSubjectId, startDate, endDate, startTime, endTime]);
 
-    // 3. Xử lý sự kiện kích hoạt xem chi tiết một điểm check-in
+    // 3. Xử lý sự kiện xem chi tiết
     const handleSelectCheckin = async (id: string, coords: [number, number]) => {
         setMapCenter(coords);
         try {
@@ -300,7 +301,7 @@ const MapPage: React.FC = () => {
         }
     };
 
-    // Hàm xóa toàn bộ bộ lọc thời gian hiện tại
+    // 4. Xóa bộ lọc
     const handleClearFilters = () => {
         setStartDate('');
         setEndDate('');
@@ -308,16 +309,13 @@ const MapPage: React.FC = () => {
         setEndTime('');
     };
 
-    // Đảo ngược danh sách hiển thị ở thanh tác vụ bên trái (Đưa sự kiện mới nhất lên đầu tiên)
-    const displayListInSidebar = [...checkins].reverse();
-
-    // Mảng tập hợp danh sách các tọa độ điểm để phục vụ vẽ tuyến đường
-    const movementPath: [number, number][] = checkins.map(p => [p.latitude, p.longitude]);
+    // Mảng tọa độ để vẽ Polyline
+    const movementPath: [number, number][] = mapCheckins.map(p => [p.latitude, p.longitude]);
 
     return (
         <PageContainer>
             <TopBar>
-                <FilterGroup>
+                 <FilterGroup>
                     <Label htmlFor="subject-filter">Giám sát:</Label>
                     <Select
                         id="subject-filter"
@@ -332,7 +330,6 @@ const MapPage: React.FC = () => {
                     </Select>
                 </FilterGroup>
 
-                {/* --- BỘ LỌC THỜI GIAN THỰC TẾ (NÂNG CẤP NGÀY & GIỜ) --- */}
                 <FilterGroup>
                     <Label htmlFor="start-date">Từ:</Label>
                     <DateInput 
@@ -377,18 +374,17 @@ const MapPage: React.FC = () => {
             </TopBar>
 
             <MainContent>
-                {/* === CỘT TRÁI: DANH SÁCH LỊCH SỬ VỊ TRÍ === */}
                 <SidebarList>
                     <SidebarHeader>
-                        LỊCH SỬ VỊ TRÍ ({checkins.length} Điểm ghi nhận)
+                        LỊCH SỬ VỊ TRÍ ({sidebarCheckins.length} Điểm ghi nhận)
                     </SidebarHeader>
-                    {displayListInSidebar.length === 0 ? (
+                    {sidebarCheckins.length === 0 ? (
                         <div style={{ padding: '24px', textAlign: 'center', color: '#adb5bd', fontSize: '14px' }}>
                             Không tìm thấy dữ liệu check-in trong khoảng này
                         </div>
                     ) : (
-                        displayListInSidebar.map((item) => {
-                            const originalIndex = checkins.findIndex(c => c.id === item.id);
+                        sidebarCheckins.map((item) => {
+                            const originalIndex = mapCheckins.findIndex(c => c.id === item.id);
                             const isActive = selectedCheckin?.id === item.id;
                             return (
                                 <CheckinCard
@@ -422,7 +418,6 @@ const MapPage: React.FC = () => {
                     )}
                 </SidebarList>
 
-                {/* === CỘT PHẢI: BẢN ĐỒ SỐ REAL-TIME === */}
                 <MapWrapper>
                     <MapContainer center={mapCenter} zoom={16} style={{ height: '100%', width: '100%' }}>
                         <TileLayer
@@ -432,8 +427,7 @@ const MapPage: React.FC = () => {
 
                         <MapController center={mapCenter} />
 
-                        {/* Vẽ toàn bộ các điểm mốc Marker định vị */}
-                        {checkins.map((point, idx) => (
+                        {mapCheckins.map((point, idx) => (
                             <Marker
                                 key={point.id}
                                 position={[point.latitude, point.longitude]}
@@ -470,7 +464,6 @@ const MapPage: React.FC = () => {
                             </Marker>
                         ))}
 
-                        {/* Tuyến đường Polyline biểu diễn hành trình di chuyển */}
                         {movementPath.length > 1 && (
                             <Polyline
                                 pathOptions={{ color: '#228be6', weight: 4, opacity: 0.8, dashArray: '1, 5' }}

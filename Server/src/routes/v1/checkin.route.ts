@@ -13,12 +13,14 @@ import upload from '../../middlewares/upload.middleware';
 const router = Router();
 const checkinController = new CheckinController();
 
-// Đọc trực tiếp từ query trong controller, không đi qua middleware validate nữa
-router.get('/user/time-filter', checkinController.getUserManagedCheckinsByTime);
-router.get('/subject/:subjectId/time-filter', checkinController.getCheckinsBySubjectAndTime);
+
 
 // Tất cả các route trong file này đều yêu cầu xác thực
 router.use(authMiddleware);
+
+// Đọc trực tiếp từ query trong controller, không đi qua middleware validate nữa
+router.get('/user/time-filter', checkinController.getUserManagedCheckinsByTime);
+router.get('/subject/:subjectId/time-filter', checkinController.getCheckinsBySubjectAndTime);
 
 // Lấy danh sách check-in của chính subject đang đăng nhập (có phân trang)
 router.get('/me', checkinController.getMyCheckins);

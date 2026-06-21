@@ -165,23 +165,6 @@ class SubjectService {
             type: true
           }
         },
-        checkin: {
-          orderBy: {
-            checkin_time: 'desc'
-          },
-          take: 10
-        },
-        creator: {
-          select: {
-            id: true,
-            full_name: true,
-            account: {
-              select: {
-                email: true
-              }
-            }
-          }
-        }
       }
     });
 
