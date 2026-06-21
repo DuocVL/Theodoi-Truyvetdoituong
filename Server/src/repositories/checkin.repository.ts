@@ -33,7 +33,6 @@ export class CheckinRepository {
         orderBy: { checkin_time: 'desc' },
         skip,
         take: limit,
-        include: { image: true }, // Luôn kèm ảnh
       }),
       prisma.checkin.count({
         where: { subject_id: subjectId },
@@ -56,7 +55,6 @@ export class CheckinRepository {
         orderBy: { checkin_time: 'desc' },
         skip,
         take: limit,
-        include: { image: true }, // Luôn kèm ảnh
       }),
       prisma.checkin.count({ where: whereClause }),
     ]);
@@ -71,7 +69,6 @@ export class CheckinRepository {
     return prisma.checkin.update({
       where: { id },
       data,
-      include: { image: true }, // Luôn kèm ảnh
     });
   }
 }

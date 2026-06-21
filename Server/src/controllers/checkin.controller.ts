@@ -8,6 +8,7 @@ import { NextFunction, Response } from 'express';
 import { CheckinService } from '../services/checkin.service';
 import { RequestWithUser } from '../types/data';
 import { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
+import { getUserByAccountId } from '../repositories/user.repository'
 import { HttpException } from '../exceptions/http-exception';
 
 export class CheckinController {
@@ -36,8 +37,15 @@ export class CheckinController {
         throw new HttpException(403, 'Forbidden: This route is for users only');
       }
 
+      const user = await getUserByAccountId(req.account?.id as string);
+      const createdByUserId = user?.id;
+      if (!createdByUserId) {
+        res.status(401).json({ message: 'Unauthorized: Account ID not found' });
+        return;
+      }
+
       const { page = 1, limit = 10 } = req.query;
-      const result = await this.checkinService.getUserManagedCheckins(accountId, Number(page), Number(limit));
+      const result = await this.checkinService.getUserManagedCheckins(createdByUserId, Number(page), Number(limit));
       res.status(200).json(result);
     } catch (error) {
       next(error);

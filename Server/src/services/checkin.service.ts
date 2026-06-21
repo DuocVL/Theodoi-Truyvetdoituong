@@ -48,19 +48,23 @@ export class CheckinService {
     return checkin;
   }
 
-  // Cập nhật: Service cho /subject/:subjectId
   public async getCheckinsBySubject(subjectId: string, page: number, limit: number, requestingUser: { id: string; role: string }) {
     if (requestingUser.role !== 'ADMIN') {
-      // Nếu không phải ADMIN, kiểm tra xem USER có quản lý subject này không
-      const userManagesSubject = await prisma.user.findFirst({
+      // FIX: Lỗi xảy ra do 'managed_subjects' không tồn tại trên model User.
+      // Thay đổi logic: truy vấn từ model Subject để kiểm tra xem nó có được quản lý bởi User hiện tại không.
+      // Giả định rằng model Subject có một relation (quan hệ) đến User tên là `managed_by`.
+      const subjectIsManagedByUser = await prisma.subject.findFirst({
         where: {
-          account_id: requestingUser.id,
-          managed_subjects: {
-            some: { id: subjectId },
+          id: subjectId,
+          managed_by: {
+            some: {
+              account_id: requestingUser.id,
+            },
           },
         },
       });
-      if (!userManagesSubject) {
+
+      if (!subjectIsManagedByUser) {
         throw new HttpException(403, 'Forbidden: You do not manage this subject');
       }
     }
@@ -68,20 +72,27 @@ export class CheckinService {
     return this.checkinRepository.findBySubjectIdPaginated(subjectId, page, limit);
   }
 
-  // Mới: Service cho /user
   public async getUserManagedCheckins(userId: string, page: number, limit: number) {
     // 1. Tìm tất cả subject ID mà user này quản lý
-    const userWithManagedSubjects = await prisma.user.findUnique({
-      where: { account_id: userId },
-      select: { managed_subjects: { select: { id: true } } },
+    // FIX: Lỗi xảy ra do 'managed_subjects' không tồn tại trên model User.
+    // Thay đổi logic: Tìm tất cả các Subject được quản lý bởi User có account_id này.
+    // Giả định rằng model Subject có một relation (quan hệ) đến User tên là `managed_by`.
+
+    
+    const managedSubjects = await prisma.subject.findMany({
+      where: {
+        created_by: userId
+      },
+      select: { id: true },
     });
 
-    if (!userWithManagedSubjects || userWithManagedSubjects.managed_subjects.length === 0) {
+    if (!managedSubjects || managedSubjects.length === 0) {
       // Nếu user không quản lý subject nào, trả về mảng rỗng
       return { data: [], pagination: { page, limit, total: 0, totalPages: 0 } };
     }
 
-    const subjectIds = userWithManagedSubjects.managed_subjects.map(s => s.id);
+    // FIX: Thêm kiểu cho 's' để giải quyết lỗi "implicitly has an 'any' type".
+    const subjectIds = managedSubjects.map((s: { id: string }) => s.id);
 
     // 2. Lấy check-in từ các subject ID đó
     return this.checkinRepository.findBySubjectIdsPaginated(subjectIds, page, limit);
