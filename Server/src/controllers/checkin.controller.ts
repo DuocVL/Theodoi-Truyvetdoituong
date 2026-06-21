@@ -6,10 +6,9 @@
 
 import { NextFunction, Response } from 'express';
 import { CheckinService } from '../services/checkin.service';
-import { RequestWithUser } from '../types/data'; // Đảm bảo interface này được định nghĩa đúng
+import { RequestWithUser } from '../types/data';
 import { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
 import { HttpException } from '../exceptions/http-exception';
-import { UploadedFile } from 'express-fileupload';
 
 export class CheckinController {
   private checkinService = new CheckinService();
@@ -17,19 +16,32 @@ export class CheckinController {
   public getMyCheckins = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const accountId = req.account?.id;
-      if (!accountId) {
-        throw new HttpException(401, 'Unauthorized');
-      }
+      if (!accountId) throw new HttpException(401, 'Unauthorized');
 
-      const {page = 1,limit = 10} = req.query ;
-
-      const result = await this.checkinService.getMyCheckins(accountId,Number(page),Number(limit));
-
+      const { page = 1, limit = 10 } = req.query;
+      const result = await this.checkinService.getMyCheckins(accountId, Number(page), Number(limit));
       res.status(200).json(result);
-    } catch(error){
+    } catch (error) {
       next(error);
     }
+  };
 
+  // Mới: Controller cho /user
+  public getUserManagedCheckins = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const accountId = req.account?.id;
+      const role = req.role?.toUpperCase();
+
+      if (!accountId || role !== 'USER') {
+        throw new HttpException(403, 'Forbidden: This route is for users only');
+      }
+
+      const { page = 1, limit = 10 } = req.query;
+      const result = await this.checkinService.getUserManagedCheckins(accountId, Number(page), Number(limit));
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
   };
 
   public createCheckin = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
@@ -37,22 +49,19 @@ export class CheckinController {
       const accountId = req.account?.id;
       if (!accountId) throw new HttpException(401, 'Unauthorized');
 
-      const imageFile = req.file
+      const imageFile = req.file;
       if (!imageFile) {
         throw new HttpException(400, 'Image file is missing');
       }
-      
+
       const checkinData: CreateCheckinDto = req.body;
-
       const newCheckin = await this.checkinService.createCheckin(accountId, checkinData, imageFile);
-
       res.status(201).json({ data: newCheckin, message: 'Check-in created successfully' });
     } catch (error) {
       next(error);
     }
   };
 
-  // FIX: Sử dụng RequestWithUser để đảm bảo có req.params
   public getCheckinById = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
       const checkinId = req.params.id as string;
@@ -63,20 +72,18 @@ export class CheckinController {
     }
   };
 
-  // FIX: Sử dụng RequestWithUser để đảm bảo có req.params
+  // Cập nhật: Controller cho /subject/:subjectId
   public getCheckinsBySubject = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const accountId = req.account?.id;
       const role = req.role?.toUpperCase();
-      if (role !== 'ADMIN' && role !== 'USER') {
-        res.status(403).json({ message: 'Forbidden' });
-        return;
-      }
+      if (!accountId || !role) throw new HttpException(401, 'Unauthorized');
+      
       const subjectId = req.params.subjectId as string;
+      const { page = 1, limit = 10 } = req.query;
 
-      const {page = 1,limit = 10} = req.query ;
-
-      const checkins = await this.checkinService.getCheckinsBySubjectId(subjectId);
-      res.status(200).json({ data: checkins });
+      const result = await this.checkinService.getCheckinsBySubject(subjectId, Number(page), Number(limit), { id: accountId, role });
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
@@ -91,10 +98,10 @@ export class CheckinController {
       const updateData: UpdateCheckinDto = req.body;
 
       const updatedCheckin = await this.checkinService.updateCheckinNotes(accountId, checkinId, updateData);
-
       res.status(200).json({ data: updatedCheckin, message: 'Check-in updated successfully' });
     } catch (error) {
       next(error);
     }
   };
 }
+
