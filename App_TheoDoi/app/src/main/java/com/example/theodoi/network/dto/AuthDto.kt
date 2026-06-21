@@ -7,12 +7,7 @@ data class RefreshTokenRequest(
     @SerializedName("refreshToken") val refreshToken: String
 )
 
-// Response khi Refresh Token thành công
-data class TokenResponse(
-    @SerializedName("data") val data: TokenData
-)
-
-data class TokenData(
+data class TokenReponse(
     @SerializedName("accessToken") val accessToken: String,
     @SerializedName("refreshToken") val refreshToken: String
 )

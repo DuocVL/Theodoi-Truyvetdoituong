@@ -4,7 +4,7 @@ import com.example.theodoi.network.dto.ForgotPasswordRequest
 import com.example.theodoi.network.dto.LoginRequest
 import com.example.theodoi.network.dto.LoginResponse
 import com.example.theodoi.network.dto.RefreshTokenRequest
-import com.example.theodoi.network.dto.TokenResponse
+import com.example.theodoi.network.dto.TokenReponse
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -20,7 +20,7 @@ interface AuthApiService {
 
     // Dùng mã đồng bộ Call thay vì suspend cho cơ chế Authenticator ngầm của OkHttp
     @POST("api/v1/auth/refresh-token")
-    fun refreshTokenSync(@Body request: RefreshTokenRequest): Call<TokenResponse>
+    fun refreshTokenSync(@Body request: RefreshTokenRequest): Call<TokenReponse>
 
     @POST("api/v1/auth/logout")
     suspend fun logout(@Body request: RefreshTokenRequest): Response<Unit>

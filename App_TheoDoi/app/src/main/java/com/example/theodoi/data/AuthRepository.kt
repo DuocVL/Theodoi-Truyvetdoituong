@@ -9,7 +9,7 @@ import retrofit2.Response
 
 class AuthRepository {
 
-    private val authApiService = ApiClient.authApiService
+    private val authApiService by lazy { ApiClient.authApiService }
 
     suspend fun login(username: String, password: String, deviceId: String): Response<LoginResponse> {
         val request = LoginRequest(username, password, deviceId)

@@ -6,11 +6,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.theodoi.data.AppDatabase
+import com.example.theodoi.data.AuthRepository
 import com.example.theodoi.data.FaceRepository
 import com.example.theodoi.data.SessionManager
 import com.example.theodoi.data.UserEntity
 import com.example.theodoi.databinding.ActivityMainBinding
+import com.example.theodoi.network.ApiClient
 import com.example.theodoi.security.CryptoManager
+import com.example.theodoi.ui.HistoryActivity
+import com.example.theodoi.ui.auth.LoginActivity
 import com.example.theodoi.utils.FaceMath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,19 +33,48 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        ApiClient.init(applicationContext)
+
         sessionManager = SessionManager(this)
         database = AppDatabase.getDatabase(this)
 
         // Thực hiện kiểm tra đồng bộ khuôn mặt từ Server
         checkAndSyncFaceBiometric()
 
-        binding.btnGoToRegister.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
-        }
-
         binding.btnGoToVerify.setOnClickListener {
             startActivity(Intent(this, VerifyActivity::class.java))
         }
+
+        // Bên trong hàm onCreate() của MainActivity.kt thiết lập:
+        binding.btnLogout.setOnClickListener {
+            val refreshToken = sessionManager.getRefreshToken()
+            if (!refreshToken.isNullOrEmpty()) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    try {
+                        // Gọi API báo hủy Token lên hệ thống Backend
+                        AuthRepository().logout(refreshToken)
+                    } catch (e: Exception) {
+                        // Có thể bỏ qua lỗi kết nối tại đây vì ta vẫn sẽ xóa cục bộ
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        // Xóa SharedPreferences
+                        sessionManager.clearTokens()
+
+                        // Điều hướng quay lại LoginActivity
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    }
+                }
+            }
+        }
+
+        binding.btnGoToHistory.setOnClickListener {
+            startActivity(Intent(this, HistoryActivity::class.java))
+        }
+
     }
 
     private fun checkAndSyncFaceBiometric() {

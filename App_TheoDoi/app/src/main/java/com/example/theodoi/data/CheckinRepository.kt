@@ -2,7 +2,9 @@ package com.example.theodoi.data
 
 import android.util.Log
 import com.example.theodoi.network.ApiClient
+import com.example.theodoi.network.dto.CheckinDetailResponse
 import com.example.theodoi.network.dto.CheckinResponse
+import com.example.theodoi.network.dto.HistoryListResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -48,5 +50,13 @@ class CheckinRepository {
             requestUuid = uuidBody, // MOI
             image = imagePart
         )
+    }
+
+    suspend fun getMyCheckins(page: Int, limit: Int): Response<HistoryListResponse> {
+        return checkinApiService.getMyCheckins(page, limit)
+    }
+
+    suspend fun getCheckinById(id: String): Response<CheckinDetailResponse> {
+        return checkinApiService.getCheckinById(id)
     }
 }

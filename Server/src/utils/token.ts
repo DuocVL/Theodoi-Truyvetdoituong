@@ -8,7 +8,7 @@ interface RefreshTokenResult {
     hashedToken: string;
 }
 
-const expiresIn = '15m';
+const expiresIn = '1m';
 
 export const generateAccessToken = (payload: AccountPayload) => {
     return jwt.sign(

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private val authRepository = AuthRepository()
+    private val authRepository by lazy { AuthRepository() }
     private lateinit var sessionManager: SessionManager
 
     companion object {
@@ -64,7 +64,10 @@ class LoginActivity : AppCompatActivity() {
                 val response = authRepository.login(username, password, deviceId)
                 if (response.isSuccessful && response.body() != null) {
                     val loginResponse = response.body()!!
+                    Log.e("TheoDoi", loginResponse.toString())
                     sessionManager.saveTokens(loginResponse.accessToken, loginResponse.refreshToken)
+                    Log.e("TheoDoi",sessionManager.getAccessToken()!!)
+                    Log.e("TheoDoi",sessionManager.getRefreshToken()!!)
                     Toast.makeText(this@LoginActivity, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
                     navigateToMain()
                 } else {

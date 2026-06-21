@@ -3,55 +3,74 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="6dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="3dp">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:orientation="horizontal">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <View
+            android:id="@+id/viewStatusIndicator"
+            android:layout_width="5dp"
+            android:layout_height="match_parent"
+            android:background="#4CAF50" />
 
-            <TextView
-                android:id="@+id/txtTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2026-06-21 13:00"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/txtStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="ON_TIME"
-                android:textColor="#4CAF50"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/txtCoordinates"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Tọa độ: 20.9746, 105.8466"
-            android:textColor="#666666"
-            android:textSize="13sp" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/txtFaceVerification"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Xác minh khuôn mặt: Hợp lệ"
-            android:textSize="13sp" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/txtTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2026-06-21 13:00"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:textSize="15sp"
+                    android:layout_alignParentStart="true" />
+
+                <TextView
+                    android:id="@+id/txtStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="ON_TIME"
+                    android:textColor="#2E7D32"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    android:background="#E8F5E9"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/txtCoordinates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📍 Tọa độ: 20.9746, 105.8466"
+                android:textColor="#555555"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:id="@+id/txtFaceVerification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="👤 Xác minh khuôn mặt: Hợp lệ"
+                android:textColor="#666666"
+                android:textSize="13sp" />
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
