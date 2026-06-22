@@ -62,6 +62,21 @@ export type User = Prisma.UserModel
  */
 export type Subject = Prisma.SubjectModel
 /**
+ * Model Zone
+ * 
+ */
+export type Zone = Prisma.ZoneModel
+/**
+ * Model Alert
+ * 
+ */
+export type Alert = Prisma.AlertModel
+/**
+ * Model Checkin
+ * 
+ */
+export type Checkin = Prisma.CheckinModel
+/**
  * Model RefreshToken
  * 
  */
@@ -81,21 +96,6 @@ export type Device = Prisma.DeviceModel
  * 
  */
 export type FaceData = Prisma.FaceDataModel
-/**
- * Model Zone
- * 
- */
-export type Zone = Prisma.ZoneModel
-/**
- * Model SubjectZone
- * 
- */
-export type SubjectZone = Prisma.SubjectZoneModel
-/**
- * Model Checkin
- * 
- */
-export type Checkin = Prisma.CheckinModel
 /**
  * Model EventLog
  * 

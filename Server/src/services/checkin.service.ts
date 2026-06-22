@@ -4,6 +4,9 @@
 import { CheckinRepository } from '../repositories/checkin.repository';
 import { ImageService } from '../services/image.service';
 import { HttpException } from '../exceptions/http-exception';
+import { AlertRepository } from '../repositories/alert.repository';
+import { NotificationService } from '../services/notification.service';
+import { isInsideZone } from '../utils/geo.util';
 import type { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
 import type { Checkin, Image } from '../../generated/prisma/client';
 import { prisma } from '../configs/prisma';
@@ -15,14 +18,60 @@ import path from 'path';
 export class CheckinService {
   private checkinRepository = new CheckinRepository();
   private imageService = new ImageService();
-
-  // ... Các hàm createCheckin, getMyCheckins, getCheckinById, updateCheckinNotes giữ nguyên bản cũ ...
+  private alertRepository = new AlertRepository();
+  private notificationService = new NotificationService();
 
   public async createCheckin(accountId: string, checkinData: CreateCheckinDto, imageFile: Express.Multer.File): Promise<Checkin> {
     const subject = await prisma.subject.findUnique({ where: { account_id: accountId } });
     if (!subject) throw new HttpException(403, 'Forbidden: User is not a subject');
+
     const image: Image = await this.imageService.uploadImage(imageFile, 'checkins');
-    return this.checkinRepository.create({ ...checkinData, subject_id: subject.id, image_id: image.id });
+
+    const zones = await prisma.zone.findMany({ where: { subject_id: subject.id, is_active: true } });
+    const { latitude, longitude } = checkinData;
+
+    // 1. Check vùng cấm trước
+    const restrictedHit = zones.find(z => z.type === 'RESTRICTED' && isInsideZone(latitude, longitude, z));
+    if (restrictedHit) {
+      const checkin = await this.checkinRepository.create({
+        ...checkinData,
+        subject_id: subject.id,
+        image_id: image.id,
+        zone_id: restrictedHit.id,
+        status: 'RESTRICTED_VIOLATION',
+      });
+      await this.notificationService.notifySubject(subject.id, `Bạn đang ở khu vực hạn chế: ${restrictedHit.zone_name}`);
+      await this.alertRepository.create({
+        subject_id: subject.id,
+        zone_id: restrictedHit.id,
+        checkin_id: checkin.id,
+        type: 'RESTRICTED_ENTRY',
+      });
+      return checkin;
+    }
+
+    // 2. Xác định zone SAFE đang đứng (nếu có) để làm ngữ cảnh tính hạn
+    const safeHit = zones.find(z => z.type === 'SAFE' && isInsideZone(latitude, longitude, z));
+
+    const checkin = await this.checkinRepository.create({
+      ...checkinData,
+      subject_id: subject.id,
+      image_id: image.id,
+      zone_id: safeHit?.id,
+      status: 'ON_TIME',
+    });
+
+    // 3. Reset lịch theo dõi ở Subject
+    await prisma.subject.update({
+      where: { id: subject.id },
+      data: {
+        last_checkin_at: new Date(),
+        last_notified_at: null,
+        current_zone_id: safeHit?.id ?? null,
+      },
+    });
+
+    return checkin;
   }
 
   public async getMyCheckins(accountId: string, page: number, limit: number) {

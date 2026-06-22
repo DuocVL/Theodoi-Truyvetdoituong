@@ -68,6 +68,7 @@ model Subject {
   address          String?
   phone            String?
   status           SubjectStatus @default(INACTIVE)
+
   monitoring_start DateTime?
   monitoring_end   DateTime?
   avatar_id        String?       @unique
@@ -76,18 +77,104 @@ model Subject {
   update_at        DateTime      @updatedAt
   deleted_at       DateTime?
 
+  interval_minutes Int       @default(30)   // dùng khi KHÔNG thuộc zone nào
+  grace_minutes    Int       @default(5)    // NEW - thời gian chờ thêm sau khi nhắc (case không zone)
+  last_checkin_at  DateTime?                // NEW - lần checkin hợp lệ gần nhất (bất kể trong/ngoài zone)
+  last_notified_at DateTime?                // NEW - lần nhắc gần nhất cho nghĩa vụ hiện tại
+  current_zone_id  String?                  // NEW - zone SAFE đang là "ngữ cảnh" tính hạn, null = đang dùng default
+
   checkins         Checkin[]     @relation("SubjectToCheckin")
   events           EventLog[]    @relation("SubjectToEventLog")
   faceData         FaceData[]    @relation("SubjectToFaceData")
-  subjectZone      SubjectZone[] @relation("SubjectToSubjectZone")
+  zones            Zone[]        @relation("SubjectToZones")
   account          Account       @relation(fields: [account_id], references: [id])
   avatar           Image?        @relation("SubjectToAvatar", fields: [avatar_id], references: [id])
   creator          User          @relation("UserToSubject", fields: [created_by], references: [id])
+  currentZone      Zone?     @relation("SubjectCurrentZone", fields: [current_zone_id], references: [id], onDelete: SetNull)
+
+  alertSubject Alert[] @relation("SubjectToAlert")
 
   @@index([full_name])
   @@index([status])
   @@index([created_by])
   @@map("subjects")
+}
+
+enum ZoneType {
+  SAFE          // Vùng an toàn/chỉ định (Đối tượng KHÔNG ĐƯỢC rời khỏi)
+  RESTRICTED    // Vùng cấm/hạn chế (Đối tượng KHÔNG ĐƯỢC đi vào)
+}
+
+model Zone {
+  id               String        @id @default(uuid())
+  subject_id       String        // Khóa ngoại liên kết trực tiếp tới Đối tượng
+  zone_name        String
+  type             ZoneType      @default(SAFE)
+  latitude         Float
+  longitude        Float
+  radius           Float
+  interval_minutes Int           @default(15) // Thời gian giãn cách yêu cầu checkin (phút)
+  grace_minutes   Int        @default(5)  // thời gian chờ thêm sau khi nhắc, trước khi tạo Alert
+  description      String?
+  created_by       String        // ID của User (Cán bộ) tạo vùng này
+  is_active        Boolean       @default(true)
+  created_at       DateTime      @default(now())
+  update_at        DateTime      @updatedAt
+
+  subject          Subject       @relation("SubjectToZones", fields: [subject_id], references: [id], onDelete: Cascade)
+  creator          User          @relation("UserToZone", fields: [created_by], references: [id])
+  subjectsCurrent  Subject[]     @relation("SubjectCurrentZone")
+  
+  alertZone Alert[] @relation("ZoneToAlert")
+  checkins Checkin[] @relation("ZoneToCheckin")
+
+  @@map("zones")
+  
+}
+
+enum AlertType {
+  RESTRICTED_ENTRY   // checkin/vị trí rơi vào vùng cấm
+  MISSED_CHECKIN     // quá hạn checkin ở vùng an toàn, đã nhắc nhưng không checkin
+}
+
+model Alert {
+  id          String    @id @default(uuid())
+  subject_id  String
+  zone_id     String?
+  checkin_id  String?            // liên kết checkin gây ra alert, nếu có
+  type        AlertType
+  message     String?
+  is_read     Boolean   @default(false)
+  created_at  DateTime  @default(now())
+
+  subject Subject @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
+  zone    Zone?    @relation("ZoneToAlert", fields: [zone_id], references: [id], onDelete: SetNull)
+  checkin Checkin? @relation("CheckinToAlert", fields: [checkin_id], references: [id], onDelete: SetNull)
+
+  @@index([subject_id, created_at])
+  @@map("alerts")
+}
+
+model Checkin {
+  id            String                                @id @default(uuid())
+  subject_id    String
+  notes         String?
+  image_id      String?                               @unique
+  face_verified Boolean                               @default(false)
+
+  latitude          Float
+  longitude         Float
+  status        String                                @default("ON_TIME") // Consider an enum for this
+  checkin_time  DateTime                              @default(now())
+  zone_id String?
+  zone    Zone?   @relation("ZoneToCheckin", fields: [zone_id], references: [id], onDelete: SetNull)
+
+  image   Image?  @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
+  subject Subject @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
+  alertCheckin Alert[] @relation("CheckinToAlert")
+
+  @@index([subject_id, checkin_time])
+  @@map("checkins")
 }
 
 model RefreshToken {
@@ -140,53 +227,6 @@ model FaceData {
   subject    Subject               @relation("SubjectToFaceData", fields: [subject_id], references: [id], onDelete: Cascade)
 
   @@map("face_data")
-}
-
-model Zone {
-  id          String                                  @id @default(uuid())
-  zone_name   String
-  geom        Unsupported("geography(Polygon, 4326)")
-  description String?
-  created_by  String
-  is_active   Boolean                                 @default(true)
-  created_at  DateTime                                @default(now())
-  update_at   DateTime                                @updatedAt
-  subjectZone SubjectZone[]                           @relation("ZoneToSubjectZone")
-  creator     User                                    @relation("UserToZone", fields: [created_by], references: [id])
-
-  @@index([geom], type: Gist)
-  @@map("zones")
-}
-
-model SubjectZone {
-  subject_id       String
-  zone_id          String
-  interval_minutes Int      @default(15)
-  created_at       DateTime @default(now())
-  subject          Subject  @relation("SubjectToSubjectZone", fields: [subject_id], references: [id], onDelete: Cascade)
-  zone             Zone     @relation("ZoneToSubjectZone", fields: [zone_id], references: [id], onDelete: Cascade)
-
-  @@id([subject_id, zone_id])
-  @@map("subject_zones")
-}
-
-model Checkin {
-  id            String                                @id @default(uuid())
-  subject_id    String
-  notes         String?
-  image_id      String?                               @unique
-  face_verified Boolean                               @default(false)
-
-  latitude          Float
-  longitude         Float
-  status        String                                @default("ON_TIME") // Consider an enum for this
-  checkin_time  DateTime                              @default(now())
-
-  image   Image?  @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
-  subject Subject @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
-
-  @@index([subject_id, checkin_time])
-  @@map("checkins")
 }
 
 model EventLog {

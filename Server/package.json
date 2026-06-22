@@ -17,7 +17,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "- Cập nhật schema \r npx prisma migrate dev --name add_account_table\r - Genarate lại\r npx prisma generate\r - Reset database\r npx prisma migrate reset",
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
@@ -45,6 +45,7 @@
     "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-fileupload": "^1.5.2",
+    "firebase-admin": "^14.0.0",
     "form-data": "^4.0.5",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",

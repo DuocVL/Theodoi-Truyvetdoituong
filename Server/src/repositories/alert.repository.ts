@@ -1,18 +1,23 @@
 import { prisma } from '../configs/prisma';
-import { Alert, Prisma } from '../../generated/prisma/client';
+import type { AlertType } from '../../generated/prisma/client';
 
-export const createAlert = async (
-  data: Prisma.AlertCreateInput
-): Promise<Alert> => {
-  return await prisma.alert.create({ data });
-};
+interface CreateAlertData {
+  subject_id: string;
+  zone_id?: string | null;
+  checkin_id?: string | null;
+  type: AlertType;
+  message?: string;
+}
 
-export const getAlertById = async (
-  id: string
-): Promise<Alert | null> => {
-  return await prisma.alert.findUnique({ where: { id } });
-};
+export class AlertRepository {
+  public async create(data: CreateAlertData) {
+    return prisma.alert.create({ data });
+  }
 
-export const getAllAlerts = async (): Promise<Alert[]> => {
-  return await prisma.alert.findMany();
-};
+  // Tránh tạo trùng MISSED_CHECKIN nhiều lần cho cùng 1 lần trễ
+  public async findRecentMissedAlert(subjectId: string, sinceDate: Date) {
+    return prisma.alert.findFirst({
+      where: { subject_id: subjectId, type: 'MISSED_CHECKIN', created_at: { gte: sinceDate } },
+    });
+  }
+}

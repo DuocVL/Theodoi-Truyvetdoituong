@@ -55,13 +55,13 @@ export const ModelName = {
   ActivationToken: 'ActivationToken',
   User: 'User',
   Subject: 'Subject',
+  Zone: 'Zone',
+  Alert: 'Alert',
+  Checkin: 'Checkin',
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
   Device: 'Device',
   FaceData: 'FaceData',
-  Zone: 'Zone',
-  SubjectZone: 'SubjectZone',
-  Checkin: 'Checkin',
   EventLog: 'EventLog',
   SystemLog: 'SystemLog',
   RequestLog: 'RequestLog',
@@ -140,10 +140,65 @@ export const SubjectScalarFieldEnum = {
   created_by: 'created_by',
   created_at: 'created_at',
   update_at: 'update_at',
-  deleted_at: 'deleted_at'
+  deleted_at: 'deleted_at',
+  interval_minutes: 'interval_minutes',
+  grace_minutes: 'grace_minutes',
+  last_checkin_at: 'last_checkin_at',
+  last_notified_at: 'last_notified_at',
+  current_zone_id: 'current_zone_id'
 } as const
 
 export type SubjectScalarFieldEnum = (typeof SubjectScalarFieldEnum)[keyof typeof SubjectScalarFieldEnum]
+
+
+export const ZoneScalarFieldEnum = {
+  id: 'id',
+  subject_id: 'subject_id',
+  zone_name: 'zone_name',
+  type: 'type',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  radius: 'radius',
+  interval_minutes: 'interval_minutes',
+  grace_minutes: 'grace_minutes',
+  description: 'description',
+  created_by: 'created_by',
+  is_active: 'is_active',
+  created_at: 'created_at',
+  update_at: 'update_at'
+} as const
+
+export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
+
+
+export const AlertScalarFieldEnum = {
+  id: 'id',
+  subject_id: 'subject_id',
+  zone_id: 'zone_id',
+  checkin_id: 'checkin_id',
+  type: 'type',
+  message: 'message',
+  is_read: 'is_read',
+  created_at: 'created_at'
+} as const
+
+export type AlertScalarFieldEnum = (typeof AlertScalarFieldEnum)[keyof typeof AlertScalarFieldEnum]
+
+
+export const CheckinScalarFieldEnum = {
+  id: 'id',
+  subject_id: 'subject_id',
+  notes: 'notes',
+  image_id: 'image_id',
+  face_verified: 'face_verified',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  status: 'status',
+  checkin_time: 'checkin_time',
+  zone_id: 'zone_id'
+} as const
+
+export type CheckinScalarFieldEnum = (typeof CheckinScalarFieldEnum)[keyof typeof CheckinScalarFieldEnum]
 
 
 export const RefreshTokenScalarFieldEnum = {
@@ -194,44 +249,6 @@ export const FaceDataScalarFieldEnum = {
 } as const
 
 export type FaceDataScalarFieldEnum = (typeof FaceDataScalarFieldEnum)[keyof typeof FaceDataScalarFieldEnum]
-
-
-export const ZoneScalarFieldEnum = {
-  id: 'id',
-  zone_name: 'zone_name',
-  description: 'description',
-  created_by: 'created_by',
-  is_active: 'is_active',
-  created_at: 'created_at',
-  update_at: 'update_at'
-} as const
-
-export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
-
-
-export const SubjectZoneScalarFieldEnum = {
-  subject_id: 'subject_id',
-  zone_id: 'zone_id',
-  interval_minutes: 'interval_minutes',
-  created_at: 'created_at'
-} as const
-
-export type SubjectZoneScalarFieldEnum = (typeof SubjectZoneScalarFieldEnum)[keyof typeof SubjectZoneScalarFieldEnum]
-
-
-export const CheckinScalarFieldEnum = {
-  id: 'id',
-  subject_id: 'subject_id',
-  notes: 'notes',
-  image_id: 'image_id',
-  face_verified: 'face_verified',
-  latitude: 'latitude',
-  longitude: 'longitude',
-  status: 'status',
-  checkin_time: 'checkin_time'
-} as const
-
-export type CheckinScalarFieldEnum = (typeof CheckinScalarFieldEnum)[keyof typeof CheckinScalarFieldEnum]
 
 
 export const EventLogScalarFieldEnum = {

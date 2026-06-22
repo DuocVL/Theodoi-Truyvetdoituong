@@ -9,6 +9,22 @@
 * 🟢 You can import this file directly.
 */
 
+export const ZoneType = {
+  SAFE: 'SAFE',
+  RESTRICTED: 'RESTRICTED'
+} as const
+
+export type ZoneType = (typeof ZoneType)[keyof typeof ZoneType]
+
+
+export const AlertType = {
+  RESTRICTED_ENTRY: 'RESTRICTED_ENTRY',
+  MISSED_CHECKIN: 'MISSED_CHECKIN'
+} as const
+
+export type AlertType = (typeof AlertType)[keyof typeof AlertType]
+
+
 export const AccountType = {
   USER: 'USER',
   SUBJECT: 'SUBJECT'

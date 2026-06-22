@@ -2,6 +2,7 @@ package com.example.theodoi
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,7 @@ import com.example.theodoi.security.CryptoManager
 import com.example.theodoi.ui.HistoryActivity
 import com.example.theodoi.ui.auth.LoginActivity
 import com.example.theodoi.utils.FaceMath
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,6 +45,16 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnGoToVerify.setOnClickListener {
             startActivity(Intent(this, VerifyActivity::class.java))
+        }
+
+        //lay token test
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM_TEST", "Lấy token thất bại", task.exception)
+                return@addOnCompleteListener
+            }
+            val token = task.result
+            Log.d("FCM_TEST", "Token : $token")
         }
 
         // Bên trong hàm onCreate() của MainActivity.kt thiết lập:

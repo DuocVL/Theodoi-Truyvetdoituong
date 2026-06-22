@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "261837226669",
+    "project_id": "truy-vet-doi-tuong",
+    "storage_bucket": "truy-vet-doi-tuong.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:261837226669:android:bebefca9aa7777fd5b7c24",
+        "android_client_info": {
+          "package_name": "com.example.theodoi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAK9hlEGp4KP4rx2xQtCkp2yEsYLIOu1Gw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

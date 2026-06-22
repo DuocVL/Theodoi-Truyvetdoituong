@@ -460,6 +460,12 @@ export type UserUpdateOneRequiredWithoutSubjectNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSubjectInput, Prisma.UserUpdateWithoutSubjectInput>, Prisma.UserUncheckedUpdateWithoutSubjectInput>
 }
 
+export type UserCreateNestedOneWithoutZoneInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutZoneInput, Prisma.UserUncheckedCreateWithoutZoneInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutZoneInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
 export type UserUpdateOneRequiredWithoutZoneNestedInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutZoneInput, Prisma.UserUncheckedCreateWithoutZoneInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutZoneInput

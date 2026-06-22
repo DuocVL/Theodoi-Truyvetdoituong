@@ -5,7 +5,12 @@ import { prisma } from '../configs/prisma';
 import type { Checkin } from '../../generated/prisma/client';
 import type { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
 
-type CheckinCreationData = CreateCheckinDto & { subject_id: string; image_id?: string };
+type CheckinCreationData = CreateCheckinDto & { 
+  subject_id: string;
+  image_id?: string;
+  zone_id?: string | null;
+  status?: string;
+};
 
 export class CheckinRepository {
   public async create(data: CheckinCreationData): Promise<Checkin> {

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 android {
     namespace = "com.example.theodoi"
@@ -113,4 +114,8 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation("org.osmdroid:osmdroid-android:6.1.18")
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:34.13.0"))
+    implementation("com.google.firebase:firebase-messaging")
 }
