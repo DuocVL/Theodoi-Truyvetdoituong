@@ -13,8 +13,8 @@ import axios from 'axios';
 export interface User {
   id: string;
   username: string;
-  fullName: string;
-  role: 'admin' | 'user';
+  full_name: string;
+  role: 'ADMIN' | 'USER';
 }
 
 export interface RegisterData {
@@ -144,6 +144,34 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+// Thêm vào src/services/api.ts của bạn
+export interface CreateZonePayload {
+  subject_id: string;
+  zone_name: string;
+  type: 'SAFE' | 'RESTRICTED';
+  latitude: number;
+  longitude: number;
+  radius: number;
+  interval_minutes?: number;
+  grace_minutes?: number;
+  description?: string;
+}
+
+export interface Zone {
+  id: string;
+  subject_id: string;
+  zone_name: string;
+  type: 'SAFE' | 'RESTRICTED';
+  latitude: number;
+  longitude: number;
+  radius: number; // đơn vị: mét
+  interval_minutes?: number;
+  grace_minutes?: number;
+  description?: string;
+  is_active: boolean;
+  createdAt?: string;
+}
+
 // ==================================================================
 // API CLIENT CONFIGURATION
 // ==================================================================
@@ -270,8 +298,8 @@ export const activateSubjectAccount = async (data: { token: string; username: st
 };
 
 export const getMe = async (): Promise<User> => {
-  const response = await apiClient.get<User>('/auth/me');
-  return response.data;
+  const response = await apiClient.get('/auth/me');
+  return response.data.user;
 };
 
 export const forgotPassword = async (email: string): Promise<{ message: string }> => {
@@ -423,4 +451,59 @@ export const exportCheckinsReportExcel = async (subjectId: string, startDate: st
   });
   return response.data;
 };
+
+// Lấy danh sách zone theo từng đối tượng cụ thể
+export const getZonesBySubject = async (subjectId: string): Promise<Zone[]> => {
+  // Đồng bộ query param 'subjectId' khớp với Controller: req.query.subjectId
+  const response = await apiClient.get(`/zones?subjectId=${subjectId}`); 
+  return response.data.data; // Sửa lỗi 'zones.map is not a function' bằng cách lấy đúng thuộc tính .data nội bộ
+};
+
+export const createZone = (
+  data: Omit<Zone, "_id" | "createdAt" | "id"> & { subject_id: string }
+) => {
+  return apiClient.post('/zones', data);
+};
+
+// 2. Hàm cập nhật: body truyền lên cũng loại bỏ id
+export const updateZone = (
+  id: string, 
+  data: Omit<Zone, "_id" | "createdAt" | "subject_id" | "id">
+) => {
+  return apiClient.put(`/zones/${id}`, data);
+};
+
+// Xóa vùng
+export const deleteZone = async (id: string): Promise<void> => {
+  await apiClient.delete(`/zones/${id}`);
+};
+
+export const getSystemLogs = async (params: { 
+  page?: number; 
+  limit?: number; 
+  category?: string; 
+  userId?: string; 
+  subjectId?: string;
+  startDate?: any;
+  endDate?: any;
+}): Promise<any> => {
+  const response = await apiClient.get('/logs', { params });
+  return response.data;
+};
+
+export const getDetailLog = async(id: string): Promise<any> => {
+  const response = await apiClient.get(`/logs/${id}`);
+  return response.data;
+}
+
+export const getAllUsersApi = async (fullName?: string, role?: string) : Promise<any> => {
+  const reponse = await apiClient.get('/users', { params: {fullName, role} });
+  return  reponse.data
+}
+
+export const deleteUserApi = async (id: string) : Promise<any> => {
+  const reponse = await apiClient.get(`/users/${id}`);
+  return  reponse.data
+}
+
 

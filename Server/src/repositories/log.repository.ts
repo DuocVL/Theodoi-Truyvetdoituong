@@ -1,64 +1,51 @@
 import { Prisma } from "../../generated/prisma/client";
 import { prisma } from "../configs/prisma";
 
-// Create operations
-export async function createRequestLog(data: Prisma.RequestLogCreateInput) {
-    return await prisma.requestLog.create({
-        data
-    });
-}
-
 export async function createSystemLog(data: Prisma.SystemLogCreateInput) {
-    return await prisma.systemLog.create({
-        data
-    });
+    return await prisma.systemLog.create({ data });
 }
 
-// Get operations
-export async function getRequestLogs(options: { page: number, limit: number }) {
-    const { page, limit } = options;
-    const skip = (page - 1) * limit;
-    const [logs, total] = await Promise.all([
-        prisma.requestLog.findMany({
-            skip,
-            take: limit,
-            orderBy: {
-                created_at: 'desc'
+export async function getSystemLogs(options: any) {
+    const { page, limit, userId, subjectId, category, startDate, endDate } = options;
+
+    // Loại bỏ các key undefined để Prisma không query nhầm
+    const where: Prisma.SystemLogWhereInput = {
+        ...(userId && { user_id: userId }),
+        ...(subjectId && { subject_id: subjectId }),
+        ...(category && { category }),
+        ...( (startDate || endDate) && {
+            created_at: {
+                ...(startDate && { gte: startDate }),
+                ...(endDate && { lte: endDate }),
             }
-        }),
-        prisma.requestLog.count()
-    ]);
-    return { logs, total, page, limit };
-}
-
-export async function getSystemLogs(options: { page: number, limit: number, userId?: string, entity?: string }) {
-    const { page, limit, userId, entity } = options;
-    const skip = (page - 1) * limit;
-    const where: Prisma.SystemLogWhereInput = {};
-    if (userId) {
-        where.user_id = userId;
-    }
-    if (entity) {
-        where.entity = entity;
-    }
+        })
+    };
 
     const [logs, total] = await Promise.all([
         prisma.systemLog.findMany({
             where,
-            skip,
+            skip: (page - 1) * limit,
             take: limit,
-            orderBy: {
-                created_at: 'desc'
-            },
-            include: {
-                user: {
-                    select: {
-                        full_name: true
-                    }
-                }
+            orderBy: { created_at: 'desc' },
+            select: {
+                id: true,
+                created_at: true,
+                category: true,
+                action: true,
+                ip_address: true,
+                status_code: true,
+                duration_ms: true,
+                user: { select: { full_name: true } },
+                subject: { select: { full_name: true } }
+                // KHÔNG chọn old_data/new_data ở đây để tránh tràn RAM
             }
         }),
         prisma.systemLog.count({ where })
     ]);
     return { logs, total, page, limit };
+}
+
+// Thêm hàm lấy chi tiết (dùng cho Drawer)
+export async function getLogDetail(id: string) {
+    return await prisma.systemLog.findUnique({ where: { id } });
 }

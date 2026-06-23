@@ -1,7 +1,7 @@
 import { prisma } from '../configs/prisma';
 import { AlertRepository } from '../repositories/alert.repository';
 import { NotificationService } from '../services/notification.service';
-import { logger } from '../utils/logger';
+import { logger } from '../utils/log-helper';
 
 export class ComplianceService {
   private alertRepository = new AlertRepository();

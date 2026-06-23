@@ -10,7 +10,7 @@ import React, { type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTachometerAlt, FaMapMarkedAlt, FaSignOutAlt, FaAddressBook } from 'react-icons/fa';
+import { FaTachometerAlt, FaMapMarkedAlt, FaSignOutAlt, FaAddressBook, FaShieldAlt, FaUserAlt } from 'react-icons/fa';
 
 // ==================================================================
 // STYLED COMPONENTS
@@ -122,7 +122,8 @@ interface LayoutProps {
  */
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Lấy hàm `logout` từ AuthContext để xử lý đăng xuất.
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
+
   // Lấy hàm `navigate` từ react-router-dom để chuyển hướng trang.
   const navigate = useNavigate();
 
@@ -153,6 +154,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <FaMapMarkedAlt />
             <span>Bản đồ</span>
           </StyledNavLink>
+          {user?.role === "ADMIN" && (
+            <StyledNavLink to="/admin/logs">
+              <FaShieldAlt /> {/* Cần cài react-icons/fa */}
+              <span>Logs Hệ thống</span>
+            </StyledNavLink>)}
+            {user?.role === "ADMIN" && (
+            <StyledNavLink to="/admin/users">
+              <FaUserAlt /> {/* Cần cài react-icons/fa */}
+              <span>Quản lý User</span>
+            </StyledNavLink>)}
+
         </Nav>
         {/* Nút đăng xuất ở cuối Sidebar */}
         <LogoutButton onClick={handleLogout}>

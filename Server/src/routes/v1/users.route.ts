@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import UserController from '../../controllers/users.controller';
-import { authMiddleware } from '../../middlewares/auth.middleware';// Import the new RBAC middleware
-import { UserAccountRole } from '../../../generated/prisma/client'; // Import the Role enum
+import { authMiddleware } from '../../middlewares/auth.middleware';
 
 
 class UsersRoute {
@@ -17,11 +16,10 @@ class UsersRoute {
     // All user management routes are protected and restricted to ADMINs.
     this.router.use(authMiddleware);
 
-    // this.router.get(`${this.path}`, this.userController.getUsers);
-    // this.router.get(`${this.path}/:id`, this.userController.getUserById);
-    // this.router.post(`${this.path}`, this.userController.createUser);
-    // this.router.put(`${this.path}/:id`, this.userController.updateUser);
-    // this.router.delete(`${this.path}/:id`, this.userController.deleteUser);
+    this.router.get(`/`, this.userController.getAll);
+    this.router.get(`/:id`, this.userController.getById);
+    this.router.put(`/:id`, this.userController.update);
+    this.router.delete(`/:id`, this.userController.delete);
   }
 }
 

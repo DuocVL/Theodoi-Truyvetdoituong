@@ -60,11 +60,8 @@ export const ModelName = {
   Checkin: 'Checkin',
   RefreshToken: 'RefreshToken',
   PasswordResetToken: 'PasswordResetToken',
-  Device: 'Device',
   FaceData: 'FaceData',
-  EventLog: 'EventLog',
   SystemLog: 'SystemLog',
-  RequestLog: 'RequestLog',
   Image: 'Image',
   spatial_ref_sys: 'spatial_ref_sys'
 } as const
@@ -178,7 +175,6 @@ export const AlertScalarFieldEnum = {
   checkin_id: 'checkin_id',
   type: 'type',
   message: 'message',
-  is_read: 'is_read',
   created_at: 'created_at'
 } as const
 
@@ -225,22 +221,6 @@ export const PasswordResetTokenScalarFieldEnum = {
 export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
 
 
-export const DeviceScalarFieldEnum = {
-  id: 'id',
-  account_id: 'account_id',
-  device_token: 'device_token',
-  device_uuid: 'device_uuid',
-  platform: 'platform',
-  app_version: 'app_version',
-  is_active: 'is_active',
-  is_trusted: 'is_trusted',
-  last_seen_at: 'last_seen_at',
-  created_at: 'created_at'
-} as const
-
-export type DeviceScalarFieldEnum = (typeof DeviceScalarFieldEnum)[keyof typeof DeviceScalarFieldEnum]
-
-
 export const FaceDataScalarFieldEnum = {
   id: 'id',
   subject_id: 'subject_id',
@@ -251,20 +231,11 @@ export const FaceDataScalarFieldEnum = {
 export type FaceDataScalarFieldEnum = (typeof FaceDataScalarFieldEnum)[keyof typeof FaceDataScalarFieldEnum]
 
 
-export const EventLogScalarFieldEnum = {
-  id: 'id',
-  subject_id: 'subject_id',
-  event_type: 'event_type',
-  description: 'description',
-  created_at: 'created_at'
-} as const
-
-export type EventLogScalarFieldEnum = (typeof EventLogScalarFieldEnum)[keyof typeof EventLogScalarFieldEnum]
-
-
 export const SystemLogScalarFieldEnum = {
   id: 'id',
   user_id: 'user_id',
+  subject_id: 'subject_id',
+  category: 'category',
   action: 'action',
   entity: 'entity',
   entity_id: 'entity_id',
@@ -272,32 +243,12 @@ export const SystemLogScalarFieldEnum = {
   new_data: 'new_data',
   ip_address: 'ip_address',
   user_agent: 'user_agent',
-  device_id: 'device_id',
-  request_id: 'request_id',
-  status: 'status',
-  error: 'error',
+  duration_ms: 'duration_ms',
+  status_code: 'status_code',
   created_at: 'created_at'
 } as const
 
 export type SystemLogScalarFieldEnum = (typeof SystemLogScalarFieldEnum)[keyof typeof SystemLogScalarFieldEnum]
-
-
-export const RequestLogScalarFieldEnum = {
-  id: 'id',
-  user_id: 'user_id',
-  method: 'method',
-  path: 'path',
-  status_code: 'status_code',
-  duration_ms: 'duration_ms',
-  ip_address: 'ip_address',
-  user_agent: 'user_agent',
-  device_id: 'device_id',
-  request_body: 'request_body',
-  response_body: 'response_body',
-  created_at: 'created_at'
-} as const
-
-export type RequestLogScalarFieldEnum = (typeof RequestLogScalarFieldEnum)[keyof typeof RequestLogScalarFieldEnum]
 
 
 export const ImageScalarFieldEnum = {

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpException } from "../exceptions/http-exception"; // Correctly imported
-import { logger } from "../utils/logger";
+import { logger } from "../utils/log-helper";
 import { env } from "../configs/env";
 
 /**

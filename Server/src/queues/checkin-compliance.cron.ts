@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import { ComplianceService } from '../services/compliance.service';
-import { logger } from '../utils/logger';
+import { logger } from '../utils/log-helper';
 
 const complianceService = new ComplianceService();
 

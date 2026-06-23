@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '../utils/log-helper';
 // import admin from 'firebase-admin'; // bật khi đã cấu hình firebase-admin ở configs/
 
 export class NotificationService {

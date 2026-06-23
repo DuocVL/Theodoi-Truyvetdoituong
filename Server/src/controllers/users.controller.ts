@@ -7,16 +7,25 @@ import { z } from 'zod';
 class UserController {
 
   public getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
-      const users = await userService.findAllUsers();
-      res.status(200).json({ data: users, message: 'findAll' });
-    } catch (error) {
-      next(error);
-    }
-  };
+  try {
+    // Trích xuất cả fullName và role
+    const fullName = req.query.fullName as string;
+    const role = req.query.role as string;
+    
+    const users = await userService.findAllUsers(fullName, role);
+    res.status(200).json({ data: users, message: 'findAll' });
+  } catch (error) {
+    next(error);
+  }
+};
 
   public getById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const role = req.role?.toUpperCase();
+      if (role !== 'ADMIN' && role !== 'USER') {
+        res.status(403).json({ message: 'Forbidden' });
+        return;
+      }
       const userId = z.string().parse(req.params.id);
       const user = await userService.findUserById(userId);
       res.status(200).json({ data: user, message: 'findOne' });
@@ -38,6 +47,11 @@ class UserController {
 
   public delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      const role = req.role?.toUpperCase();
+      if (role !== 'ADMIN' && role !== 'USER') {
+        res.status(403).json({ message: 'Forbidden' });
+        return;
+      }
       const userId = z.string().parse(req.params.id);
       await userService.deleteUser(userId);
       res.status(200).json({ message: 'deleted' });

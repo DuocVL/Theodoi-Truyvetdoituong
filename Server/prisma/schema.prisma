@@ -6,7 +6,7 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  extensions = [postgis, vector]
+  extensions = [vector]
 }
 
 model Account {
@@ -18,7 +18,6 @@ model Account {
   status              AccountStatus        @default(PENDING_ACTIVATION)
   created_at          DateTime             @default(now())
   activationTokens    ActivationToken[]
-  devices             Device[]
   passwordResetTokens PasswordResetToken[]
   refreshToken        RefreshToken[]
   subject             Subject?
@@ -48,49 +47,49 @@ model User {
   created_at DateTime        @default(now())
   update_at  DateTime        @updatedAt
 
-  subject    Subject[]       @relation("UserToSubject")
-  auditLogs  SystemLog[]     @relation("UserToSystemLog")
-  account    Account         @relation(fields: [account_id], references: [id])
-  avatar     Image?          @relation("UserToAvatar", fields: [avatar_id], references: [id])
-  zone       Zone[]          @relation("UserToZone")
+  subject   Subject[]   @relation("UserToSubject")
+  systemLogs SystemLog[] @relation("UserToSystemLog")
+  account   Account     @relation(fields: [account_id], references: [id])
+  avatar    Image?      @relation("UserToAvatar", fields: [avatar_id], references: [id])
+  zone      Zone[]      @relation("UserToZone")
 
   @@map("users")
 }
 
 model Subject {
-  id               String        @id @default(uuid())
-  account_id       String        @unique
-  code             String        @unique @default(uuid())
-  full_name        String
-  dob              DateTime?
-  gender           String?
-  id_number        String?
-  address          String?
-  phone            String?
-  status           SubjectStatus @default(INACTIVE)
+  id         String        @id @default(uuid())
+  account_id String        @unique
+  code       String        @unique @default(uuid())
+  full_name  String
+  dob        DateTime?
+  gender     String?
+  id_number  String?
+  address    String?
+  phone      String?
+  status     SubjectStatus @default(INACTIVE)
 
   monitoring_start DateTime?
   monitoring_end   DateTime?
-  avatar_id        String?       @unique
+  avatar_id        String?   @unique
   created_by       String
-  created_at       DateTime      @default(now())
-  update_at        DateTime      @updatedAt
+  created_at       DateTime  @default(now())
+  update_at        DateTime  @updatedAt
   deleted_at       DateTime?
 
-  interval_minutes Int       @default(30)   // dùng khi KHÔNG thuộc zone nào
-  grace_minutes    Int       @default(5)    // NEW - thời gian chờ thêm sau khi nhắc (case không zone)
-  last_checkin_at  DateTime?                // NEW - lần checkin hợp lệ gần nhất (bất kể trong/ngoài zone)
-  last_notified_at DateTime?                // NEW - lần nhắc gần nhất cho nghĩa vụ hiện tại
-  current_zone_id  String?                  // NEW - zone SAFE đang là "ngữ cảnh" tính hạn, null = đang dùng default
+  interval_minutes Int       @default(30) // dùng khi KHÔNG thuộc zone nào
+  grace_minutes    Int       @default(5) // NEW - thời gian chờ thêm sau khi nhắc (case không zone)
+  last_checkin_at  DateTime? // NEW - lần checkin hợp lệ gần nhất (bất kể trong/ngoài zone)
+  last_notified_at DateTime? // NEW - lần nhắc gần nhất cho nghĩa vụ hiện tại
+  current_zone_id  String? // NEW - zone SAFE đang là "ngữ cảnh" tính hạn, null = đang dùng default
 
-  checkins         Checkin[]     @relation("SubjectToCheckin")
-  events           EventLog[]    @relation("SubjectToEventLog")
-  faceData         FaceData[]    @relation("SubjectToFaceData")
-  zones            Zone[]        @relation("SubjectToZones")
-  account          Account       @relation(fields: [account_id], references: [id])
-  avatar           Image?        @relation("SubjectToAvatar", fields: [avatar_id], references: [id])
-  creator          User          @relation("UserToSubject", fields: [created_by], references: [id])
-  currentZone      Zone?     @relation("SubjectCurrentZone", fields: [current_zone_id], references: [id], onDelete: SetNull)
+  checkins    Checkin[]   @relation("SubjectToCheckin")
+  systemLog   SystemLog[] @relation("SubjectToSystemLog")
+  faceData    FaceData[]  @relation("SubjectToFaceData")
+  zones       Zone[]      @relation("SubjectToZones")
+  account     Account     @relation(fields: [account_id], references: [id])
+  avatar      Image?      @relation("SubjectToAvatar", fields: [avatar_id], references: [id])
+  creator     User        @relation("UserToSubject", fields: [created_by], references: [id])
+  currentZone Zone?       @relation("SubjectCurrentZone", fields: [current_zone_id], references: [id], onDelete: SetNull)
 
   alertSubject Alert[] @relation("SubjectToAlert")
 
@@ -101,53 +100,51 @@ model Subject {
 }
 
 enum ZoneType {
-  SAFE          // Vùng an toàn/chỉ định (Đối tượng KHÔNG ĐƯỢC rời khỏi)
-  RESTRICTED    // Vùng cấm/hạn chế (Đối tượng KHÔNG ĐƯỢC đi vào)
+  SAFE // Vùng an toàn/chỉ định (Đối tượng KHÔNG ĐƯỢC rời khỏi)
+  RESTRICTED // Vùng cấm/hạn chế (Đối tượng KHÔNG ĐƯỢC đi vào)
 }
 
 model Zone {
-  id               String        @id @default(uuid())
-  subject_id       String        // Khóa ngoại liên kết trực tiếp tới Đối tượng
+  id               String   @id @default(uuid())
+  subject_id       String // Khóa ngoại liên kết trực tiếp tới Đối tượng
   zone_name        String
-  type             ZoneType      @default(SAFE)
+  type             ZoneType @default(SAFE)
   latitude         Float
   longitude        Float
   radius           Float
-  interval_minutes Int           @default(15) // Thời gian giãn cách yêu cầu checkin (phút)
-  grace_minutes   Int        @default(5)  // thời gian chờ thêm sau khi nhắc, trước khi tạo Alert
+  interval_minutes Int      @default(15) // Thời gian giãn cách yêu cầu checkin (phút)
+  grace_minutes    Int      @default(5) // thời gian chờ thêm sau khi nhắc, trước khi tạo Alert
   description      String?
-  created_by       String        // ID của User (Cán bộ) tạo vùng này
-  is_active        Boolean       @default(true)
-  created_at       DateTime      @default(now())
-  update_at        DateTime      @updatedAt
+  created_by       String // ID của User (Cán bộ) tạo vùng này
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(now())
+  update_at        DateTime @updatedAt
 
-  subject          Subject       @relation("SubjectToZones", fields: [subject_id], references: [id], onDelete: Cascade)
-  creator          User          @relation("UserToZone", fields: [created_by], references: [id])
-  subjectsCurrent  Subject[]     @relation("SubjectCurrentZone")
-  
-  alertZone Alert[] @relation("ZoneToAlert")
-  checkins Checkin[] @relation("ZoneToCheckin")
+  subject         Subject   @relation("SubjectToZones", fields: [subject_id], references: [id], onDelete: Cascade)
+  creator         User      @relation("UserToZone", fields: [created_by], references: [id])
+  subjectsCurrent Subject[] @relation("SubjectCurrentZone")
+
+  alertZone Alert[]   @relation("ZoneToAlert")
+  checkins  Checkin[] @relation("ZoneToCheckin")
 
   @@map("zones")
-  
 }
 
 enum AlertType {
-  RESTRICTED_ENTRY   // checkin/vị trí rơi vào vùng cấm
-  MISSED_CHECKIN     // quá hạn checkin ở vùng an toàn, đã nhắc nhưng không checkin
+  RESTRICTED_ENTRY // checkin/vị trí rơi vào vùng cấm
+  MISSED_CHECKIN // quá hạn checkin ở vùng an toàn, đã nhắc nhưng không checkin
 }
 
 model Alert {
-  id          String    @id @default(uuid())
-  subject_id  String
-  zone_id     String?
-  checkin_id  String?            // liên kết checkin gây ra alert, nếu có
-  type        AlertType
-  message     String?
-  is_read     Boolean   @default(false)
-  created_at  DateTime  @default(now())
+  id         String    @id @default(uuid())
+  subject_id String
+  zone_id    String?
+  checkin_id String? // liên kết checkin gây ra alert, nếu có
+  type       AlertType
+  message    String?
+  created_at DateTime  @default(now())
 
-  subject Subject @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
+  subject Subject  @relation("SubjectToAlert", fields: [subject_id], references: [id], onDelete: Cascade)
   zone    Zone?    @relation("ZoneToAlert", fields: [zone_id], references: [id], onDelete: SetNull)
   checkin Checkin? @relation("CheckinToAlert", fields: [checkin_id], references: [id], onDelete: SetNull)
 
@@ -156,21 +153,21 @@ model Alert {
 }
 
 model Checkin {
-  id            String                                @id @default(uuid())
+  id            String  @id @default(uuid())
   subject_id    String
   notes         String?
-  image_id      String?                               @unique
-  face_verified Boolean                               @default(false)
+  image_id      String? @unique
+  face_verified Boolean @default(false)
 
-  latitude          Float
-  longitude         Float
-  status        String                                @default("ON_TIME") // Consider an enum for this
-  checkin_time  DateTime                              @default(now())
-  zone_id String?
-  zone    Zone?   @relation("ZoneToCheckin", fields: [zone_id], references: [id], onDelete: SetNull)
+  latitude     Float
+  longitude    Float
+  status       String   @default("ON_TIME") // Consider an enum for this
+  checkin_time DateTime @default(now())
+  zone_id      String?
+  zone         Zone?    @relation("ZoneToCheckin", fields: [zone_id], references: [id], onDelete: SetNull)
 
-  image   Image?  @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
-  subject Subject @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
+  image        Image?  @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
+  subject      Subject @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
   alertCheckin Alert[] @relation("CheckinToAlert")
 
   @@index([subject_id, checkin_time])
@@ -201,23 +198,6 @@ model PasswordResetToken {
   @@map("password_reset_tokens")
 }
 
-model Device {
-  id           String    @id @default(uuid())
-  account_id   String
-  device_token String?
-  device_uuid  String
-  platform     String
-  app_version  String?
-  is_active    Boolean   @default(true)
-  is_trusted   Boolean   @default(true)
-  last_seen_at DateTime?
-  created_at   DateTime  @default(now())
-  account      Account   @relation(fields: [account_id], references: [id])
-
-  @@unique([account_id, device_uuid])
-  @@map("devices")
-}
-
 model FaceData {
   id         String                @id @default(uuid())
   subject_id String                @unique
@@ -229,58 +209,35 @@ model FaceData {
   @@map("face_data")
 }
 
-model EventLog {
-  id          String   @id @default(uuid())
-  subject_id  String
-  event_type  String
-  description String
-  created_at  DateTime @default(now())
-  subject     Subject  @relation("SubjectToEventLog", fields: [subject_id], references: [id], onDelete: Cascade)
-
-  @@index([subject_id, created_at])
-  @@map("event_logs")
-}
-
 model SystemLog {
-  id         String   @id @default(uuid())
+  id         String  @id @default(uuid())
   user_id    String?
-  action     String
-  entity     String?
-  entity_id  String?
-  old_data   Json?
-  new_data   Json?
+  subject_id String? // Đối tượng bị tác động (THÊM MỚI để truy vết đối tượng)
+
+  // Phân loại log để dễ lọc: 
+  // 'SYSTEM' (đăng nhập, lỗi), 'SUBJECT_ACTIVITY' (checkin, di chuyển), 'AUDIT' (cán bộ sửa hồ sơ)
+  category String @default("SYSTEM")
+  action   String // Hành động cụ thể: "CHECKIN", "ZONE_VIOLATION", "PROFILE_UPDATE"
+
+  entity    String?
+  entity_id String?
+
+  old_data Json?
+  new_data Json?
+
   ip_address String?
   user_agent String?
-  device_id  String?
-  request_id String?
-  status     String?
-  error      String?
+  duration_ms Int?
+  status_code Int?
+
   created_at DateTime @default(now())
-  user       User?    @relation("UserToSystemLog", fields: [user_id], references: [id], onDelete: SetNull)
 
-  @@index([user_id])
-  @@index([entity, entity_id])
-  @@index([created_at])
-  @@map("system_log")
-}
+  user    User?    @relation("UserToSystemLog", fields: [user_id], references: [id],onDelete: Cascade)
+  subject Subject? @relation("SubjectToSystemLog", fields: [subject_id], references: [id],onDelete: Cascade)
 
-model RequestLog {
-  id            String   @id @default(uuid())
-  user_id       String?
-  method        String
-  path          String
-  status_code   Int
-  duration_ms   Int
-  ip_address    String?
-  user_agent    String?
-  device_id     String?
-  request_body  Json?
-  response_body Json?
-  created_at    DateTime @default(now())
-
-  @@index([user_id])
-  @@index([created_at])
-  @@map("request_log")
+  @@index([category, created_at(sort: Desc)])
+  @@index([user_id, created_at(sort: Desc)])
+  @@index([subject_id, created_at(sort: Desc)])
 }
 
 model Image {

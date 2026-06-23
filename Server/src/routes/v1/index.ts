@@ -5,7 +5,6 @@ import UserRoute from './users.route'; // Corrected import
 import SubjectRoute from './subjects.route';
 import ZoneRoute from './zones.route';
 import logRoutes from './log.route';
-import trackingRoutes from './tracking.route';
 import FaceRoute from './face.route';
 import imageRouter from './image.route'; // Import the new image router
 import CheckinRoute from './checkin.route';
@@ -26,8 +25,6 @@ router.use(subjectRoute.path, subjectRoute.router);
 router.use(zoneRoute.path, zoneRoute.router);
 // Truy xuất nhật ký/audit logs
 router.use('/logs', logRoutes);
-// Truy xuất dữ liệu theo dõi/vị trí
-router.use('/tracking', trackingRoutes);
 // Xử lý nhận diện/đăng ký khuôn mặt
 router.use('/face', FaceRoute);
 

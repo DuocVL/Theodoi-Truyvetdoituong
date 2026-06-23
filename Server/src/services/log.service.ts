@@ -1,9 +1,10 @@
 import * as logRepository from '../repositories/log.repository';
 
-export async function getRequestLogs(page: number, limit: number) {
-    return await logRepository.getRequestLogs({ page, limit });
+// Dùng cho Dashboard: Truy vấn linh hoạt theo loại log (HTTP, AUDIT, SUBJECT_EVENT)
+export async function getLogs(page: number, limit: number, filters: any) {
+    return await logRepository.getSystemLogs({ page, limit, ...filters });
 }
 
-export async function getSystemLogs(page: number, limit: number, userId?: string, entity?: string) {
-    return await logRepository.getSystemLogs({ page, limit, userId, entity });
+export async function getLogDetail(id: string) {
+    return await logRepository.getLogDetail(id);
 }

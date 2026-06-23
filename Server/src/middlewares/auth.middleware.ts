@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { env } from '../configs/env';
 import * as accountRepository from '../repositories/account.repository';
+import { getUserByAccountId } from '../repositories/user.repository';
 import { AccountPayload } from '../types/data';
 
 /**
@@ -76,6 +77,13 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         req.account = decoded;
 
         req.role=account.type;
+        if(req.role == "USER"){
+            const user = await getUserByAccountId(req.account?.id)
+            if(!user){
+                return res.status(401).json({ message: "Unauthorized: Account not found" });
+            }
+            req.role = user.role
+        }
 
         // ✔️ Cho phép request tiếp tục tới controller
         next();

@@ -1,38 +1,33 @@
 import { Request, Response, NextFunction } from 'express';
 import * as logService from '../services/log.service';
 
-export async function getRequestLogs(req: Request, res: Response, next: NextFunction) {
+// controllers/log.controller.ts
+export async function getAllLogs(req: Request, res: Response, next: NextFunction) {
     try {
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
-        const data = await logService.getRequestLogs(page, limit);
+        // Validation cơ bản
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20)); // Giới hạn limit tối đa 100
+        
+        const filters = {
+            category: req.query.category as string,
+            userId: req.query.userId as string,
+            subjectId: req.query.subjectId as string,
+            startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
+            endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined,
+        };
+
+        const data = await logService.getLogs(page, limit, filters);
         res.json(data);
     } catch (error) {
         next(error);
     }
 }
 
-export async function getAuthLogs(req: Request, res: Response, next: NextFunction) {
+export async function getLogById(req: Request, res: Response, next: NextFunction) {
     try {
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
-        const accountId = req.query.accountId as string | undefined;
-        const data = await logService.getAuthLogs(page, limit, accountId);
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function getSystemLogs(req: Request, res: Response, next: NextFunction) {
-    try {
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
-        const userId = req.query.userId as string | undefined;
-        const entity = req.query.entity as string | undefined;
-        const data = await logService.getSystemLogs(page, limit, userId, entity);
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
+        const { id } = req.params;
+        const log = await logService.getLogDetail(id as string);
+        if (!log) return res.status(404).json({ message: "Log not found" });
+        res.json(log);
+    } catch (error) { next(error); }
 }

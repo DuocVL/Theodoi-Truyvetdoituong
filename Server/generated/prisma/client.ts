@@ -87,30 +87,15 @@ export type RefreshToken = Prisma.RefreshTokenModel
  */
 export type PasswordResetToken = Prisma.PasswordResetTokenModel
 /**
- * Model Device
- * 
- */
-export type Device = Prisma.DeviceModel
-/**
  * Model FaceData
  * 
  */
 export type FaceData = Prisma.FaceDataModel
 /**
- * Model EventLog
- * 
- */
-export type EventLog = Prisma.EventLogModel
-/**
  * Model SystemLog
  * 
  */
 export type SystemLog = Prisma.SystemLogModel
-/**
- * Model RequestLog
- * 
- */
-export type RequestLog = Prisma.RequestLogModel
 /**
  * Model Image
  * 
