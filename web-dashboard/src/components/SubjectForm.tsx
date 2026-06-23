@@ -1,255 +1,83 @@
 
-/**
- * @file SubjectForm.tsx
- * @description
- * Component biểu mẫu (form) có thể tái sử dụng để tạo mới hoặc chỉnh sửa thông tin của một đối tượng (Subject).
- */
+
 
 import React from 'react';
-import styled from 'styled-components';
+import { Form, Input, Select, DatePicker, InputNumber, Row, Col, Button, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { type Subject } from '../services/api';
-import Spinner from './Spinner';
-import { Link } from 'react-router-dom';
-
-// ==================================================================
-// TYPE DEFINITIONS
-// ==================================================================
+import dayjs from 'dayjs'; // Giả sử bạn để type ở file riêng
 
 export type SubjectFormData = Omit<Subject, '_id' | 'createdAt' | 'updatedAt' | 'account'>;
 
 interface SubjectFormProps {
   initialData?: Partial<SubjectFormData>;
-  onSubmit: (data: Partial<SubjectFormData>) => Promise<void>; // Allow partial data for submission
+  onSubmit: (data: any) => Promise<void>;
   isSaving: boolean;
   submitButtonText: string;
-  error: string | null;
+  error?: string | null;
 }
 
-// ==================================================================
-// STYLED COMPONENTS
-// ==================================================================
+const SubjectForm: React.FC<SubjectFormProps> = ({ initialData, onSubmit, isSaving, submitButtonText }) => {
+  const [form] = Form.useForm();
+  const navigate = useNavigate();
 
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FormRow = styled.div`
-  grid-column: 1 / -1;
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const FormLabel = styled.label`
-  font-weight: 600;
-  color: #4a5568;
-`;
-
-const FormInput = styled.input`
-  padding: 0.75rem;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  font-size: 1rem;
-  &:focus {
-      outline: none;
-      border-color: #4299e1;
-      box-shadow: 0 0 0 1px #4299e1;
-  }
-  &:disabled {
-    background-color: #e2e8f0;
-  }
-`;
-
-const FormSelect = styled.select`
-  padding: 0.75rem;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  font-size: 1rem;
-  background-color: white;
-  &:disabled {
-    background-color: #e2e8f0;
-  }
-`;
-
-const ErrorMessage = styled.p`
-    color: #e53e3e;
-    background-color: #fed7d7;
-    padding: 1rem;
-    border-radius: 6px;
-    margin: 1.5rem 0 0 0;
-    text-align: center;
-`;
-
-const ButtonContainer = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-`;
-
-const SubmitButton = styled.button`
-    padding: 0.75rem 1.5rem;
-    background-color: #3182ce;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background-color 0.2s;
-
-    &:hover:not(:disabled) { background-color: #2b6cb0; }
-    &:disabled { background-color: #a0aec0; cursor: not-allowed; }
-`;
-
-const CancelLink = styled(Link)`
-    padding: 0.75rem 1.5rem;
-    background-color: #718096;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: background-color 0.2s;
-    &:hover { background-color: #4a5568; }
-`;
-
-// ==================================================================
-// FORM COMPONENT
-// ==================================================================
-
-const SubjectForm: React.FC<SubjectFormProps> = ({ initialData, onSubmit, isSaving, submitButtonText, error }) => {
-
-  const [formData, setFormData] = React.useState<Partial<SubjectFormData>>({
-    email: '',
-    fullName: '',
-    dob: '',
-    gender: 'Other',
-    idNumber: '',
-    address: '',
-    phone: '',
-    monitoringStart: '',
-    monitoringEnd: '',
-    ...initialData,
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Create a copy of the data to process before submitting.
-    const dataToSubmit: Partial<SubjectFormData> = { ...formData };
-
-    // Convert local datetime strings to full ISO strings (UTC).
-    // If the field is empty, delete it to send `undefined` instead of `''`.
-    if (dataToSubmit.monitoringStart) {
-        dataToSubmit.monitoringStart = new Date(dataToSubmit.monitoringStart).toISOString();
-    } else {
-        delete dataToSubmit.monitoringStart;
-    }
-
-    if (dataToSubmit.monitoringEnd) {
-        dataToSubmit.monitoringEnd = new Date(dataToSubmit.monitoringEnd).toISOString();
-    } else {
-        delete dataToSubmit.monitoringEnd;
-    }
-
-    // Also ensure optional string fields are not sent as empty strings.
-    if (!dataToSubmit.dob) delete dataToSubmit.dob;
-    if (!dataToSubmit.idNumber) delete dataToSubmit.idNumber;
-    if (!dataToSubmit.address) delete dataToSubmit.address;
-    if (!dataToSubmit.phone) delete dataToSubmit.phone;
-
-    // Call the parent onSubmit with the processed data.
-    onSubmit(dataToSubmit);
+  // Xử lý khi submit form
+  const onFinish = async (values: any) => {
+    // Format dữ liệu trước khi gửi lên API
+    const processedData = {
+      ...values,
+      monitoringStart: values.monitoringStart ? values.monitoringStart.toISOString() : undefined,
+      monitoringEnd: values.monitoringEnd ? values.monitoringEnd.toISOString() : undefined,
+    };
+    await onSubmit(processedData);
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <FormGrid>
-        {/* Row 1: Full Name & Email */}
-        <FormGroup>
-          <FormLabel htmlFor="fullName">Họ và tên (*)</FormLabel>
-          <FormInput id="fullName" name="fullName" type="text" value={formData.fullName} onChange={handleChange} required disabled={isSaving} placeholder="Nguyễn Văn A" />
-        </FormGroup>
-        <FormGroup>
-          <FormLabel htmlFor="email">Email (*)</FormLabel>
-          <FormInput id="email" name="email" type="email" value={formData.email} onChange={handleChange} required disabled={isSaving} placeholder="subject@example.com" />
-        </FormGroup>
+    <Form
+      form={form}
+      layout="vertical"
+      initialValues={{
+        ...initialData,
+        gender: initialData?.gender || 'Other',
+        interval_minutes: initialData?.interval_minutes ?? 30,
+        grace_minutes: initialData?.grace_minutes ?? 5,
+        // Convert date string to dayjs object for AntD
+        monitoringStart: initialData?.monitoringStart ? dayjs(initialData.monitoringStart) : undefined,
+        monitoringEnd: initialData?.monitoringEnd ? dayjs(initialData.monitoringEnd) : undefined,
+      }}
+      onFinish={onFinish}
+    >
+      <Row gutter={24}>
+        <Col span={12}><Form.Item label="Họ tên" name="fullName" rules={[{ required: true }]}><Input /></Form.Item></Col>
+        <Col span={12}><Form.Item label="Email" name="email" rules={[{ required: true, type: 'email' }]}><Input /></Form.Item></Col>
+        
+        <Col span={12}><Form.Item label="Ngày sinh" name="dob"><Input type="date" /></Form.Item></Col>
+        <Col span={12}>
+          <Form.Item label="Giới tính" name="gender">
+            <Select>
+              <Select.Option value="Male">Nam</Select.Option>
+              <Select.Option value="Female">Nữ</Select.Option>
+              <Select.Option value="Other">Khác</Select.Option>
+            </Select>
+          </Form.Item>
+        </Col>
 
-        {/* Row 2: Date of Birth & Gender */}
-        <FormGroup>
-          <FormLabel htmlFor="dob">Ngày sinh</FormLabel>
-          <FormInput id="dob" name="dob" type="date" value={formData.dob ? formData.dob.split('T')[0] : ''} onChange={handleChange} disabled={isSaving} />
-        </FormGroup>
-        <FormGroup>
-          <FormLabel htmlFor="gender">Giới tính</FormLabel>
-          <FormSelect id="gender" name="gender" value={formData.gender} onChange={handleChange} disabled={isSaving}>
-            <option value="Male">Nam</option>
-            <option value="Female">Nữ</option>
-            <option value="Other">Khác</option>
-          </FormSelect>
-        </FormGroup>
+        <Col span={12}><Form.Item label="CCCD/CMND" name="idNumber"><Input /></Form.Item></Col>
+        <Col span={12}><Form.Item label="SĐT" name="phone"><Input /></Form.Item></Col>
+        
+        <Col span={24}><Form.Item label="Địa chỉ" name="address"><Input /></Form.Item></Col>
 
-        {/* Row 3: ID Number & Phone */}
-        <FormGroup>
-          <FormLabel htmlFor="idNumber">Số CCCD/CMND</FormLabel>
-          <FormInput id="idNumber" name="idNumber" type="text" value={formData.idNumber} onChange={handleChange} disabled={isSaving} />
-        </FormGroup>
-        <FormGroup>
-          <FormLabel htmlFor="phone">Số điện thoại</FormLabel>
-          <FormInput id="phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} disabled={isSaving} />
-        </FormGroup>
+        <Col span={12}><Form.Item label="Khoảng cách check-in (phút)" name="interval_minutes"><InputNumber min={1} style={{width:'100%'}} /></Form.Item></Col>
+        <Col span={12}><Form.Item label="Thời gian chờ (phút)" name="grace_minutes"><InputNumber min={0} style={{width:'100%'}} /></Form.Item></Col>
 
-        {/* Row 4: Address (Full Width) */}
-        <FormRow>
-          <FormGroup>
-            <FormLabel htmlFor="address">Địa chỉ</FormLabel>
-            <FormInput id="address" name="address" type="text" value={formData.address} onChange={handleChange} disabled={isSaving} />
-          </FormGroup>
-        </FormRow>
+        <Col span={12}><Form.Item label="Giờ bắt đầu" name="active_start_time"><Input type="time" /></Form.Item></Col>
+        <Col span={12}><Form.Item label="Giờ kết thúc" name="active_end_time"><Input type="time" /></Form.Item></Col>
+      </Row>
 
-        {/* Row 5: Monitoring Start & End */}
-        <FormGroup>
-          <FormLabel htmlFor="monitoringStart">Bắt đầu theo dõi</FormLabel>
-          <FormInput id="monitoringStart" name="monitoringStart" type="datetime-local" value={formData.monitoringStart ? formData.monitoringStart.slice(0, 16) : ''} onChange={handleChange} disabled={isSaving} />
-        </FormGroup>
-        <FormGroup>
-          <FormLabel htmlFor="monitoringEnd">Kết thúc theo dõi</FormLabel>
-          <FormInput id="monitoringEnd" name="monitoringEnd" type="datetime-local" value={formData.monitoringEnd ? formData.monitoringEnd.slice(0, 16) : ''} onChange={handleChange} disabled={isSaving} />
-        </FormGroup>
-
-      </FormGrid>
-
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-
-      <ButtonContainer>
-          <CancelLink to="/subjects">Hủy</CancelLink>
-          <SubmitButton type="submit" disabled={isSaving}>
-              {isSaving ? <Spinner size={20} /> : submitButtonText}
-          </SubmitButton>
-      </ButtonContainer>
+      <div style={{ textAlign: 'right', marginTop: '20px' }}>
+        <Button onClick={() => navigate('/subjects')} style={{ marginRight: '10px' }}>Hủy</Button>
+        <Button type="primary" htmlType="submit" loading={isSaving}>{submitButtonText}</Button>
+      </div>
     </Form>
   );
 };

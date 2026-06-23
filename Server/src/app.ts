@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -10,21 +9,21 @@ import v1Routes from './routes/v1';
 
 const app = express();
 
-// Define allowed origins
-const allowedOrigins = [env.FRONTEND_URL, 'http://localhost:5173'];
+const allowedOrigins = [env.FRONTEND_URL, 'http://localhost:5173'].filter(Boolean); // Loại bỏ các giá trị null/undefined
 
-// Middlewares
 app.use(cors({ 
     origin: (origin, callback) => {
-        // allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
+        // 1. Cho phép requests không có origin (như mobile, curl)
+        // 2. Kiểm tra origin có nằm trong danh sách cho phép không
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
         }
-        return callback(null, true);
     },
-    credentials: true 
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Nên chỉ định rõ các method
+    allowedHeaders: ['Content-Type', 'Authorization'] // Nên chỉ định rõ các header
 }));
 app.use(helmet());
 app.use(express.json());

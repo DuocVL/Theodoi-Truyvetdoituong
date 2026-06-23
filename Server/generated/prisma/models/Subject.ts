@@ -59,6 +59,8 @@ export type SubjectMinAggregateOutputType = {
   last_checkin_at: Date | null
   last_notified_at: Date | null
   current_zone_id: string | null
+  active_start_time: string | null
+  active_end_time: string | null
   fcm_token: string | null
 }
 
@@ -85,6 +87,8 @@ export type SubjectMaxAggregateOutputType = {
   last_checkin_at: Date | null
   last_notified_at: Date | null
   current_zone_id: string | null
+  active_start_time: string | null
+  active_end_time: string | null
   fcm_token: string | null
 }
 
@@ -111,6 +115,8 @@ export type SubjectCountAggregateOutputType = {
   last_checkin_at: number
   last_notified_at: number
   current_zone_id: number
+  active_start_time: number
+  active_end_time: number
   fcm_token: number
   _all: number
 }
@@ -149,6 +155,8 @@ export type SubjectMinAggregateInputType = {
   last_checkin_at?: true
   last_notified_at?: true
   current_zone_id?: true
+  active_start_time?: true
+  active_end_time?: true
   fcm_token?: true
 }
 
@@ -175,6 +183,8 @@ export type SubjectMaxAggregateInputType = {
   last_checkin_at?: true
   last_notified_at?: true
   current_zone_id?: true
+  active_start_time?: true
+  active_end_time?: true
   fcm_token?: true
 }
 
@@ -201,6 +211,8 @@ export type SubjectCountAggregateInputType = {
   last_checkin_at?: true
   last_notified_at?: true
   current_zone_id?: true
+  active_start_time?: true
+  active_end_time?: true
   fcm_token?: true
   _all?: true
 }
@@ -314,6 +326,8 @@ export type SubjectGroupByOutputType = {
   last_checkin_at: Date | null
   last_notified_at: Date | null
   current_zone_id: string | null
+  active_start_time: string | null
+  active_end_time: string | null
   fcm_token: string | null
   _count: SubjectCountAggregateOutputType | null
   _avg: SubjectAvgAggregateOutputType | null
@@ -363,6 +377,8 @@ export type SubjectWhereInput = {
   last_checkin_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   last_notified_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   current_zone_id?: Prisma.StringNullableFilter<"Subject"> | string | null
+  active_start_time?: Prisma.StringNullableFilter<"Subject"> | string | null
+  active_end_time?: Prisma.StringNullableFilter<"Subject"> | string | null
   fcm_token?: Prisma.StringNullableFilter<"Subject"> | string | null
   checkins?: Prisma.CheckinListRelationFilter
   systemLog?: Prisma.SystemLogListRelationFilter
@@ -398,6 +414,8 @@ export type SubjectOrderByWithRelationInput = {
   last_checkin_at?: Prisma.SortOrderInput | Prisma.SortOrder
   last_notified_at?: Prisma.SortOrderInput | Prisma.SortOrder
   current_zone_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  active_start_time?: Prisma.SortOrderInput | Prisma.SortOrder
+  active_end_time?: Prisma.SortOrderInput | Prisma.SortOrder
   fcm_token?: Prisma.SortOrderInput | Prisma.SortOrder
   checkins?: Prisma.CheckinOrderByRelationAggregateInput
   systemLog?: Prisma.SystemLogOrderByRelationAggregateInput
@@ -436,6 +454,8 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   last_checkin_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   last_notified_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   current_zone_id?: Prisma.StringNullableFilter<"Subject"> | string | null
+  active_start_time?: Prisma.StringNullableFilter<"Subject"> | string | null
+  active_end_time?: Prisma.StringNullableFilter<"Subject"> | string | null
   fcm_token?: Prisma.StringNullableFilter<"Subject"> | string | null
   checkins?: Prisma.CheckinListRelationFilter
   systemLog?: Prisma.SystemLogListRelationFilter
@@ -471,6 +491,8 @@ export type SubjectOrderByWithAggregationInput = {
   last_checkin_at?: Prisma.SortOrderInput | Prisma.SortOrder
   last_notified_at?: Prisma.SortOrderInput | Prisma.SortOrder
   current_zone_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  active_start_time?: Prisma.SortOrderInput | Prisma.SortOrder
+  active_end_time?: Prisma.SortOrderInput | Prisma.SortOrder
   fcm_token?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.SubjectCountOrderByAggregateInput
   _avg?: Prisma.SubjectAvgOrderByAggregateInput
@@ -505,6 +527,8 @@ export type SubjectScalarWhereWithAggregatesInput = {
   last_checkin_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Subject"> | Date | string | null
   last_notified_at?: Prisma.DateTimeNullableWithAggregatesFilter<"Subject"> | Date | string | null
   current_zone_id?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
+  active_start_time?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
+  active_end_time?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
   fcm_token?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
 }
 
@@ -527,6 +551,8 @@ export type SubjectCreateInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
@@ -562,6 +588,8 @@ export type SubjectUncheckedCreateInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -589,6 +617,8 @@ export type SubjectUpdateInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
@@ -624,6 +654,8 @@ export type SubjectUncheckedUpdateInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -655,6 +687,8 @@ export type SubjectCreateManyInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
 }
 
@@ -677,6 +711,8 @@ export type SubjectUpdateManyMutationInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -703,6 +739,8 @@ export type SubjectUncheckedUpdateManyInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -744,6 +782,8 @@ export type SubjectCountOrderByAggregateInput = {
   last_checkin_at?: Prisma.SortOrder
   last_notified_at?: Prisma.SortOrder
   current_zone_id?: Prisma.SortOrder
+  active_start_time?: Prisma.SortOrder
+  active_end_time?: Prisma.SortOrder
   fcm_token?: Prisma.SortOrder
 }
 
@@ -775,6 +815,8 @@ export type SubjectMaxOrderByAggregateInput = {
   last_checkin_at?: Prisma.SortOrder
   last_notified_at?: Prisma.SortOrder
   current_zone_id?: Prisma.SortOrder
+  active_start_time?: Prisma.SortOrder
+  active_end_time?: Prisma.SortOrder
   fcm_token?: Prisma.SortOrder
 }
 
@@ -801,6 +843,8 @@ export type SubjectMinOrderByAggregateInput = {
   last_checkin_at?: Prisma.SortOrder
   last_notified_at?: Prisma.SortOrder
   current_zone_id?: Prisma.SortOrder
+  active_start_time?: Prisma.SortOrder
+  active_end_time?: Prisma.SortOrder
   fcm_token?: Prisma.SortOrder
 }
 
@@ -1063,6 +1107,8 @@ export type SubjectCreateWithoutAccountInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
@@ -1096,6 +1142,8 @@ export type SubjectUncheckedCreateWithoutAccountInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -1139,6 +1187,8 @@ export type SubjectUpdateWithoutAccountInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
@@ -1172,6 +1222,8 @@ export type SubjectUncheckedUpdateWithoutAccountInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1199,6 +1251,8 @@ export type SubjectCreateWithoutCreatorInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
@@ -1232,6 +1286,8 @@ export type SubjectUncheckedCreateWithoutCreatorInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -1292,6 +1348,8 @@ export type SubjectScalarWhereInput = {
   last_checkin_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   last_notified_at?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   current_zone_id?: Prisma.StringNullableFilter<"Subject"> | string | null
+  active_start_time?: Prisma.StringNullableFilter<"Subject"> | string | null
+  active_end_time?: Prisma.StringNullableFilter<"Subject"> | string | null
   fcm_token?: Prisma.StringNullableFilter<"Subject"> | string | null
 }
 
@@ -1314,6 +1372,8 @@ export type SubjectCreateWithoutZonesInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
@@ -1348,6 +1408,8 @@ export type SubjectUncheckedCreateWithoutZonesInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -1379,6 +1441,8 @@ export type SubjectCreateWithoutCurrentZoneInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
@@ -1412,6 +1476,8 @@ export type SubjectUncheckedCreateWithoutCurrentZoneInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -1460,6 +1526,8 @@ export type SubjectUpdateWithoutZonesInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
@@ -1494,6 +1562,8 @@ export type SubjectUncheckedUpdateWithoutZonesInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1536,6 +1606,8 @@ export type SubjectCreateWithoutAlertSubjectInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
@@ -1570,6 +1642,8 @@ export type SubjectUncheckedCreateWithoutAlertSubjectInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -1612,6 +1686,8 @@ export type SubjectUpdateWithoutAlertSubjectInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
@@ -1646,6 +1722,8 @@ export type SubjectUncheckedUpdateWithoutAlertSubjectInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1672,6 +1750,8 @@ export type SubjectCreateWithoutCheckinsInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
@@ -1706,6 +1786,8 @@ export type SubjectUncheckedCreateWithoutCheckinsInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
@@ -1748,6 +1830,8 @@ export type SubjectUpdateWithoutCheckinsInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
@@ -1782,6 +1866,8 @@ export type SubjectUncheckedUpdateWithoutCheckinsInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1808,6 +1894,8 @@ export type SubjectCreateWithoutFaceDataInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
@@ -1842,6 +1930,8 @@ export type SubjectUncheckedCreateWithoutFaceDataInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -1884,6 +1974,8 @@ export type SubjectUpdateWithoutFaceDataInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
@@ -1918,6 +2010,8 @@ export type SubjectUncheckedUpdateWithoutFaceDataInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -1944,6 +2038,8 @@ export type SubjectCreateWithoutSystemLogInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
@@ -1978,6 +2074,8 @@ export type SubjectUncheckedCreateWithoutSystemLogInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
@@ -2020,6 +2118,8 @@ export type SubjectUpdateWithoutSystemLogInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
@@ -2054,6 +2154,8 @@ export type SubjectUncheckedUpdateWithoutSystemLogInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
@@ -2080,6 +2182,8 @@ export type SubjectCreateWithoutAvatarInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
@@ -2113,6 +2217,8 @@ export type SubjectUncheckedCreateWithoutAvatarInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
@@ -2156,6 +2262,8 @@ export type SubjectUpdateWithoutAvatarInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
@@ -2189,6 +2297,8 @@ export type SubjectUncheckedUpdateWithoutAvatarInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -2219,6 +2329,8 @@ export type SubjectCreateManyCreatorInput = {
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
   current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
 }
 
@@ -2241,6 +2353,8 @@ export type SubjectUpdateWithoutCreatorInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
@@ -2274,6 +2388,8 @@ export type SubjectUncheckedUpdateWithoutCreatorInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -2304,6 +2420,8 @@ export type SubjectUncheckedUpdateManyWithoutCreatorInput = {
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -2329,6 +2447,8 @@ export type SubjectCreateManyCurrentZoneInput = {
   grace_minutes?: number
   last_checkin_at?: Date | string | null
   last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
   fcm_token?: string | null
 }
 
@@ -2351,6 +2471,8 @@ export type SubjectUpdateWithoutCurrentZoneInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
@@ -2384,6 +2506,8 @@ export type SubjectUncheckedUpdateWithoutCurrentZoneInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
@@ -2414,6 +2538,8 @@ export type SubjectUncheckedUpdateManyWithoutCurrentZoneInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
@@ -2507,6 +2633,8 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   last_checkin_at?: boolean
   last_notified_at?: boolean
   current_zone_id?: boolean
+  active_start_time?: boolean
+  active_end_time?: boolean
   fcm_token?: boolean
   checkins?: boolean | Prisma.Subject$checkinsArgs<ExtArgs>
   systemLog?: boolean | Prisma.Subject$systemLogArgs<ExtArgs>
@@ -2543,6 +2671,8 @@ export type SubjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   last_checkin_at?: boolean
   last_notified_at?: boolean
   current_zone_id?: boolean
+  active_start_time?: boolean
+  active_end_time?: boolean
   fcm_token?: boolean
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
@@ -2573,6 +2703,8 @@ export type SubjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   last_checkin_at?: boolean
   last_notified_at?: boolean
   current_zone_id?: boolean
+  active_start_time?: boolean
+  active_end_time?: boolean
   fcm_token?: boolean
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
@@ -2603,10 +2735,12 @@ export type SubjectSelectScalar = {
   last_checkin_at?: boolean
   last_notified_at?: boolean
   current_zone_id?: boolean
+  active_start_time?: boolean
+  active_end_time?: boolean
   fcm_token?: boolean
 }
 
-export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "code" | "full_name" | "dob" | "gender" | "id_number" | "address" | "phone" | "status" | "monitoring_start" | "monitoring_end" | "avatar_id" | "created_by" | "created_at" | "update_at" | "deleted_at" | "interval_minutes" | "grace_minutes" | "last_checkin_at" | "last_notified_at" | "current_zone_id" | "fcm_token", ExtArgs["result"]["subject"]>
+export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "code" | "full_name" | "dob" | "gender" | "id_number" | "address" | "phone" | "status" | "monitoring_start" | "monitoring_end" | "avatar_id" | "created_by" | "created_at" | "update_at" | "deleted_at" | "interval_minutes" | "grace_minutes" | "last_checkin_at" | "last_notified_at" | "current_zone_id" | "active_start_time" | "active_end_time" | "fcm_token", ExtArgs["result"]["subject"]>
 export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   checkins?: boolean | Prisma.Subject$checkinsArgs<ExtArgs>
   systemLog?: boolean | Prisma.Subject$systemLogArgs<ExtArgs>
@@ -2668,6 +2802,8 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     last_checkin_at: Date | null
     last_notified_at: Date | null
     current_zone_id: string | null
+    active_start_time: string | null
+    active_end_time: string | null
     fcm_token: string | null
   }, ExtArgs["result"]["subject"]>
   composites: {}
@@ -3123,6 +3259,8 @@ export interface SubjectFieldRefs {
   readonly last_checkin_at: Prisma.FieldRef<"Subject", 'DateTime'>
   readonly last_notified_at: Prisma.FieldRef<"Subject", 'DateTime'>
   readonly current_zone_id: Prisma.FieldRef<"Subject", 'String'>
+  readonly active_start_time: Prisma.FieldRef<"Subject", 'String'>
+  readonly active_end_time: Prisma.FieldRef<"Subject", 'String'>
   readonly fcm_token: Prisma.FieldRef<"Subject", 'String'>
 }
     

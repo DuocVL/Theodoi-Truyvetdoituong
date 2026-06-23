@@ -4,6 +4,7 @@
  * Đây là file trung tâm để quản lý tất cả các tương tác với API backend.
  */
 
+import { Alert } from 'antd';
 import axios from 'axios';
 
 // ==================================================================
@@ -39,6 +40,14 @@ export interface Subject {
   status: string;
   createdAt: string;
   updatedAt: string;
+  avatar_url?: string;
+  interval_minutes: number;       
+  grace_minutes: number; 
+  last_checkin_at?: string; 
+  last_notified_at?: string; 
+  current_zone_id?: string;
+  active_start_time?: string; 
+  active_end_time?: String;  
 }
 
 export interface CheckinData {
@@ -96,6 +105,13 @@ type ServerSubject = {
   created_at: string;
   update_at: string;
   username?: string;
+  interval_minutes: number;       
+  grace_minutes: number; 
+  last_checkin_at?: string; 
+  last_notified_at?: string; 
+  current_zone_id?: string;
+  active_start_time?: string; 
+  active_end_time?: String;  
   email?: string;
   // BỔ SUNG: Định nghĩa object account trả về từ câu lệnh include/join của Prisma backend
   account?: {
@@ -104,6 +120,9 @@ type ServerSubject = {
     status: string;
     type: string;
   };
+  avatar?:{
+    url: string;
+  }
 };
 
 /** Hàm chuyển đổi dữ liệu từ server sang client */
@@ -116,15 +135,20 @@ const mapServerToClientSubject = (subject: ServerSubject): Subject => ({
   createdAt: subject.created_at,
   updatedAt: subject.update_at,
   username: subject.username || '',
-  
-  // SỬA TẠI ĐÂY: Lấy email ở ngoài, nếu không có thì bóc tách từ trong subject.account.email
+  avatar_url: subject.avatar ? subject.avatar.url : '',
   email: subject.email || subject.account?.email || '', 
-  
   dob: subject.dob ? new Date(subject.dob).toISOString().split('T')[0] : undefined,
   gender: subject.gender,
   address: subject.address || '',
   phone: subject.phone || '',
   status: subject.status,
+  interval_minutes: subject.interval_minutes,       
+  grace_minutes: subject.grace_minutes, 
+  last_checkin_at: subject.last_checkin_at || '', 
+  last_notified_at: subject.last_checkin_at || '', 
+  current_zone_id: subject.current_zone_id || '',
+  active_start_time: subject.active_start_time || '', 
+  active_end_time: subject.active_end_time || '',
 });
 
 export interface TrackingPoint {
@@ -155,6 +179,8 @@ export interface CreateZonePayload {
   interval_minutes?: number;
   grace_minutes?: number;
   description?: string;
+  active_start_time?: String;
+  active_end_time?: String;
 }
 
 export interface Zone {
@@ -168,8 +194,43 @@ export interface Zone {
   interval_minutes?: number;
   grace_minutes?: number;
   description?: string;
+  active_start_time?: string;
+  active_end_time?: string;
   is_active: boolean;
   createdAt?: string;
+
+}
+
+export interface Alert {
+  _id: string;
+  subject_id: string;
+  zone_id?: string | null;
+  checkin_id?: string | null;
+  type: 'RESTRICTED_ENTRY' | 'MISSED_CHECKIN';
+  message?: string;
+  created_at: string;
+  subject?:{
+    full_name: string,
+    id_number: string,
+  },
+  zone?:{
+    zone_name: string, 
+    type: string
+  },
+  checkin?:{
+    checkin_time: string, 
+    status: string,
+  }
+}
+
+// Interface cho response trả về từ server
+export interface AlertResponse {
+  data: Alert[];
+  pagination: {
+    current: number;
+    total: number;
+    limit: number;
+  };
 }
 
 // ==================================================================
@@ -506,4 +567,33 @@ export const deleteUserApi = async (id: string) : Promise<any> => {
   return  reponse.data
 }
 
+export const getAlerts = async (
+  page: number = 1, 
+  limit: number = 15, 
+  filters: { type?: string; startDate?: string; endDate?: string } = {}
+): Promise<AlertResponse> => {
+  try {
+    const response = await apiClient.get('/alerts', {
+      params: {
+        page,
+        limit,
+        ...filters // Truyền trực tiếp các filter: type, startDate, endDate
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi gọi API getAlerts:', error);
+    throw error;
+  }
+};
+
+export const getDetailAlert = async (id: string): Promise<any> => {
+  try {
+    const reponse = await apiClient.get(`/alerts/${id}`);
+    return  reponse.data
+  } catch (error) {
+    console.error('Lỗi khi gọi API getAlerts:', error);
+    throw error;
+  }
+};
 

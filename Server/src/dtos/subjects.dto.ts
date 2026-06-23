@@ -12,6 +12,10 @@ export const createSubjectSchema = z.object({
   phone: z.string().optional(),
   monitoringStart: z.string().datetime().optional(),
   monitoringEnd: z.string().datetime().optional(),
+  interval_minutes:z.number().optional().default(30),
+  grace_minutes: z.number().optional().default(5),
+  active_start_time: z.string().optional(),
+  active_end_time: z.string().optional(),
 });
 
 export const activateAccountSchema = z.object({

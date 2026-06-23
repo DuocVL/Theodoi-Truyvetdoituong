@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaTimes, FaUser, FaFileDownload } from 'react-icons/fa';
+import { FaTimes, FaUser, FaFileDownload, FaClock, FaShieldAlt, FaInfoCircle } from 'react-icons/fa';
 import { type Subject } from '../../services/api';
 
 // Tái sử dụng các Styled Components Premium từ Palette của bạn
@@ -49,30 +49,61 @@ interface Props {
   onTriggerExport: (subject: Subject) => void;
 }
 
+const AvatarContainer = styled.div`
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #f1f5f9; }
+  .placeholder { width: 100px; height: 100px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #94a3b8; }
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 0.9rem; color: #4f46e5; border-bottom: 2px solid #eef2ff;
+  padding-bottom: 0.3rem; margin: 1.5rem 0 0.8rem 0; grid-column: 1 / -1;
+  display: flex; align-items: center; gap: 0.5rem;
+`;
+
 const SubjectDetailModal: React.FC<Props> = ({ subject, onClose, onTriggerExport }) => {
+  const baseURL = 'http://localhost:3333'
+  console.log(subject)
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContent onClick={(e) => e.stopPropagation()}>
         <ModalHeader>
-          <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FaUser style={{ color: '#4f46e5' }} /> Hồ sơ thông tin chi tiết
-          </h2>
+          <h2><FaUser /> Hồ sơ đối tượng</h2>
           <CloseButton onClick={onClose}><FaTimes /></CloseButton>
         </ModalHeader>
+
+        <AvatarContainer>
+          {subject.avatar_url ? (
+            <img src={`${baseURL}${subject.avatar_url}`} crossOrigin='anonymous' alt={subject.fullName} />
+          ) : (
+            <div className="placeholder"><FaUser /></div>
+          )}
+          <StatusBadge status={subject.status}>{subject.status}</StatusBadge>
+        </AvatarContainer>
+
         <ModalBody>
-          <DetailItem><label>Họ và Tên</label><span>{subject.fullName}</span></DetailItem>
-          <DetailItem><label>Email liên hệ</label><span>{subject.email}</span></DetailItem>
-          <DetailItem><label>Số CCCD</label><span>{subject.idNumber || '—'}</span></DetailItem>
-          <DetailItem><label>Tên tài khoản</label><span>{subject.username || '—'}</span></DetailItem>
-          <DetailItem><label>Ngày tháng năm sinh</label><span>{subject.dob || '—'}</span></DetailItem>
-          <DetailItem><label>Giới tính</label><span>{subject.gender || '—'}</span></DetailItem>
-          <DetailItem><label>Số điện thoại</label><span>{subject.phone || '—'}</span></DetailItem>
-          <DetailItem><label>Diện theo dõi</label><span><StatusBadge status={subject.status}>{subject.status}</StatusBadge></span></DetailItem>
+          <SectionTitle><FaInfoCircle /> Thông tin cá nhân</SectionTitle>
+          <DetailItem><label>Họ tên</label><span>{subject.fullName}</span></DetailItem>
+          <DetailItem><label>Email</label><span>{subject.email}</span></DetailItem>
+          <DetailItem><label>CCCD</label><span>{subject.idNumber || '—'}</span></DetailItem>
+          <DetailItem><label>Số ĐT</label><span>{subject.phone || '—'}</span></DetailItem>
           <DetailItem style={{ gridColumn: '1 / -1' }}><label>Địa chỉ</label><span>{subject.address || '—'}</span></DetailItem>
+
+          <SectionTitle><FaShieldAlt /> Cấu hình giám sát</SectionTitle>
+          <DetailItem><label>Khoảng cách Check-in</label><span>{subject.interval_minutes} phút</span></DetailItem>
+          <DetailItem><label>Thời gian chờ (Grace)</label><span>{subject.grace_minutes} phút</span></DetailItem>
+          <DetailItem><label>Giờ hoạt động</label><span>{subject.active_start_time || '00:00'} - {subject.active_end_time || '23:59'}</span></DetailItem>
+          <DetailItem><label>Zone hiện tại</label><span>{subject.current_zone_id || 'Mặc định'}</span></DetailItem>
+
+          <SectionTitle><FaClock /> Trạng thái hệ thống</SectionTitle>
+          <DetailItem><label>Check-in gần nhất</label><span>{subject.last_checkin_at ? new Date(subject.last_checkin_at).toLocaleString() : 'Chưa có'}</span></DetailItem>
+          <DetailItem><label>Nhắc nhở gần nhất</label><span>{subject.last_notified_at ? new Date(subject.last_notified_at).toLocaleString() : 'Chưa có'}</span></DetailItem>
         </ModalBody>
+
         <ModalFooter>
           <ExportButton onClick={() => onTriggerExport(subject)}>
-            <FaFileDownload /> <span>Xuất Báo Cáo Đối Tượng</span>
+            <FaFileDownload /> <span>Xuất Báo Cáo</span>
           </ExportButton>
         </ModalFooter>
       </ModalContent>

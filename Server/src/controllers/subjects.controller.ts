@@ -42,7 +42,17 @@ class SubjectController {
 
   public getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const subjects = await this.subjectService.findAllSubjects();
+      const role = req.role?.toUpperCase();
+      if (role !== 'ADMIN' && role !== 'USER') {
+        res.status(403).json({ message: 'Forbidden' });
+        return;
+      }
+      const user = await getUserByAccountId(req.account?.id as string)
+      if(!user){
+        res.status(401).json({ message: 'Unauthorized: Account ID not found' });
+        return;
+      }
+      const subjects = await this.subjectService.findAllSubjects(role, user.id);
       res.status(200).json({ data: subjects, message: 'findAll' });
     } catch (error) {
       next(error);

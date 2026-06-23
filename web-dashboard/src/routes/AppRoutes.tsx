@@ -17,6 +17,7 @@ import Spinner from '../components/Spinner';
 import AdminRoute from '../routes/AdminRoute';
 import SystemLogsPage from '../pages/admin/SystemLogsPage';
 import UserManagementPage  from '../pages/admin/UserManagementPage'
+import AlertPage from '../pages/AlertPage';
 
 const AppRoutes: React.FC = () => {
   const { user, loading } = useAuth();
@@ -55,8 +56,9 @@ const AppRoutes: React.FC = () => {
       <Route path="/subjects/edit/:id" element={<ProtectedRoute><EditSubjectPage /></ProtectedRoute>} />
       <Route path="/map" element={<ProtectedRoute><MapPage /></ProtectedRoute>} />
 
-      {/* KHẮC PHỤC: Thêm chính xác route động quản lý zone cho đối tượng tại đây */}
+    
       <Route path="/subjects/:subjectId/zones" element={<SubjectZoneManagementPage />} />
+      <Route path='/alerts' element={<ProtectedRoute><AlertPage/></ProtectedRoute>}/>
 
       <Route path="/admin/logs" element={
         <AdminRoute>

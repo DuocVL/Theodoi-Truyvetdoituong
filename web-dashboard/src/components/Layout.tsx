@@ -10,7 +10,7 @@ import React, { type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
-import { FaTachometerAlt, FaMapMarkedAlt, FaSignOutAlt, FaAddressBook, FaShieldAlt, FaUserAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaMapMarkedAlt, FaSignOutAlt, FaAddressBook, FaShieldAlt, FaUserAlt, FaExclamationTriangle } from 'react-icons/fa';
 
 // ==================================================================
 // STYLED COMPONENTS
@@ -154,12 +154,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <FaMapMarkedAlt />
             <span>Bản đồ</span>
           </StyledNavLink>
+
+          <StyledNavLink to="/alerts">
+            <FaExclamationTriangle />
+            <span>Cảnh báo</span>
+          </StyledNavLink>
+
           {user?.role === "ADMIN" && (
             <StyledNavLink to="/admin/logs">
               <FaShieldAlt /> {/* Cần cài react-icons/fa */}
               <span>Logs Hệ thống</span>
             </StyledNavLink>)}
-            {user?.role === "ADMIN" && (
+          {user?.role === "ADMIN" && (
             <StyledNavLink to="/admin/users">
               <FaUserAlt /> {/* Cần cài react-icons/fa */}
               <span>Quản lý User</span>

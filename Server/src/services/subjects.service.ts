@@ -46,6 +46,11 @@ class SubjectService {
           phone: subjectData.phone,
           monitoring_start: subjectData.monitoringStart ? new Date(subjectData.monitoringStart) : undefined,
           monitoring_end: subjectData.monitoringEnd ? new Date(subjectData.monitoringEnd) : undefined,
+          interval_minutes: subjectData.interval_minutes,
+          grace_minutes: subjectData.grace_minutes,
+          active_start_time: subjectData.active_start_time ? subjectData.active_start_time : undefined,
+          active_end_time: subjectData.active_end_time ? subjectData.active_end_time : undefined,
+
         },
       });
 
@@ -128,8 +133,19 @@ class SubjectService {
     });
   }
 
-  public async findAllSubjects(): Promise<any[]> {
+  public async findAllSubjects(role: string, userId: string): Promise<any[]> {
+    // Định nghĩa điều kiện lọc
+    let whereCondition: any = {};
+
+    // Nếu là USER, chỉ lấy những subject mà user đó tạo (giả sử trường lưu ID người tạo là created_by)
+    if (role === 'USER') {
+      whereCondition = {
+        created_by: userId
+      };
+    }
+
     const subjects = await prisma.subject.findMany({
+      where: whereCondition, // Nếu là Admin, object này rỗng -> lấy tất cả
       include: {
         account: {
           select: {
@@ -150,6 +166,7 @@ class SubjectService {
         }
       }
     });
+
     return subjects;
   }
 
@@ -162,9 +179,15 @@ class SubjectService {
             id: true,
             email: true,
             status: true,
-            type: true
+            type: true,
+            
           }
         },
+        avatar:{
+          select:{
+            url: true,
+          }
+        }
       }
     });
 
@@ -216,7 +239,7 @@ class SubjectService {
       // BƯỚC 2: Sau khi subject đã bị xóa, giờ ta có thể xóa account một cách an toàn.
       // Đảm bảo accountId tồn tại trước khi xóa
       if (accountIdToDelete) {
-          await tx.account.delete({ where: { id: accountIdToDelete } });
+        await tx.account.delete({ where: { id: accountIdToDelete } });
       }
 
       return { message: "Subject and associated account deleted successfully." };
@@ -227,11 +250,11 @@ class SubjectService {
     try {
       console.log(fcm_token)
       await prisma.subject.update({
-        where: { id: subjectId},
-        data: {fcm_token: fcm_token}
+        where: { id: subjectId },
+        data: { fcm_token: fcm_token }
       })
     } catch (error) {
-       throw new HttpException(500, 'Update error');
+      throw new HttpException(500, 'Update error');
     }
   }
 

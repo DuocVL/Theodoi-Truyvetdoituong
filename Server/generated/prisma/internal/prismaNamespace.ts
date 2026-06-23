@@ -1462,6 +1462,8 @@ export const SubjectScalarFieldEnum = {
   last_checkin_at: 'last_checkin_at',
   last_notified_at: 'last_notified_at',
   current_zone_id: 'current_zone_id',
+  active_start_time: 'active_start_time',
+  active_end_time: 'active_end_time',
   fcm_token: 'fcm_token'
 } as const
 
@@ -1481,6 +1483,8 @@ export const ZoneScalarFieldEnum = {
   description: 'description',
   created_by: 'created_by',
   is_active: 'is_active',
+  active_start_time: 'active_start_time',
+  active_end_time: 'active_end_time',
   created_at: 'created_at',
   update_at: 'update_at'
 } as const

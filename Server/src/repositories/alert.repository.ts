@@ -18,7 +18,13 @@ export const getAlerts = async (
   const [alerts, total] = await prisma.$transaction([
     prisma.alert.findMany({
       where: whereClause,
-      include: { subject: true, zone: true },
+      include:{
+        subject:{
+          select:{
+            full_name: true,
+          }
+        }
+      },
       orderBy: { created_at: 'desc' },
       skip,
       take: limit,
@@ -32,7 +38,17 @@ export const createAlert = async (data: CreateAlertData) => {
   return await prisma.alert.create({ data });
 };
 
-// MỚI - hàm bị thiếu, dùng để chống tạo trùng MISSED_CHECKIN trong cùng 1 lần trễ
+export const getById = async (id: string) => {
+  return await prisma.alert.findUnique({
+      where: { id },
+      include: {
+        subject: { select: { full_name: true, id_number: true } },
+        zone: { select: { zone_name: true, type: true } },
+        checkin: { select: { checkin_time: true, status: true } }
+      }
+    });
+}
+
 export const findRecentMissedAlert = async (subjectId: string, sinceDate: Date) => {
   return prisma.alert.findFirst({
     where: { subject_id: subjectId, type: 'MISSED_CHECKIN', created_at: { gte: sinceDate } },

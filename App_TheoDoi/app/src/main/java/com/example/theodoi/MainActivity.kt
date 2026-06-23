@@ -54,16 +54,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, VerifyActivity::class.java))
         }
 
-        //lay token test
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("FCM_TEST", "Lấy token thất bại", task.exception)
-                return@addOnCompleteListener
-            }
-            val token = task.result
-            Log.d("FCM_TEST", "Token : $token")
-        }
-
         // Bên trong hàm onCreate() của MainActivity.kt thiết lập:
         binding.btnLogout.setOnClickListener {
             val refreshToken = sessionManager.getRefreshToken()

@@ -6,12 +6,31 @@ import { FaPlus, FaEdit, FaTrash, FaMapMarkerAlt, FaArrowLeft, FaClock } from 'r
 import Spinner from '../components/Spinner';
 import ZoneModal from '../components/zones/ZoneModal';
 
-const PageContainer = styled.div` 
-  padding: 1.5rem; 
+const PageContainer = styled.div`
+  padding: 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
 `;
 
+const Grid = styled.div`
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:1.5rem;
+
+  max-height:calc(100vh - 180px);
+  overflow-y:auto;
+
+  padding-right:8px;
+
+  &::-webkit-scrollbar{
+    width:6px;
+  }
+
+  &::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:8px;
+  }
+`;
 const BackLink = styled.button`
   display: inline-flex; align-items: center; gap: 0.5rem; color: #64748b; font-weight: 600;
   margin-bottom: 1rem; font-size: 0.9rem; background: transparent; border: none; cursor: pointer;
@@ -19,10 +38,24 @@ const BackLink = styled.button`
   &:hover { color: #4f46e5; }
 `;
 
-const TopBar = styled.div` 
-  display: flex; justify-content: space-between; align-items: center; 
-  margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; 
-  border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem;
+const TopBar = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin-bottom:1.5rem;
+  padding:1rem 0;
+
+  background:#f8fafc;
+
+  border-bottom:1px solid #e2e8f0;
+
+  flex-wrap:wrap;
+  gap:1rem;
 `;
 
 const TitleContainer = styled.div`
@@ -35,10 +68,6 @@ const CreateButton = styled.button`
   background-color: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
   transition: all 0.2s;
   &:hover { background-color: #4338ca; transform: translateY(-1px); }
-`;
-
-const Grid = styled.div` 
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; 
 `;
 
 const ZoneCard = styled.div`
@@ -98,13 +127,13 @@ const SubjectZoneManagementPage: React.FC = () => {
         if (!subjectId) return;
         try {
             setLoading(true);
-            
+
             // Gọi song song cả API lấy danh sách vùng lẫn chi tiết đối tượng để tối ưu tốc độ hiển thị UI
             const [zonesData, subjectData] = await Promise.all([
                 getZonesBySubject(subjectId),
                 getSubjectById ? getSubjectById(subjectId).catch(() => null) : Promise.resolve(null)
             ]);
-            
+
             setZones(Array.isArray(zonesData) ? zonesData : []);
             if (subjectData) {
                 setSubject(subjectData);
@@ -117,8 +146,8 @@ const SubjectZoneManagementPage: React.FC = () => {
         }
     };
 
-    useEffect(() => { 
-        fetchPageData(); 
+    useEffect(() => {
+        fetchPageData();
     }, [subjectId]);
 
     const triggerToast = (msg: string) => {
@@ -127,31 +156,31 @@ const SubjectZoneManagementPage: React.FC = () => {
     };
 
     const handleDelete = async (zone: Zone) => {
-    // Thử lấy tất cả các trường định danh có thể có từ Backend (snake_case hoặc mặc định)
-    const id = zone.id
+        // Thử lấy tất cả các trường định danh có thể có từ Backend (snake_case hoặc mặc định)
+        const id = zone.id
 
-    if (!id) {
-        alert(`Lỗi hệ thống: Vùng "${zone.zone_name}" không tìm thấy ID hợp lệ.`);
-        // In toàn bộ object ra để bạn bấm vào mũi tên trong F12 kiểm tra chính xác tên trường
-        console.error(">>> Cấu trúc chi tiết của Object Zone bị thiếu ID:", zone);
-        return;
-    }
-
-    if (window.confirm(`Bạn chắc chắn muốn xóa vùng "${zone.zone_name}"?`)) {
-        try {
-            await deleteZone(id);
-            // Xóa sạch ở local state bất kể dùng tên trường ID nào
-            setZones(prev => prev.filter(z => 
-                z.id !== id && 
-                (z as any).id !== id && 
-                (z as any).zone_id !== id
-            ));
-            triggerToast('Xóa vùng giám sát thành công.');
-        } catch (err) {
-            alert('Không thể xóa vùng.');
+        if (!id) {
+            alert(`Lỗi hệ thống: Vùng "${zone.zone_name}" không tìm thấy ID hợp lệ.`);
+            // In toàn bộ object ra để bạn bấm vào mũi tên trong F12 kiểm tra chính xác tên trường
+            console.error(">>> Cấu trúc chi tiết của Object Zone bị thiếu ID:", zone);
+            return;
         }
-    }
-};
+
+        if (window.confirm(`Bạn chắc chắn muốn xóa vùng "${zone.zone_name}"?`)) {
+            try {
+                await deleteZone(id);
+                // Xóa sạch ở local state bất kể dùng tên trường ID nào
+                setZones(prev => prev.filter(z =>
+                    z.id !== id &&
+                    (z as any).id !== id &&
+                    (z as any).zone_id !== id
+                ));
+                triggerToast('Xóa vùng giám sát thành công.');
+            } catch (err) {
+                alert('Không thể xóa vùng.');
+            }
+        }
+    };
 
     const handleEditClick = (zone: Zone) => {
         setSelectedZone(zone);
@@ -173,7 +202,6 @@ const SubjectZoneManagementPage: React.FC = () => {
 
             <TopBar>
                 <TitleContainer>
-                    {/* Hiển thị tên đối tượng trực quan trên tiêu đề nếu đã fetch thành công */}
                     <h1>Vùng Giám Sát: {subject?.fullName || 'Đối Tượng'}</h1>
                     <p>Mã hệ thống: {subjectId}</p>
                 </TitleContainer>
@@ -188,56 +216,46 @@ const SubjectZoneManagementPage: React.FC = () => {
                 </div>
             ) : !Array.isArray(zones) || zones.length === 0 ? (
                 <div style={{ textAlign: 'center', color: '#64748b', padding: '4rem', background: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                    Đối tượng này chưa cấu hình vùng an toàn/cách ly nào. Hãy thêm vùng đầu tiên!
+                    Đối tượng này chưa cấu hình vùng giám sát nào. Hãy thêm vùng đầu tiên!
                 </div>
             ) : (
                 <Grid>
                     {zones.map((zone) => (
                         <ZoneCard key={zone.id}>
                             <ZoneInfo>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '0.5rem' }}>
-                                    <h3>{zone.zone_name}</h3>
-                                    <StatusBadge active={zone.is_active ?? true}>
-                                        {zone.is_active ? 'Active' : 'Inactive'}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <h3 style={{ color: '#1e293b' }}>{zone.zone_name}</h3>
+                                    <StatusBadge active={zone.is_active}>
+                                        {zone.is_active ? 'Đang hoạt động' : 'Tạm dừng'}
                                     </StatusBadge>
                                 </div>
-                                
-                                <div style={{ margin: '0.5rem 0' }}>
+
+                                <div style={{ marginTop: '0.5rem' }}>
                                     <span style={{
-                                        fontSize: '0.75rem', 
-                                        padding: '0.2rem 0.5rem', 
-                                        borderRadius: '6px', 
-                                        fontWeight: '700',
-                                        background: zone.type === 'SAFE' ? '#e0f2fe' : '#ffedd5',
-                                        color: zone.type === 'SAFE' ? '#0369a1' : '#c2410c'
+                                        fontSize: '0.75rem', fontWeight: 800, padding: '4px 8px', borderRadius: '4px',
+                                        backgroundColor: zone.type === 'SAFE' ? '#f0fdf4' : '#fef2f2',
+                                        color: zone.type === 'SAFE' ? '#166534' : '#991b1b',
+                                        border: `1px solid ${zone.type === 'SAFE' ? '#bbf7d0' : '#fecaca'}`
                                     }}>
-                                        {zone.type === 'SAFE' ? '🟢 Vùng An Toàn' : '🔴 Vùng Hạn Chế'}
+                                        {zone.type === 'SAFE' ? '🟢 VÙNG AN TOÀN' : '🔴 VÙNG CẤM'}
                                     </span>
                                 </div>
-                                
-                                <p className="description">{zone.description || <i>Không có mô tả.</i>}</p>
 
-                                <MetaItem>
-                                    <FaMapMarkerAlt style={{ color: '#64748b' }} /> 
-                                    Tâm: <strong style={{ color: '#334155' }}>{zone.latitude?.toFixed(5)}, {zone.longitude?.toFixed(5)}</strong>
-                                </MetaItem>
-                                
-                                <MetaItem>
-                                    <span style={{ fontSize: '1.1rem' }}>🌐</span> 
-                                    Bán kính: <strong style={{ color: '#0f172a' }}>{zone.radius}m</strong>
-                                </MetaItem>
-
-                                <MetaItem>
-                                    <FaClock style={{ color: '#64748b' }} />
-                                    <span>Chu kỳ: <strong>{zone.interval_minutes ?? '--'} phút</strong></span>
-                                    <span style={{ color: '#cbd5e1', margin: '0 0.25rem' }}>|</span>
-                                    <span>Chờ gia hạn: <strong>{zone.grace_minutes ?? '--'} phút</strong></span>
-                                </MetaItem>
+                                <p className="description" style={{ color: '#475569', fontSize: '0.9rem', marginTop: '1rem' }}>
+                                    {zone.description || 'Chưa có mô tả'}
+                                </p>
                             </ZoneInfo>
-                            
+
+                            <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '8px', marginTop: '1rem', fontSize: '0.85rem' }}>
+                                <MetaItem>🗺️ <b>Tọa độ:</b> {zone.latitude.toFixed(4)}, {zone.longitude.toFixed(4)}</MetaItem>
+                                <MetaItem>📏 <b>Bán kính:</b> {zone.radius} mét</MetaItem>
+                                <MetaItem>⏱️ <b>Chu kỳ:</b> {zone.interval_minutes}p | <b>Chờ:</b> {zone.grace_minutes}p</MetaItem>
+                                <MetaItem><FaClock /> <b>Giờ hoạt động:</b> {zone.active_start_time || '--:--'} - {zone.active_end_time || '--:--'}</MetaItem>
+                            </div>
+
                             <Actions>
                                 <ActionBtn onClick={() => handleEditClick(zone)}>
-                                    <FaEdit /> Sửa thông số
+                                    <FaEdit /> Chỉnh sửa
                                 </ActionBtn>
                                 <ActionBtn danger onClick={() => handleDelete(zone)}>
                                     <FaTrash /> Xóa
@@ -258,9 +276,9 @@ const SubjectZoneManagementPage: React.FC = () => {
                         setSelectedZone(null);
                     }}
                     // Sửa đổi tên prop sang onSuccess và gán type string tường minh cho msg
-                    onSuccess={(msg: string) => { 
-                        triggerToast(msg); 
-                        fetchPageData(); 
+                    onSuccess={(msg: string) => {
+                        triggerToast(msg);
+                        fetchPageData();
                     }}
                 />
             )}

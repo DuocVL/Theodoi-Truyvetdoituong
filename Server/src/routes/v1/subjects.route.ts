@@ -38,8 +38,6 @@ class SubjectRoute {
       this.subjectController.delete
     );
 
-    // Routes for viewing subjects.
-    // Accessible by both ADMIN and USER roles.
     this.router.get(
       '/',
       this.subjectController.getAll

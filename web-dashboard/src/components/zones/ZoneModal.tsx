@@ -6,11 +6,6 @@ import { MapContainer, TileLayer, Marker, Circle, useMapEvents, useMap } from 'r
 import type { LeafletMouseEvent } from 'leaflet';
 import { createZone, updateZone, type Subject } from '../../services/api';
 
-const ModalOverlay = styled.div`
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(15, 23, 42, 0.45); display: flex; align-items: center; justify-content: center; z-index: 1000;
-`;
-
 const LargeModalContent = styled.div`
   background: #ffffff; padding: 2rem; border-radius: 12px; width: 95%; max-width: 1050px;
   max-height: 90vh; display: grid; grid-template-rows: auto 1fr auto; gap: 1rem;
@@ -35,18 +30,9 @@ const FormContainer = styled.div`
   display: flex; flex-direction: column; gap: 1rem;
 `;
 
-const FormGroup = styled.div`
-  display: flex; flex-direction: column; gap: 0.35rem;
-  label { font-size: 0.8rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
-  input, select, textarea { 
-    padding: 0.6rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; color: #1e293b;
-    &:focus { outline: 2px solid #4f46e5; border-color: transparent; }
-  }
-`;
-
 const MapWrapper = styled.div`
-  width: 100%; height: 100%; min-height: 440px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1;
-  position: relative;
+  width:100%;height:100%;min-height:440px;border-radius:12px;
+  overflow:hidden;border:1px solid #e2e8f0;
 `;
 
 const ModalFooter = styled.div`
@@ -64,6 +50,38 @@ const SecondaryButton = styled.button`
   &:hover { background-color: #e2e8f0; }
 `;
 
+const ModalOverlay = styled.div`
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 1500;
+`;
+
+const ModalContent = styled.div`
+  background: white; padding: 2rem; border-radius: 12px;
+  width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 1rem;
+  label {
+    display:block;font-size:.875rem;font-weight:600;color:#334155;margin-bottom:.4rem;
+  }
+  input, select, textarea {
+    width:100%;padding:.65rem;border:1px solid #cbd5e1;border-radius:8px;
+    background:#fff;color:#0f172a;font-size:.95rem;outline:none;
+    &:focus {
+      border-color:#4f46e5;box-shadow:0 0 0 2px #eef2ff;
+    }
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color:#94a3b8;
+  }
+  option {
+    color:#0f172a;background:#fff;
+  }
+`;
+
 // Cập nhật Interface khớp hoàn toàn với định nghĩa Type Zone của API
 interface ZoneData {
   id: string;
@@ -75,7 +93,9 @@ interface ZoneData {
   interval_minutes?: number;
   grace_minutes?: number;
   description?: string;
-  is_active: boolean; 
+  active_start_time?: string;
+  active_end_time?: string;
+  is_active: boolean;
 }
 
 interface Props {
@@ -111,6 +131,8 @@ const ZoneModal: React.FC<Props> = ({ subject, zoneToEdit, onClose, onSuccess })
   const [graceMin, setGraceMin] = useState<number>(5);
   const [description, setDescription] = useState('');
   const [isActive, setIsActive] = useState<boolean>(true); // Quản lý thuộc tính is_active
+  const [activeStartTime, setActiveStartTime] = useState<string>('--:--');
+  const [activeEndTime, setActiveEndTime] = useState<string>('--:--');
   const [submitting, setSubmitting] = useState(false);
 
   // Map dữ liệu cũ phục vụ tính năng "Sửa thông số"
@@ -125,6 +147,8 @@ const ZoneModal: React.FC<Props> = ({ subject, zoneToEdit, onClose, onSuccess })
       setGraceMin(zoneToEdit.grace_minutes ?? 5);
       setDescription(zoneToEdit.description ?? '');
       setIsActive(zoneToEdit.is_active ?? true);
+      setActiveStartTime(zoneToEdit.active_start_time ?? '00:00');
+      setActiveEndTime(zoneToEdit.active_end_time ?? '23:59');
     }
   }, [zoneToEdit]);
 
@@ -150,7 +174,9 @@ const ZoneModal: React.FC<Props> = ({ subject, zoneToEdit, onClose, onSuccess })
         interval_minutes: intervalMin,
         grace_minutes: graceMin,
         description: description || undefined,
-        is_active: isActive, 
+        active_start_time: activeStartTime,
+        active_end_time: activeEndTime,
+        is_active: isActive,
       };
 
       if (isEditMode && zoneToEdit) {
@@ -178,7 +204,7 @@ const ZoneModal: React.FC<Props> = ({ subject, zoneToEdit, onClose, onSuccess })
       <LargeModalContent onClick={e => e.stopPropagation()}>
         <ModalHeader>
           <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <FaMapMarkedAlt style={{ color: '#4f46e5' }} /> 
+            <FaMapMarkedAlt style={{ color: '#4f46e5' }} />
             {isEditMode ? `Sửa thông số vùng: ${zoneToEdit?.zone_name}` : `Thiết lập Vùng giám sát mới: ${subject.fullName}`}
           </h2>
           <button style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }} onClick={onClose}>
@@ -239,6 +265,16 @@ const ZoneModal: React.FC<Props> = ({ subject, zoneToEdit, onClose, onSuccess })
                   <input type="number" min="0" value={graceMin} onChange={e => setGraceMin(Number(e.target.value))} required />
                 </FormGroup>
               </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <FormGroup>
+                  <label>Giờ bắt đầu hoạt động</label>
+                  <input type="time" value={activeStartTime} onChange={(e) => setActiveStartTime(e.target.value)} />
+                </FormGroup>
+                <FormGroup>
+                  <label>Giờ kết thúc hoạt động</label>
+                  <input type="time" value={activeEndTime} onChange={(e) => setActiveEndTime(e.target.value)} />
+                </FormGroup>
+              </div>
 
               <FormGroup>
                 <label>Ghi Chú Chi Tiết</label>
@@ -257,14 +293,14 @@ const ZoneModal: React.FC<Props> = ({ subject, zoneToEdit, onClose, onSuccess })
               <MapClickHandler onClick={handleMapClick} />
               <MapRecenter lat={lat} lng={lng} />
               <Marker position={[lat, lng]} />
-              <Circle 
-                center={[lat, lng]} 
-                radius={radius} 
+              <Circle
+                center={[lat, lng]}
+                radius={radius}
                 pathOptions={{
                   color: type === 'SAFE' ? '#10b981' : '#ef4444',
                   fillColor: type === 'SAFE' ? '#10b981' : '#ef4444',
                   fillOpacity: 0.18
-                }} 
+                }}
               />
             </MapContainer>
           </MapWrapper>
@@ -276,8 +312,8 @@ const ZoneModal: React.FC<Props> = ({ subject, zoneToEdit, onClose, onSuccess })
             <FaSave /> {submitting ? 'Đang lưu vùng...' : 'Xác Nhận Lưu Vùng'}
           </PrimaryButton>
         </ModalFooter>
-  {/* Đóng thẻ LargeModalContent */}
-      </LargeModalContent> 
+        {/* Đóng thẻ LargeModalContent */}
+      </LargeModalContent>
     </ModalOverlay>
   );
 };

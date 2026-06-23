@@ -8,13 +8,12 @@
  * - Danh sách các đối tượng được thêm vào gần đây.
  * Trang này lấy dữ liệu từ API và tính toán các số liệu thống kê.
  */
-
 import React, { useEffect, useState, useMemo } from 'react';
 import styled from 'styled-components';
 import { getSubjects, type Subject } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import Spinner from '../components/Spinner';
-import { FaUsers, FaEye, FaPauseCircle, FaCheckCircle } from 'react-icons/fa';
+import { FaUsers, FaExclamationTriangle, FaCheckCircle, FaPauseCircle } from 'react-icons/fa';
 
 // ==================================================================
 // STYLED COMPONENTS
@@ -89,19 +88,14 @@ const CardContent = styled.div`
 `;
 
 const RecentSubjectsCard = styled.div`
-  background: #fff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: #fff; border-radius: 12px; padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
 `;
 
 const Table = styled.table`
-  /* ... CSS cho bảng ... */
-`;
-
-// Badge để hiển thị trạng thái của đối tượng với màu sắc tương ứng.
-const StatusBadge = styled.span<{ status: string }>`
-    /* ... CSS cho badge ... */
+  width: 100%; border-collapse: collapse; margin-top: 1rem;
+  th { text-align: left; padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 0.85rem; }
+  td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #1e293b; font-size: 0.9rem; }
 `;
 
 const CenteredMessage = styled.div`
@@ -115,98 +109,92 @@ const CenteredMessage = styled.div`
 // ==================================================================
 
 const DashboardPage: React.FC = () => {
-    // --- HOOKS & STATE ---
-    const { user } = useAuth(); // Lấy thông tin người dùng từ AuthContext để hiển thị lời chào.
+    const { user } = useAuth();
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
-    // --- DATA FETCHING (useEffect) ---
     useEffect(() => {
-        const fetchAllSubjects = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                // Gọi API để lấy danh sách tất cả các đối tượng.
-                const subjectsArray = await getSubjects();
-                if (Array.isArray(subjectsArray)) {
-                    setSubjects(subjectsArray);
-                } else {
-                    // Phòng trường hợp API trả về không phải là mảng.
-                    setSubjects([]);
-                    console.warn('API did not return a valid array for subjects.');
-                }
-            } catch (err) {
-                console.error("Failed to load dashboard subjects:", err);
-                setError("Không thể tải dữ liệu. Vui lòng thử lại.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchAllSubjects();
-    }, []); // Chạy 1 lần khi component mount.
+        getSubjects().then(data => {
+            setSubjects(data);
+            setLoading(false);
+        }).catch(() => setLoading(false));
+    }, []);
 
-    // --- DATA COMPUTATION (useMemo) ---
-    // `useMemo` được sử dụng để tính toán các giá trị thống kê.
-    // Hook này sẽ chỉ chạy lại khi `subjects` thay đổi, tránh việc tính toán lại không cần thiết mỗi lần render.
     const stats = useMemo(() => {
-        // Sắp xếp các đối tượng theo ngày tạo mới nhất.
+        // Sắp xếp lấy 5 đối tượng mới nhất
         const recent = [...subjects]
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .slice(0, 5); // Lấy 5 đối tượng gần đây nhất.
-        
-        // Trả về một object chứa tất cả các số liệu đã tính toán.
+            .slice(0, 5);
+
+        // Tính toán thông số chuẩn dựa trên enum
         return {
             total: subjects.length,
-            tracking: subjects.filter(s => s.status === 'Đang theo dõi').length,
-            paused: subjects.filter(s => s.status === 'Tạm dừng').length,
-            finished: subjects.filter(s => s.status === 'Đã hoàn thành').length,
+            active: subjects.filter(s => s.status === "ACTIVE").length,
+            inactive: subjects.filter(s => s.status === "INACTIVE").length,
+            completed: subjects.filter(s => s.status === "COMPLETED").length,
             recent
         };
-    }, [subjects]); // Phụ thuộc vào `subjects`.
+    }, [subjects]);
 
-    // --- RENDER LOGIC ---
+    const getStatusConfig = (status: string) => {
+        switch (status) {
+            case "ACTIVE":
+                return { label: 'Đang hoạt động', color: '#16a34a' }; // Xanh lá
+            case "INACTIVE":
+                return { label: 'Tạm dừng', color: '#ea580c' }; // Cam
+            case "COMPLETED":
+                return { label: 'Hoàn thành', color: '#2563eb' }; // Xanh dương
+            default:
+                return { label: 'Khác', color: '#64748b' };
+        }
+    };
 
-    // Hiển thị spinner khi đang tải dữ liệu.
-    if (loading) {
-        return <CenteredMessage><Spinner size={50} /><p>Đang tải dữ liệu...</p></CenteredMessage>;
-    }
-
-    // Hiển thị thông báo lỗi nếu có.
-    if (error) {
-        return <CenteredMessage><p style={{color: 'red'}}>{error}</p></CenteredMessage>;
-    }
+    if (loading) return <CenteredMessage><Spinner size={50} /></CenteredMessage>;
 
     return (
         <>
-            {/* Phần Header */}
             <Header>
-                <WelcomeTitle>Chào mừng trở lại, {user?.fullName || 'User'}!</WelcomeTitle>
-                <WelcomeSubtitle>Đây là bức tranh tổng quan về các đối tượng của bạn.</WelcomeSubtitle>
+                <WelcomeTitle>Chào mừng trở lại, {user?.full_name || 'Admin'}!</WelcomeTitle>
+                <WelcomeSubtitle>Tổng quan hệ thống giám sát đối tượng.</WelcomeSubtitle>
             </Header>
 
-            {/* Lưới các thẻ thống kê */}
             <StatsGrid>
-                <StatCard>
-                    <IconWrapper color="#4299e1"><FaUsers /></IconWrapper>
-                    <CardContent><h3>Tổng số đối tượng</h3><p>{stats.total}</p></CardContent>
-                </StatCard>
-                {/* ... Các thẻ thống kê khác ... */}
+                <StatCard><IconWrapper color="#4f46e5"><FaUsers /></IconWrapper><CardContent><h3>Tổng số</h3><p>{stats.total}</p></CardContent></StatCard>
+                <StatCard><IconWrapper color="#16a34a"><FaCheckCircle /></IconWrapper><CardContent><h3>Đang theo dõi</h3><p>{stats.active}</p></CardContent></StatCard>
+                <StatCard><IconWrapper color="#ea580c"><FaPauseCircle /></IconWrapper><CardContent><h3>Tạm dừng</h3><p>{stats.inactive}</p></CardContent></StatCard>
             </StatsGrid>
 
-            {/* Bảng các đối tượng gần đây */}
             <RecentSubjectsCard>
-                <h2 style={{marginTop: 0, color: '#2d3748'}}>Đối tượng được thêm gần đây</h2>
+                <h2 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Đối tượng thêm gần đây</h2>
                 {stats.recent.length > 0 ? (
                     <Table>
-                        {/* ... Render bảng ... */}
+                        <thead>
+                            <tr><th>Tên đối tượng</th><th>Trạng thái</th><th>Ngày tạo</th></tr>
+                        </thead>
+                        <tbody>
+                            {stats.recent.map(s => (
+                                <tr key={s._id}>
+                                    <td>{s.fullName}</td>
+                                    <td>
+                                        <span style={{
+                                            color: getStatusConfig(s.status).color,
+                                            fontWeight: 600,
+                                            backgroundColor: `${getStatusConfig(s.status).color}15`,
+                                            padding: '4px 8px',
+                                            borderRadius: '4px'
+                                        }}>
+                                            {getStatusConfig(s.status).label}
+                                        </span>
+                                    </td>
+                                    <td>{new Date(s.createdAt).toLocaleDateString()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
                     </Table>
-                ) : (
-                    <CenteredMessage>Chưa có đối tượng nào.</CenteredMessage>
-                )}
+                ) : <CenteredMessage>Chưa có dữ liệu đối tượng.</CenteredMessage>}
             </RecentSubjectsCard>
         </>
     );
 };
 
-export default DashboardPage;
+export default DashboardPage

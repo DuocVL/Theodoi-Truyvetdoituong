@@ -55,6 +55,8 @@ export type ZoneMinAggregateOutputType = {
   description: string | null
   created_by: string | null
   is_active: boolean | null
+  active_start_time: string | null
+  active_end_time: string | null
   created_at: Date | null
   update_at: Date | null
 }
@@ -72,6 +74,8 @@ export type ZoneMaxAggregateOutputType = {
   description: string | null
   created_by: string | null
   is_active: boolean | null
+  active_start_time: string | null
+  active_end_time: string | null
   created_at: Date | null
   update_at: Date | null
 }
@@ -89,6 +93,8 @@ export type ZoneCountAggregateOutputType = {
   description: number
   created_by: number
   is_active: number
+  active_start_time: number
+  active_end_time: number
   created_at: number
   update_at: number
   _all: number
@@ -124,6 +130,8 @@ export type ZoneMinAggregateInputType = {
   description?: true
   created_by?: true
   is_active?: true
+  active_start_time?: true
+  active_end_time?: true
   created_at?: true
   update_at?: true
 }
@@ -141,6 +149,8 @@ export type ZoneMaxAggregateInputType = {
   description?: true
   created_by?: true
   is_active?: true
+  active_start_time?: true
+  active_end_time?: true
   created_at?: true
   update_at?: true
 }
@@ -158,6 +168,8 @@ export type ZoneCountAggregateInputType = {
   description?: true
   created_by?: true
   is_active?: true
+  active_start_time?: true
+  active_end_time?: true
   created_at?: true
   update_at?: true
   _all?: true
@@ -262,6 +274,8 @@ export type ZoneGroupByOutputType = {
   description: string | null
   created_by: string
   is_active: boolean
+  active_start_time: string | null
+  active_end_time: string | null
   created_at: Date
   update_at: Date
   _count: ZoneCountAggregateOutputType | null
@@ -302,6 +316,8 @@ export type ZoneWhereInput = {
   description?: Prisma.StringNullableFilter<"Zone"> | string | null
   created_by?: Prisma.StringFilter<"Zone"> | string
   is_active?: Prisma.BoolFilter<"Zone"> | boolean
+  active_start_time?: Prisma.StringNullableFilter<"Zone"> | string | null
+  active_end_time?: Prisma.StringNullableFilter<"Zone"> | string | null
   created_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
@@ -324,6 +340,8 @@ export type ZoneOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   created_by?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  active_start_time?: Prisma.SortOrderInput | Prisma.SortOrder
+  active_end_time?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
   subject?: Prisma.SubjectOrderByWithRelationInput
@@ -349,6 +367,8 @@ export type ZoneWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Zone"> | string | null
   created_by?: Prisma.StringFilter<"Zone"> | string
   is_active?: Prisma.BoolFilter<"Zone"> | boolean
+  active_start_time?: Prisma.StringNullableFilter<"Zone"> | string | null
+  active_end_time?: Prisma.StringNullableFilter<"Zone"> | string | null
   created_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
   subject?: Prisma.XOR<Prisma.SubjectScalarRelationFilter, Prisma.SubjectWhereInput>
@@ -371,6 +391,8 @@ export type ZoneOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   created_by?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  active_start_time?: Prisma.SortOrderInput | Prisma.SortOrder
+  active_end_time?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
   _count?: Prisma.ZoneCountOrderByAggregateInput
@@ -396,6 +418,8 @@ export type ZoneScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Zone"> | string | null
   created_by?: Prisma.StringWithAggregatesFilter<"Zone"> | string
   is_active?: Prisma.BoolWithAggregatesFilter<"Zone"> | boolean
+  active_start_time?: Prisma.StringNullableWithAggregatesFilter<"Zone"> | string | null
+  active_end_time?: Prisma.StringNullableWithAggregatesFilter<"Zone"> | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"Zone"> | Date | string
   update_at?: Prisma.DateTimeWithAggregatesFilter<"Zone"> | Date | string
 }
@@ -411,6 +435,8 @@ export type ZoneCreateInput = {
   grace_minutes?: number
   description?: string | null
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subject: Prisma.SubjectCreateNestedOneWithoutZonesInput
@@ -433,6 +459,8 @@ export type ZoneUncheckedCreateInput = {
   description?: string | null
   created_by: string
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedCreateNestedManyWithoutCurrentZoneInput
@@ -451,6 +479,8 @@ export type ZoneUpdateInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneRequiredWithoutZonesNestedInput
@@ -473,6 +503,8 @@ export type ZoneUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedUpdateManyWithoutCurrentZoneNestedInput
@@ -493,6 +525,8 @@ export type ZoneCreateManyInput = {
   description?: string | null
   created_by: string
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
 }
@@ -508,6 +542,8 @@ export type ZoneUpdateManyMutationInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -525,6 +561,8 @@ export type ZoneUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -557,6 +595,8 @@ export type ZoneCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  active_start_time?: Prisma.SortOrder
+  active_end_time?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
 }
@@ -582,6 +622,8 @@ export type ZoneMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  active_start_time?: Prisma.SortOrder
+  active_end_time?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
 }
@@ -599,6 +641,8 @@ export type ZoneMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
   is_active?: Prisma.SortOrder
+  active_start_time?: Prisma.SortOrder
+  active_end_time?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   update_at?: Prisma.SortOrder
 }
@@ -766,6 +810,8 @@ export type ZoneCreateWithoutCreatorInput = {
   grace_minutes?: number
   description?: string | null
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subject: Prisma.SubjectCreateNestedOneWithoutZonesInput
@@ -786,6 +832,8 @@ export type ZoneUncheckedCreateWithoutCreatorInput = {
   grace_minutes?: number
   description?: string | null
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedCreateNestedManyWithoutCurrentZoneInput
@@ -835,6 +883,8 @@ export type ZoneScalarWhereInput = {
   description?: Prisma.StringNullableFilter<"Zone"> | string | null
   created_by?: Prisma.StringFilter<"Zone"> | string
   is_active?: Prisma.BoolFilter<"Zone"> | boolean
+  active_start_time?: Prisma.StringNullableFilter<"Zone"> | string | null
+  active_end_time?: Prisma.StringNullableFilter<"Zone"> | string | null
   created_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
   update_at?: Prisma.DateTimeFilter<"Zone"> | Date | string
 }
@@ -850,6 +900,8 @@ export type ZoneCreateWithoutSubjectInput = {
   grace_minutes?: number
   description?: string | null
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   creator: Prisma.UserCreateNestedOneWithoutZoneInput
@@ -870,6 +922,8 @@ export type ZoneUncheckedCreateWithoutSubjectInput = {
   description?: string | null
   created_by: string
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedCreateNestedManyWithoutCurrentZoneInput
@@ -898,6 +952,8 @@ export type ZoneCreateWithoutSubjectsCurrentInput = {
   grace_minutes?: number
   description?: string | null
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subject: Prisma.SubjectCreateNestedOneWithoutZonesInput
@@ -919,6 +975,8 @@ export type ZoneUncheckedCreateWithoutSubjectsCurrentInput = {
   description?: string | null
   created_by: string
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   alertZone?: Prisma.AlertUncheckedCreateNestedManyWithoutZoneInput
@@ -968,6 +1026,8 @@ export type ZoneUpdateWithoutSubjectsCurrentInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneRequiredWithoutZonesNestedInput
@@ -989,6 +1049,8 @@ export type ZoneUncheckedUpdateWithoutSubjectsCurrentInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   alertZone?: Prisma.AlertUncheckedUpdateManyWithoutZoneNestedInput
@@ -1006,6 +1068,8 @@ export type ZoneCreateWithoutAlertZoneInput = {
   grace_minutes?: number
   description?: string | null
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subject: Prisma.SubjectCreateNestedOneWithoutZonesInput
@@ -1027,6 +1091,8 @@ export type ZoneUncheckedCreateWithoutAlertZoneInput = {
   description?: string | null
   created_by: string
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedCreateNestedManyWithoutCurrentZoneInput
@@ -1060,6 +1126,8 @@ export type ZoneUpdateWithoutAlertZoneInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneRequiredWithoutZonesNestedInput
@@ -1081,6 +1149,8 @@ export type ZoneUncheckedUpdateWithoutAlertZoneInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedUpdateManyWithoutCurrentZoneNestedInput
@@ -1098,6 +1168,8 @@ export type ZoneCreateWithoutCheckinsInput = {
   grace_minutes?: number
   description?: string | null
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subject: Prisma.SubjectCreateNestedOneWithoutZonesInput
@@ -1119,6 +1191,8 @@ export type ZoneUncheckedCreateWithoutCheckinsInput = {
   description?: string | null
   created_by: string
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedCreateNestedManyWithoutCurrentZoneInput
@@ -1152,6 +1226,8 @@ export type ZoneUpdateWithoutCheckinsInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneRequiredWithoutZonesNestedInput
@@ -1173,6 +1249,8 @@ export type ZoneUncheckedUpdateWithoutCheckinsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedUpdateManyWithoutCurrentZoneNestedInput
@@ -1191,6 +1269,8 @@ export type ZoneCreateManyCreatorInput = {
   grace_minutes?: number
   description?: string | null
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
 }
@@ -1206,6 +1286,8 @@ export type ZoneUpdateWithoutCreatorInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subject?: Prisma.SubjectUpdateOneRequiredWithoutZonesNestedInput
@@ -1226,6 +1308,8 @@ export type ZoneUncheckedUpdateWithoutCreatorInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedUpdateManyWithoutCurrentZoneNestedInput
@@ -1245,6 +1329,8 @@ export type ZoneUncheckedUpdateManyWithoutCreatorInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1261,6 +1347,8 @@ export type ZoneCreateManySubjectInput = {
   description?: string | null
   created_by: string
   is_active?: boolean
+  active_start_time?: string | null
+  active_end_time?: string | null
   created_at?: Date | string
   update_at?: Date | string
 }
@@ -1276,6 +1364,8 @@ export type ZoneUpdateWithoutSubjectInput = {
   grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   creator?: Prisma.UserUpdateOneRequiredWithoutZoneNestedInput
@@ -1296,6 +1386,8 @@ export type ZoneUncheckedUpdateWithoutSubjectInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjectsCurrent?: Prisma.SubjectUncheckedUpdateManyWithoutCurrentZoneNestedInput
@@ -1315,6 +1407,8 @@ export type ZoneUncheckedUpdateManyWithoutSubjectInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_by?: Prisma.StringFieldUpdateOperationsInput | string
   is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1381,6 +1475,8 @@ export type ZoneSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   description?: boolean
   created_by?: boolean
   is_active?: boolean
+  active_start_time?: boolean
+  active_end_time?: boolean
   created_at?: boolean
   update_at?: boolean
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
@@ -1404,6 +1500,8 @@ export type ZoneSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   created_by?: boolean
   is_active?: boolean
+  active_start_time?: boolean
+  active_end_time?: boolean
   created_at?: boolean
   update_at?: boolean
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
@@ -1423,6 +1521,8 @@ export type ZoneSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   created_by?: boolean
   is_active?: boolean
+  active_start_time?: boolean
+  active_end_time?: boolean
   created_at?: boolean
   update_at?: boolean
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
@@ -1442,11 +1542,13 @@ export type ZoneSelectScalar = {
   description?: boolean
   created_by?: boolean
   is_active?: boolean
+  active_start_time?: boolean
+  active_end_time?: boolean
   created_at?: boolean
   update_at?: boolean
 }
 
-export type ZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "zone_name" | "type" | "latitude" | "longitude" | "radius" | "interval_minutes" | "grace_minutes" | "description" | "created_by" | "is_active" | "created_at" | "update_at", ExtArgs["result"]["zone"]>
+export type ZoneOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "subject_id" | "zone_name" | "type" | "latitude" | "longitude" | "radius" | "interval_minutes" | "grace_minutes" | "description" | "created_by" | "is_active" | "active_start_time" | "active_end_time" | "created_at" | "update_at", ExtArgs["result"]["zone"]>
 export type ZoneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subject?: boolean | Prisma.SubjectDefaultArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1486,6 +1588,8 @@ export type $ZonePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     description: string | null
     created_by: string
     is_active: boolean
+    active_start_time: string | null
+    active_end_time: string | null
     created_at: Date
     update_at: Date
   }, ExtArgs["result"]["zone"]>
@@ -1928,6 +2032,8 @@ export interface ZoneFieldRefs {
   readonly description: Prisma.FieldRef<"Zone", 'String'>
   readonly created_by: Prisma.FieldRef<"Zone", 'String'>
   readonly is_active: Prisma.FieldRef<"Zone", 'Boolean'>
+  readonly active_start_time: Prisma.FieldRef<"Zone", 'String'>
+  readonly active_end_time: Prisma.FieldRef<"Zone", 'String'>
   readonly created_at: Prisma.FieldRef<"Zone", 'DateTime'>
   readonly update_at: Prisma.FieldRef<"Zone", 'DateTime'>
 }

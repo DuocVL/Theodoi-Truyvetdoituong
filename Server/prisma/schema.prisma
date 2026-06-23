@@ -81,6 +81,8 @@ model Subject {
   last_checkin_at  DateTime? // NEW - lần checkin hợp lệ gần nhất (bất kể trong/ngoài zone)
   last_notified_at DateTime? // NEW - lần nhắc gần nhất cho nghĩa vụ hiện tại
   current_zone_id  String? // NEW - zone SAFE đang là "ngữ cảnh" tính hạn, null = đang dùng default
+  active_start_time String?  // "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
+  active_end_time   String?  // "22:00" - kết thúc khung giờ
   
   fcm_token String?
 
@@ -119,6 +121,10 @@ model Zone {
   description      String?
   created_by       String // ID của User (Cán bộ) tạo vùng này
   is_active        Boolean  @default(true)
+
+  active_start_time String?  // "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
+  active_end_time   String?  // "22:00" - kết thúc khung giờ
+
   created_at       DateTime @default(now())
   update_at        DateTime @updatedAt
 

@@ -78,7 +78,7 @@ const MapView: React.FC<MapViewProps> = ({
                 <h4>📍 Điểm check-in #{idx + 1}</h4>
                 <p><b>Đối tượng:</b> <span style={{ color: '#228be6', fontWeight: 600 }}>{point.subject?.full_name || 'Không rõ'}</span></p>
                 <p><b>Thời gian:</b> {new Date(point.checkin_time).toLocaleString('vi-VN')}</p>
-                <p><b>Trạng thái:</b> <span style={{ color: point.status === 'ON_TIME' ? '#2b8a3e' : '#c92a2a', fontWeight: 'bold' }}>{point.status}</span></p>
+                <p><b>Trạng thái:</b> <span style={{ color: point.status === 'ON_TIME' ? '#2b8a3e' : '#c92a2a', fontWeight: 'bold' }}>{point.status === 'ON_TIME' ? 'Đúng hạn' : point.status === 'LATE' ? 'Quá hạn' : 'Vi phạm vùng cấm'}</span></p>
                 <p><b>Ghi chú:</b> {point.notes || 'Không có ghi chú'}</p>
                 <p><b>Xác thực:</b> {point.face_verified ? '✅ Trùng khớp' : '❌ Sai lệch'}</p>
 

@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getSubjects, deleteSubject, exportCheckinsReportExcel, type Subject } from '../services/api';
+import { getSubjects, deleteSubject, exportCheckinsReportExcel, type Subject, getSubjectById } from '../services/api';
 import styled, { keyframes } from 'styled-components';
 import Spinner from '../components/Spinner';
 import { FaEdit, FaTrash, FaPlus, FaSearch, FaFileDownload, FaMapMarkedAlt } from 'react-icons/fa';
@@ -223,10 +223,9 @@ const SubjectListPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
-  const [exportSubject, setExportSubject] = useState<Subject | null>(null); 
-  const [zoneTargetSubject, setZoneTargetSubject] = useState<Subject | null>(null);
+  const [exportSubject, setExportSubject] = useState<Subject | null>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -255,8 +254,8 @@ const SubjectListPage: React.FC = () => {
     }
   }, [successMessage]);
 
-  const filteredSubjects = useMemo(() => 
-    subjects.filter(s => 
+  const filteredSubjects = useMemo(() =>
+    subjects.filter(s =>
       s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (s.idNumber && s.idNumber.toLowerCase().includes(searchTerm.toLowerCase()))
     ), [subjects, searchTerm]);
@@ -279,8 +278,8 @@ const SubjectListPage: React.FC = () => {
   const executeExcelExport = async (id: string, start: string, end: string) => {
     try {
       const blobData = await exportCheckinsReportExcel(id, start, end);
-      const fileUrl = window.URL.createObjectURL(new Blob([blobData], { 
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      const fileUrl = window.URL.createObjectURL(new Blob([blobData], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       }));
       const downloadLink = document.createElement('a');
       downloadLink.href = fileUrl;
@@ -292,6 +291,25 @@ const SubjectListPage: React.FC = () => {
       setExportSubject(null);
     } catch (err) {
       alert('Tải file báo cáo thất bại.');
+    }
+  };
+
+  const handleRowClick = async (id: string) => {
+    try {
+
+      const detail = await getSubjectById(id);
+      setSelectedSubject(detail);
+    } catch (err) {
+      alert("Không thể tải thông tin chi tiết");
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status.toUpperCase()) {
+      case 'ACTIVE': return 'Đang hoạt động';
+      case 'INACTIVE': return 'Tạm dừng';
+      case 'COMPLETED': return 'Hoàn thành';
+      default: return status;
     }
   };
 
@@ -327,25 +345,25 @@ const SubjectListPage: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <th style={{width: '6%'}}>STT</th>
-                <th style={{width: '30%'}}>Họ và Tên</th>
-                <th style={{width: '20%'}}>CCCD / Số Định Danh</th>
-                <th style={{width: '14%'}}>Trạng thái</th>
-                <th style={{width: '30%', textAlign: 'right'}}>Hành động</th>
+                <th style={{ width: '6%' }}>STT</th>
+                <th style={{ width: '30%' }}>Họ và Tên</th>
+                <th style={{ width: '20%' }}>CCCD / Số Định Danh</th>
+                <th style={{ width: '14%' }}>Trạng thái</th>
+                <th style={{ width: '30%', textAlign: 'right' }}>Hành động</th>
               </TableRow>
             </TableHead>
             <tbody>
               {filteredSubjects.length > 0 ? filteredSubjects.map((s, index) => (
-                <TableRow key={s._id} onClick={() => setSelectedSubject(s)}>
+                <TableRow key={s._id} onClick={() => handleRowClick(s._id)}>
                   <TableCell style={{ fontWeight: 600, color: '#64748b' }}>{index + 1}</TableCell>
                   <TableCell style={{ fontWeight: 600, color: '#0f172a' }}>{s.fullName}</TableCell>
                   <TableCell>{s.idNumber || '—'}</TableCell>
-                  <TableCell><StatusBadge status={s.status}>{s.status}</StatusBadge></TableCell>
+                  <TableCell><StatusBadge status={s.status}>{getStatusLabel(s.status)}</StatusBadge></TableCell>
                   <TableCell onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                     <ActionButtons>
-                      <IconButton 
+                      <IconButton
                         onClick={() => navigate(`/subjects/${s._id}/zones`)} // Chuyển hướng sang trang quản lý Zone riêng biệt của Subject
-                        title="Quản lý Vùng giám sát" 
+                        title="Quản lý Vùng giám sát"
                         style={{ color: '#4f46e5' }}
                       >
                         <FaMapMarkedAlt />
@@ -375,18 +393,18 @@ const SubjectListPage: React.FC = () => {
       </Card>
 
       {selectedSubject && (
-        <SubjectDetailModal 
-          subject={selectedSubject} 
-          onClose={() => setSelectedSubject(null)} 
-          onTriggerExport={(sub) => { setSelectedSubject(null); setExportSubject(sub); }} 
+        <SubjectDetailModal
+          subject={selectedSubject}
+          onClose={() => setSelectedSubject(null)}
+          onTriggerExport={(sub) => { setSelectedSubject(null); setExportSubject(sub); }}
         />
       )}
 
       {exportSubject && (
-        <ExportConfigModal 
-          subject={exportSubject} 
-          onClose={() => setExportSubject(null)} 
-          onExecuteExport={executeExcelExport} 
+        <ExportConfigModal
+          subject={exportSubject}
+          onClose={() => setExportSubject(null)}
+          onExecuteExport={executeExcelExport}
         />
       )}
     </>

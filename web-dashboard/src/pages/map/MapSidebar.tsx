@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { CheckinData, Zone } from '../../services/api';
-import { 
+import {
   SidebarList, CheckinCard, CardMeta, SubjectBadgeName, StatusBadge, CardNotes,
   TabContainer, TabButton, ZoneCard, ZoneHeader, ZoneName, ZoneBadge
 } from './MapStyles';
@@ -21,6 +21,15 @@ const MapSidebar: React.FC<MapSidebarProps> = ({
 }) => {
   // Quản lý trạng thái tab hiện tại: 'checkins' hoặc 'zones'
   const [activeTab, setActiveTab] = useState<'checkins' | 'zones'>('checkins');
+  // Trong MapSidebar.tsx
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'ON_TIME': return 'Đúng hạn';
+      case 'LATE': return 'Quá hạn';
+      case 'RESTRICTED_VIOLATION': return 'Vi phạm vùng cấm';
+      default: return status;
+    }
+  };
 
   return (
     <SidebarList>
@@ -66,7 +75,7 @@ const MapSidebar: React.FC<MapSidebarProps> = ({
                     <span style={{ fontSize: '12px', color: '#868e96' }}>
                       {new Date(item.checkin_time).toLocaleDateString('vi-VN')}
                     </span>
-                    <StatusBadge $status={item.status}>{item.status}</StatusBadge>
+                    <StatusBadge $status={item.status}> {getStatusLabel(item.status)}</StatusBadge>
                   </div>
                   <CardNotes>{item.notes || 'Không có ghi chú'}</CardNotes>
                 </CheckinCard>
