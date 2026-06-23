@@ -25,9 +25,14 @@ class SubjectRoute {
       this.subjectController.create
     );
     this.router.put(
+      '/fcm-token',
+      this.subjectController.updateFCMToken
+    );
+    this.router.put(
       '/:id',
       this.subjectController.update
     );
+
     this.router.delete(
       '/:id',
       this.subjectController.delete

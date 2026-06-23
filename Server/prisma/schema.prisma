@@ -81,6 +81,8 @@ model Subject {
   last_checkin_at  DateTime? // NEW - lần checkin hợp lệ gần nhất (bất kể trong/ngoài zone)
   last_notified_at DateTime? // NEW - lần nhắc gần nhất cho nghĩa vụ hiện tại
   current_zone_id  String? // NEW - zone SAFE đang là "ngữ cảnh" tính hạn, null = đang dùng default
+  
+  fcm_token String?
 
   checkins    Checkin[]   @relation("SubjectToCheckin")
   systemLog   SystemLog[] @relation("SubjectToSystemLog")
@@ -152,6 +154,12 @@ model Alert {
   @@map("alerts")
 }
 
+enum CheckinStatus {
+  ON_TIME             // checkin trong hạn cho phép, không vi phạm zone cấm
+  LATE                // checkin trễ (sau dueAt) nhưng subject tự chủ động checkin trước khi bị tạo Alert
+  RESTRICTED_VIOLATION // checkin rơi vào zone cấm
+}
+
 model Checkin {
   id            String  @id @default(uuid())
   subject_id    String
@@ -161,7 +169,7 @@ model Checkin {
 
   latitude     Float
   longitude    Float
-  status       String   @default("ON_TIME") // Consider an enum for this
+  status CheckinStatus @default(ON_TIME)
   checkin_time DateTime @default(now())
   zone_id      String?
   zone         Zone?    @relation("ZoneToCheckin", fields: [zone_id], references: [id], onDelete: SetNull)

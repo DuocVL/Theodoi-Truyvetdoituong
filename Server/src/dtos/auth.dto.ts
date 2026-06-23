@@ -21,6 +21,7 @@ export const loginSchema = z.object({
         username: z.string(),
         password: z.string(),
         device_id: z.string(), // device_id is required for login
+        fcm_token: z.string().optional(),
     })
 });
 

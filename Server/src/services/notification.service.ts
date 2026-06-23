@@ -1,14 +1,37 @@
+import { messaging } from '../configs/firebase';
 import { logger } from '../utils/log-helper';
-// import admin from 'firebase-admin'; // bật khi đã cấu hình firebase-admin ở configs/
+import { prisma } from '../configs/prisma'
 
 export class NotificationService {
   public async notifySubject(subjectId: string, message: string): Promise<void> {
-    // TODO: thay bằng gửi FCM thật khi Subject có field fcm_token
-    // const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
-    // if (subject?.fcm_token) {
-    //   await admin.messaging().send({ token: subject.fcm_token, notification: { title: 'Nhắc nhở', body: message } });
-    //   return;
-    // }
-    logger.info(`[NOTIFY-STUB] subject=${subjectId} message="${message}"`);
+    try {
+      // 1. Lấy FCM Token từ Database của Subject
+      const subject = await prisma.subject.findUnique({ 
+        where: { id: subjectId },
+        select: { fcm_token: true } // Yêu cầu bạn đã thêm field này vào model Subject
+      });
+
+      if (!subject?.fcm_token) {
+        logger.info(`[NOTIFY] Subject ${subjectId} chưa có FCM Token`);
+        return;
+      }
+
+      // 2. Gửi thông báo
+      await messaging.send({
+        token: subject.fcm_token,
+        notification: {
+          title: 'Nhắc nhở từ hệ thống',
+          body: message,
+        },
+        data: {
+          type: 'CHECKIN_REMINDER',
+          subjectId: subjectId
+        }
+      });
+      
+      logger.info(`[NOTIFY] Gửi thành công tới subject=${subjectId}`);
+    } catch (error) {
+      logger.error(`[NOTIFY] Lỗi gửi FCM: ${error}`);
+    }
   }
 }

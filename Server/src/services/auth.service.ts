@@ -5,10 +5,11 @@ import * as passwordResetTokenRepository from '../repositories/passwordResetToke
 import * as activationService from './activation.service';
 import { generateAccessToken, generateRefreshToken } from "../utils/token";
 import { compareData, hashData } from '../utils/hash';
-import { AccountPayload  } from "../types/data";
+import { AccountPayload } from "../types/data";
 import { HttpException } from "../exceptions/http-exception";
 import { sendPasswordResetEmail } from '../utils/email';
 import { Prisma } from '../../generated/prisma/client';
+import * as subjectRepository from '../repositories/subject.repository';
 import crypto from 'crypto';
 
 export const login = async (data: LoginDto) => {
@@ -36,6 +37,33 @@ export const login = async (data: LoginDto) => {
         throw new HttpException(401, "Invalid username or password");
     }
 
+    if (account.type === "SUBJECT") {
+        try {
+            const subject = await subjectRepository.getSubjectByAccountId(account.id);
+
+            // 1. Kiểm tra null: Nếu không tìm thấy subject, không nên tiếp tục
+            if (!subject) {
+                throw new Error(`Subject không tồn tại cho account_id: ${account.id}`);
+            }
+
+            // 2. Cập nhật fcm_token
+            // Sử dụng subject.id thay vì ép kiểu (as string) giúp code an toàn hơn
+            const updatedSubject = await subjectRepository.update(subject.id, {
+                fcm_token: data.fcm_token
+            });
+
+            // 3. Log lại hành động để dễ debug (rất quan trọng cho thực tế)
+            console.log(`Đã cập nhật FCM token thành công cho Subject: ${subject.id}`);
+
+        } catch (error) {
+            // 4. Xử lý lỗi cụ thể thay vì để trống
+            console.error("Lỗi cập nhật FCM token cho Subject:", error);
+
+            // Bạn có thể ném lỗi ra ngoài nếu muốn Controller biết và phản hồi về client
+            // throw error; 
+        }
+    }
+
     // FIX: Invalidate old refresh token for the same device.
     // This ensures that a new login invalidates any previous session on the same device,
     // preventing the accumulation of unused refresh tokens.
@@ -58,7 +86,7 @@ export const login = async (data: LoginDto) => {
             connect: { id: account.id }
         }
     };
-    
+
     await refreshTokenRepository.create(tokenData);
 
     return {
@@ -145,11 +173,11 @@ export const refreshToken = async (data: RefreshTokenDto) => {
         // This would be a data integrity issue. The account linked to the token is gone.
         throw new HttpException(401, "Invalid refresh token: Associated account not found.");
     }
-    
+
     // 5. Create a new pair of access and refresh tokens
-    const newPayload: AccountPayload = { 
-        id: account.id, 
-        type: account.type, 
+    const newPayload: AccountPayload = {
+        id: account.id,
+        type: account.type,
         device_id: tokenFromDb.device_id // Carry over the device ID from the original token
     };
     const newAccessToken = generateAccessToken(newPayload);
@@ -168,7 +196,7 @@ export const refreshToken = async (data: RefreshTokenDto) => {
     await refreshTokenRepository.create(newTokenData);
 
     // 7. Return the new tokens to the client
-    return { 
+    return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken
     };
@@ -200,7 +228,7 @@ export const resetPassword = async (data: ResetPasswordDto) => {
     const passwordResetToken = await passwordResetTokenRepository.findByToken(token);
 
     if (!passwordResetToken || passwordResetToken.expires_at < new Date()) {
-        if(passwordResetToken) await passwordResetTokenRepository.deleteByToken(token);
+        if (passwordResetToken) await passwordResetTokenRepository.deleteByToken(token);
         throw new HttpException(400, "Invalid or expired token");
     }
 
@@ -246,6 +274,6 @@ export const getMe = async (accountId: string) => {
         }
         return account.user;
     }
-    
+
     throw new HttpException(500, `Unknown or unhandled account type for account ${accountId}`);
 };

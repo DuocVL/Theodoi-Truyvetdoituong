@@ -6,7 +6,7 @@ const complianceService = new ComplianceService();
 
 export function startCheckinComplianceCron(): void {
   // Chạy mỗi 1 phút — đủ chính xác cho interval_minutes/grace_minutes tính theo phút
-  cron.schedule('*/2 * * * *', async () => {
+  cron.schedule('*/1 * * * *', async () => {
     try {
       await complianceService.checkCheckinCompliance();
     } catch (err) {

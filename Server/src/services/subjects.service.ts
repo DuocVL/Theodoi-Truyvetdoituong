@@ -223,6 +223,18 @@ class SubjectService {
     });
   }
 
+  public async updateToken(subjectId: string, fcm_token: string): Promise<any> {
+    try {
+      console.log(fcm_token)
+      await prisma.subject.update({
+        where: { id: subjectId},
+        data: {fcm_token: fcm_token}
+      })
+    } catch (error) {
+       throw new HttpException(500, 'Update error');
+    }
+  }
+
 }
 
 export default SubjectService;

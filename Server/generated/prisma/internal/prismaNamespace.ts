@@ -1461,7 +1461,8 @@ export const SubjectScalarFieldEnum = {
   grace_minutes: 'grace_minutes',
   last_checkin_at: 'last_checkin_at',
   last_notified_at: 'last_notified_at',
-  current_zone_id: 'current_zone_id'
+  current_zone_id: 'current_zone_id',
+  fcm_token: 'fcm_token'
 } as const
 
 export type SubjectScalarFieldEnum = (typeof SubjectScalarFieldEnum)[keyof typeof SubjectScalarFieldEnum]
@@ -1787,6 +1788,20 @@ export type EnumAlertTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'AlertType[]'
  */
 export type ListEnumAlertTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AlertType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CheckinStatus'
+ */
+export type EnumCheckinStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CheckinStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CheckinStatus[]'
+ */
+export type ListEnumCheckinStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CheckinStatus[]'>
     
 
 

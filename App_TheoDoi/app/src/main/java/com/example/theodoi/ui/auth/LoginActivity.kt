@@ -11,7 +11,9 @@ import com.example.theodoi.data.AuthRepository
 import com.example.theodoi.data.SessionManager
 import com.example.theodoi.databinding.ActivityLoginBinding
 import com.example.theodoi.utils.DeviceUtils
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class LoginActivity : AppCompatActivity() {
 
@@ -61,13 +63,24 @@ class LoginActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val response = authRepository.login(username, password, deviceId)
+                // Hiển thị loading (nếu có UI spinner)
+                // binding.progressBar.visibility = View.VISIBLE
+
+                // Sử dụng await() để lấy token đồng bộ trong coroutine
+                val fcmToken = try {
+                    FirebaseMessaging.getInstance().token.await()
+                } catch (e: Exception) {
+                    Log.e("FCM_TAG", "Không thể lấy token: ${e.message}")
+                    "" // Nếu lỗi thì trả về chuỗi rỗng hoặc xử lý logic theo yêu cầu
+                }
+
+                // Gọi API đăng nhập với token đã có
+                val response = authRepository.login(username, password, deviceId, fcmToken)
+
                 if (response.isSuccessful && response.body() != null) {
                     val loginResponse = response.body()!!
-                    Log.e("TheoDoi", loginResponse.toString())
                     sessionManager.saveTokens(loginResponse.accessToken, loginResponse.refreshToken)
-                    Log.e("TheoDoi",sessionManager.getAccessToken()!!)
-                    Log.e("TheoDoi",sessionManager.getRefreshToken()!!)
+
                     Toast.makeText(this@LoginActivity, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
                     navigateToMain()
                 } else {
@@ -75,7 +88,11 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(this@LoginActivity, errorBody, Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@LoginActivity, "Lỗi kết nối: ${e.message}", Toast.LENGTH_LONG).show()
+                // Bắt lỗi network hoặc các lỗi khác
+                Toast.makeText(this@LoginActivity, "Lỗi: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                // Ẩn loading nếu có
+                // binding.progressBar.visibility = View.GONE
             }
         }
     }
@@ -100,4 +117,5 @@ class LoginActivity : AppCompatActivity() {
         Log.i(TAG, "Is Rooted: ${DeviceUtils.isRooted}")
         Log.i(TAG, "====================================================")
     }
+
 }

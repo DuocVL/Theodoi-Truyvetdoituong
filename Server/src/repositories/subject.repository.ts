@@ -22,6 +22,10 @@ export async function findById(id: string): Promise<Subject | null> {
     });
 }
 
+export const getSubjectByAccountId = async (account_id: string): Promise<Subject | null> => {
+  return await prisma.subject.findUnique({ where: { account_id } });
+};
+
 export async function findByFullName(full_name: string): Promise<Subject[]> {
     return prisma.subject.findMany({
         where: { 

@@ -1,9 +1,11 @@
 package com.example.theodoi
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.theodoi.data.AppDatabase
@@ -21,6 +23,9 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.Manifest
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,6 +44,8 @@ class MainActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
         database = AppDatabase.getDatabase(this)
+
+        askNotificationPermission()
 
         // Thực hiện kiểm tra đồng bộ khuôn mặt từ Server
         checkAndSyncFaceBiometric()
@@ -87,6 +94,22 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
 
+    }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            Log.w("FCM", "Người dùng từ chối quyền thông báo")
+        }
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     private fun checkAndSyncFaceBiometric() {

@@ -1,10 +1,9 @@
 import { prisma } from '../configs/prisma';
-import { AlertRepository } from '../repositories/alert.repository';
+import * as alertRepository from '../repositories/alert.repository';
 import { NotificationService } from '../services/notification.service';
 import { logger } from '../utils/log-helper';
 
 export class ComplianceService {
-  private alertRepository = new AlertRepository();
   private notificationService = new NotificationService();
 
   public async checkCheckinCompliance(): Promise<void> {
@@ -35,9 +34,10 @@ export class ComplianceService {
     const dueAt = new Date(baseline.getTime() + interval * 60_000);
     const graceDeadline = new Date(dueAt.getTime() + grace * 60_000);
 
-    if (now < dueAt) return; // chưa tới hạn, bỏ qua
+    if (now < dueAt) return; // chưa tới hạn
 
     if (now < graceDeadline) {
+      // Giai đoạn nhắc nhở nhẹ — chỉ nhắc 1 lần trong giai đoạn này
       const alreadyNotified = subject.last_notified_at && subject.last_notified_at >= dueAt;
       if (!alreadyNotified) {
         await this.notificationService.notifySubject(
@@ -49,15 +49,24 @@ export class ComplianceService {
       return;
     }
 
-    // Hết grace mà vẫn chưa checkin -> tạo Alert (tránh tạo trùng)
-    const existingAlert = await this.alertRepository.findRecentMissedAlert(subject.id, dueAt);
-    if (!existingAlert) {
-      await this.alertRepository.create({
+    // Đã hết grace — bắt đầu chu kỳ leo thang: mỗi `interval` phút trôi qua mà vẫn im lặng, nhắc + tạo Alert mới 1 lần
+    const lastEscalation = subject.last_notified_at ?? graceDeadline;
+    const nextEscalationDue = new Date(lastEscalation.getTime() + interval * 60_000);
+
+    if (now >= nextEscalationDue) {
+      const minutesLate = Math.floor((now.getTime() - dueAt.getTime()) / 60_000);
+      await this.notificationService.notifySubject(
+        subject.id,
+        `CẢNH BÁO: Bạn đã quá hạn checkin từ lúc ${dueAt.toLocaleString('vi-VN')}, vui lòng checkin ngay`
+      );
+      await alertRepository.createAlert({
         subject_id: subject.id,
         zone_id: subject.current_zone_id,
         type: 'MISSED_CHECKIN',
+        message: `Đối tượng ${subject.full_name} đã bỏ lỡ checkin, trễ ${minutesLate} phút so với hạn quy định${subject.currentZone ? ` tại khu vực "${subject.currentZone.zone_name}"` : ''}.`,
       });
-      logger.info(`[ComplianceCron] Tạo Alert MISSED_CHECKIN cho subject ${subject.id}`);
+      await prisma.subject.update({ where: { id: subject.id }, data: { last_notified_at: now } });
+      logger.info(`[ComplianceCron] Tạo Alert MISSED_CHECKIN (lặp lại) cho subject ${subject.id}`);
     }
   }
 }

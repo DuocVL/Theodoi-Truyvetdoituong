@@ -25,6 +25,15 @@ export const AlertType = {
 export type AlertType = (typeof AlertType)[keyof typeof AlertType]
 
 
+export const CheckinStatus = {
+  ON_TIME: 'ON_TIME',
+  LATE: 'LATE',
+  RESTRICTED_VIOLATION: 'RESTRICTED_VIOLATION'
+} as const
+
+export type CheckinStatus = (typeof CheckinStatus)[keyof typeof CheckinStatus]
+
+
 export const AccountType = {
   USER: 'USER',
   SUBJECT: 'SUBJECT'

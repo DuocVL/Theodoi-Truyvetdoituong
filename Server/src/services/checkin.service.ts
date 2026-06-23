@@ -4,7 +4,7 @@
 import { CheckinRepository } from '../repositories/checkin.repository';
 import { ImageService } from '../services/image.service';
 import { HttpException } from '../exceptions/http-exception';
-import { AlertRepository } from '../repositories/alert.repository';
+import * as alertRepository from '../repositories/alert.repository';
 import { NotificationService } from '../services/notification.service';
 import { isInsideZone } from '../utils/geo.util';
 import type { CreateCheckinDto, UpdateCheckinDto } from '../dtos/checkin.dto';
@@ -18,7 +18,6 @@ import path from 'path';
 export class CheckinService {
   private checkinRepository = new CheckinRepository();
   private imageService = new ImageService();
-  private alertRepository = new AlertRepository();
   private notificationService = new NotificationService();
 
   public async createCheckin(accountId: string, checkinData: CreateCheckinDto, imageFile: Express.Multer.File): Promise<Checkin> {
@@ -26,49 +25,43 @@ export class CheckinService {
     if (!subject) throw new HttpException(403, 'Forbidden: User is not a subject');
 
     const image: Image = await this.imageService.uploadImage(imageFile, 'checkins');
-
     const zones = await prisma.zone.findMany({ where: { subject_id: subject.id, is_active: true } });
     const { latitude, longitude } = checkinData;
 
-    // 1. Check vùng cấm trước
+    // 1. Check vùng cấm trước — luôn ưu tiên, không quan tâm tới hạn checkin
     const restrictedHit = zones.find(z => z.type === 'RESTRICTED' && isInsideZone(latitude, longitude, z));
     if (restrictedHit) {
       const checkin = await this.checkinRepository.create({
-        ...checkinData,
-        subject_id: subject.id,
-        image_id: image.id,
-        zone_id: restrictedHit.id,
-        status: 'RESTRICTED_VIOLATION',
+        ...checkinData, subject_id: subject.id, image_id: image.id,
+        zone_id: restrictedHit.id, status: 'RESTRICTED_VIOLATION',
       });
       await this.notificationService.notifySubject(subject.id, `Bạn đang ở khu vực hạn chế: ${restrictedHit.zone_name}`);
-      await this.alertRepository.create({
+      await alertRepository.createAlert({
         subject_id: subject.id,
         zone_id: restrictedHit.id,
         checkin_id: checkin.id,
         type: 'RESTRICTED_ENTRY',
+        message: `Đối tượng ${subject.full_name} đã checkin tại khu vực hạn chế "${restrictedHit.zone_name}" vào lúc ${new Date().toLocaleString('vi-VN')}.`,
       });
       return checkin;
     }
 
-    // 2. Xác định zone SAFE đang đứng (nếu có) để làm ngữ cảnh tính hạn
+    // 2. Tính xem checkin này có trễ hạn không, để gán LATE/ON_TIME đúng
     const safeHit = zones.find(z => z.type === 'SAFE' && isInsideZone(latitude, longitude, z));
+    const interval = safeHit?.interval_minutes ?? subject.interval_minutes;
+    const baseline = subject.last_checkin_at ?? subject.monitoring_start ?? subject.created_at;
+    const dueAt = new Date(baseline.getTime() + interval * 60_000);
+    const isLate = new Date() > dueAt;
 
     const checkin = await this.checkinRepository.create({
-      ...checkinData,
-      subject_id: subject.id,
-      image_id: image.id,
-      zone_id: safeHit?.id,
-      status: 'ON_TIME',
+      ...checkinData, subject_id: subject.id, image_id: image.id,
+      zone_id: safeHit?.id, status: isLate ? 'LATE' : 'ON_TIME',
     });
 
-    // 3. Reset lịch theo dõi ở Subject
+    // 3. Reset lịch theo dõi — checkin trễ vẫn được tính là "đã hoàn thành nghĩa vụ", chỉ đánh dấu LATE để lưu vết
     await prisma.subject.update({
       where: { id: subject.id },
-      data: {
-        last_checkin_at: new Date(),
-        last_notified_at: null,
-        current_zone_id: safeHit?.id ?? null,
-      },
+      data: { last_checkin_at: new Date(), last_notified_at: null, current_zone_id: safeHit?.id ?? null },
     });
 
     return checkin;

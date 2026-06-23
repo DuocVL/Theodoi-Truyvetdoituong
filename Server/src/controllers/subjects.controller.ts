@@ -4,6 +4,7 @@ import { RequestWithUser } from '../types/data';
 import { activateAccountSchema, createSubjectSchema, updateSubjectSchema } from '../dtos/subjects.dto';
 import { getUserByAccountId } from '../repositories/user.repository';
 import { z } from 'zod';
+import { getSubjectByAccountId } from '../repositories/subject.repository';
 
 class SubjectController {
   private subjectService = new SubjectService();
@@ -88,6 +89,32 @@ class SubjectController {
       next(error);
     }
   };
+
+  public updateFCMToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const role = req.role?.toUpperCase();
+      if (role !== 'SUBJECT') {
+        res.status(403).json({ message: 'Forbidden' });
+        return;
+      }
+      const fcm_token = req.body.fcm_token
+      if(!fcm_token){
+        res.status(400).json({messager: "Dữ liệu không hợp lệ"})
+        return;
+      }
+
+      const subject = await getSubjectByAccountId(req.account?.id as string)
+      if(!subject){
+        res.status(401).json({ message: 'Unauthorized: Account ID not found' });
+        return;
+      }
+
+      await this.subjectService.updateToken(subject?.id, fcm_token);
+      res.status(200).json({ message: 'updated' });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default SubjectController;

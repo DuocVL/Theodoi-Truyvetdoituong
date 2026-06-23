@@ -44,7 +44,7 @@ export type CheckinMinAggregateOutputType = {
   face_verified: boolean | null
   latitude: number | null
   longitude: number | null
-  status: string | null
+  status: $Enums.CheckinStatus | null
   checkin_time: Date | null
   zone_id: string | null
 }
@@ -57,7 +57,7 @@ export type CheckinMaxAggregateOutputType = {
   face_verified: boolean | null
   latitude: number | null
   longitude: number | null
-  status: string | null
+  status: $Enums.CheckinStatus | null
   checkin_time: Date | null
   zone_id: string | null
 }
@@ -221,7 +221,7 @@ export type CheckinGroupByOutputType = {
   face_verified: boolean
   latitude: number
   longitude: number
-  status: string
+  status: $Enums.CheckinStatus
   checkin_time: Date
   zone_id: string | null
   _count: CheckinCountAggregateOutputType | null
@@ -257,7 +257,7 @@ export type CheckinWhereInput = {
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   latitude?: Prisma.FloatFilter<"Checkin"> | number
   longitude?: Prisma.FloatFilter<"Checkin"> | number
-  status?: Prisma.StringFilter<"Checkin"> | string
+  status?: Prisma.EnumCheckinStatusFilter<"Checkin"> | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
   zone_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
   zone?: Prisma.XOR<Prisma.ZoneNullableScalarRelationFilter, Prisma.ZoneWhereInput> | null
@@ -294,7 +294,7 @@ export type CheckinWhereUniqueInput = Prisma.AtLeast<{
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   latitude?: Prisma.FloatFilter<"Checkin"> | number
   longitude?: Prisma.FloatFilter<"Checkin"> | number
-  status?: Prisma.StringFilter<"Checkin"> | string
+  status?: Prisma.EnumCheckinStatusFilter<"Checkin"> | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
   zone_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
   zone?: Prisma.XOR<Prisma.ZoneNullableScalarRelationFilter, Prisma.ZoneWhereInput> | null
@@ -332,7 +332,7 @@ export type CheckinScalarWhereWithAggregatesInput = {
   face_verified?: Prisma.BoolWithAggregatesFilter<"Checkin"> | boolean
   latitude?: Prisma.FloatWithAggregatesFilter<"Checkin"> | number
   longitude?: Prisma.FloatWithAggregatesFilter<"Checkin"> | number
-  status?: Prisma.StringWithAggregatesFilter<"Checkin"> | string
+  status?: Prisma.EnumCheckinStatusWithAggregatesFilter<"Checkin"> | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeWithAggregatesFilter<"Checkin"> | Date | string
   zone_id?: Prisma.StringNullableWithAggregatesFilter<"Checkin"> | string | null
 }
@@ -343,7 +343,7 @@ export type CheckinCreateInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone?: Prisma.ZoneCreateNestedOneWithoutCheckinsInput
   image?: Prisma.ImageCreateNestedOneWithoutCheckinImageInput
@@ -359,7 +359,7 @@ export type CheckinUncheckedCreateInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone_id?: string | null
   alertCheckin?: Prisma.AlertUncheckedCreateNestedManyWithoutCheckinInput
@@ -371,7 +371,7 @@ export type CheckinUpdateInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone?: Prisma.ZoneUpdateOneWithoutCheckinsNestedInput
   image?: Prisma.ImageUpdateOneWithoutCheckinImageNestedInput
@@ -387,7 +387,7 @@ export type CheckinUncheckedUpdateInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alertCheckin?: Prisma.AlertUncheckedUpdateManyWithoutCheckinNestedInput
@@ -401,7 +401,7 @@ export type CheckinCreateManyInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone_id?: string | null
 }
@@ -412,7 +412,7 @@ export type CheckinUpdateManyMutationInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -424,7 +424,7 @@ export type CheckinUncheckedUpdateManyInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -593,6 +593,10 @@ export type CheckinUpdateOneWithoutAlertCheckinNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CheckinUpdateToOneWithWhereWithoutAlertCheckinInput, Prisma.CheckinUpdateWithoutAlertCheckinInput>, Prisma.CheckinUncheckedUpdateWithoutAlertCheckinInput>
 }
 
+export type EnumCheckinStatusFieldUpdateOperationsInput = {
+  set?: $Enums.CheckinStatus
+}
+
 export type CheckinCreateNestedOneWithoutImageInput = {
   create?: Prisma.XOR<Prisma.CheckinCreateWithoutImageInput, Prisma.CheckinUncheckedCreateWithoutImageInput>
   connectOrCreate?: Prisma.CheckinCreateOrConnectWithoutImageInput
@@ -631,7 +635,7 @@ export type CheckinCreateWithoutSubjectInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone?: Prisma.ZoneCreateNestedOneWithoutCheckinsInput
   image?: Prisma.ImageCreateNestedOneWithoutCheckinImageInput
@@ -645,7 +649,7 @@ export type CheckinUncheckedCreateWithoutSubjectInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone_id?: string | null
   alertCheckin?: Prisma.AlertUncheckedCreateNestedManyWithoutCheckinInput
@@ -688,7 +692,7 @@ export type CheckinScalarWhereInput = {
   face_verified?: Prisma.BoolFilter<"Checkin"> | boolean
   latitude?: Prisma.FloatFilter<"Checkin"> | number
   longitude?: Prisma.FloatFilter<"Checkin"> | number
-  status?: Prisma.StringFilter<"Checkin"> | string
+  status?: Prisma.EnumCheckinStatusFilter<"Checkin"> | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFilter<"Checkin"> | Date | string
   zone_id?: Prisma.StringNullableFilter<"Checkin"> | string | null
 }
@@ -699,7 +703,7 @@ export type CheckinCreateWithoutZoneInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   image?: Prisma.ImageCreateNestedOneWithoutCheckinImageInput
   subject: Prisma.SubjectCreateNestedOneWithoutCheckinsInput
@@ -714,7 +718,7 @@ export type CheckinUncheckedCreateWithoutZoneInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   alertCheckin?: Prisma.AlertUncheckedCreateNestedManyWithoutCheckinInput
 }
@@ -751,7 +755,7 @@ export type CheckinCreateWithoutAlertCheckinInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone?: Prisma.ZoneCreateNestedOneWithoutCheckinsInput
   image?: Prisma.ImageCreateNestedOneWithoutCheckinImageInput
@@ -766,7 +770,7 @@ export type CheckinUncheckedCreateWithoutAlertCheckinInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone_id?: string | null
 }
@@ -793,7 +797,7 @@ export type CheckinUpdateWithoutAlertCheckinInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone?: Prisma.ZoneUpdateOneWithoutCheckinsNestedInput
   image?: Prisma.ImageUpdateOneWithoutCheckinImageNestedInput
@@ -808,7 +812,7 @@ export type CheckinUncheckedUpdateWithoutAlertCheckinInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -819,7 +823,7 @@ export type CheckinCreateWithoutImageInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone?: Prisma.ZoneCreateNestedOneWithoutCheckinsInput
   subject: Prisma.SubjectCreateNestedOneWithoutCheckinsInput
@@ -833,7 +837,7 @@ export type CheckinUncheckedCreateWithoutImageInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone_id?: string | null
   alertCheckin?: Prisma.AlertUncheckedCreateNestedManyWithoutCheckinInput
@@ -861,7 +865,7 @@ export type CheckinUpdateWithoutImageInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone?: Prisma.ZoneUpdateOneWithoutCheckinsNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutCheckinsNestedInput
@@ -875,7 +879,7 @@ export type CheckinUncheckedUpdateWithoutImageInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alertCheckin?: Prisma.AlertUncheckedUpdateManyWithoutCheckinNestedInput
@@ -888,7 +892,7 @@ export type CheckinCreateManySubjectInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
   zone_id?: string | null
 }
@@ -899,7 +903,7 @@ export type CheckinUpdateWithoutSubjectInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone?: Prisma.ZoneUpdateOneWithoutCheckinsNestedInput
   image?: Prisma.ImageUpdateOneWithoutCheckinImageNestedInput
@@ -913,7 +917,7 @@ export type CheckinUncheckedUpdateWithoutSubjectInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   alertCheckin?: Prisma.AlertUncheckedUpdateManyWithoutCheckinNestedInput
@@ -926,7 +930,7 @@ export type CheckinUncheckedUpdateManyWithoutSubjectInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -939,7 +943,7 @@ export type CheckinCreateManyZoneInput = {
   face_verified?: boolean
   latitude: number
   longitude: number
-  status?: string
+  status?: $Enums.CheckinStatus
   checkin_time?: Date | string
 }
 
@@ -949,7 +953,7 @@ export type CheckinUpdateWithoutZoneInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   image?: Prisma.ImageUpdateOneWithoutCheckinImageNestedInput
   subject?: Prisma.SubjectUpdateOneRequiredWithoutCheckinsNestedInput
@@ -964,7 +968,7 @@ export type CheckinUncheckedUpdateWithoutZoneInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   alertCheckin?: Prisma.AlertUncheckedUpdateManyWithoutCheckinNestedInput
 }
@@ -977,7 +981,7 @@ export type CheckinUncheckedUpdateManyWithoutZoneInput = {
   face_verified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   latitude?: Prisma.FloatFieldUpdateOperationsInput | number
   longitude?: Prisma.FloatFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumCheckinStatusFieldUpdateOperationsInput | $Enums.CheckinStatus
   checkin_time?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1110,7 +1114,7 @@ export type $CheckinPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     face_verified: boolean
     latitude: number
     longitude: number
-    status: string
+    status: $Enums.CheckinStatus
     checkin_time: Date
     zone_id: string | null
   }, ExtArgs["result"]["checkin"]>
@@ -1547,7 +1551,7 @@ export interface CheckinFieldRefs {
   readonly face_verified: Prisma.FieldRef<"Checkin", 'Boolean'>
   readonly latitude: Prisma.FieldRef<"Checkin", 'Float'>
   readonly longitude: Prisma.FieldRef<"Checkin", 'Float'>
-  readonly status: Prisma.FieldRef<"Checkin", 'String'>
+  readonly status: Prisma.FieldRef<"Checkin", 'CheckinStatus'>
   readonly checkin_time: Prisma.FieldRef<"Checkin", 'DateTime'>
   readonly zone_id: Prisma.FieldRef<"Checkin", 'String'>
 }

@@ -11,8 +11,8 @@ class AuthRepository {
 
     private val authApiService by lazy { ApiClient.authApiService }
 
-    suspend fun login(username: String, password: String, deviceId: String): Response<LoginResponse> {
-        val request = LoginRequest(username, password, deviceId)
+    suspend fun login(username: String, password: String, deviceId: String, fcm_token: String): Response<LoginResponse> {
+        val request = LoginRequest(username, password, deviceId, fcm_token)
         return authApiService.login(request)
     }
 

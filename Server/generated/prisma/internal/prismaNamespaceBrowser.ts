@@ -142,7 +142,8 @@ export const SubjectScalarFieldEnum = {
   grace_minutes: 'grace_minutes',
   last_checkin_at: 'last_checkin_at',
   last_notified_at: 'last_notified_at',
-  current_zone_id: 'current_zone_id'
+  current_zone_id: 'current_zone_id',
+  fcm_token: 'fcm_token'
 } as const
 
 export type SubjectScalarFieldEnum = (typeof SubjectScalarFieldEnum)[keyof typeof SubjectScalarFieldEnum]

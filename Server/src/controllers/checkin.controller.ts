@@ -83,7 +83,7 @@ export class CheckinController {
       const accountId = req.account?.id;
       const role = req.role?.toUpperCase();
       if (!accountId || !role) throw new HttpException(401, 'Unauthorized');
-      
+
       const user = await getUserByAccountId(req.account?.id as string);
       const createdByUserId = user?.id;
       if (!createdByUserId) {
@@ -127,7 +127,7 @@ export class CheckinController {
 
       // BỔ SUNG: Đọc thêm startTime và endTime trực tiếp từ query
       const { startDate, endDate, startTime, endTime, page = 1, limit = 10 } = req.query;
-      
+
       // Kiểm tra thủ công các tham số ngày bắt buộc
       if (!startDate || !endDate) {
         throw new HttpException(400, 'Missing required query parameters: startDate and endDate');
@@ -141,12 +141,12 @@ export class CheckinController {
 
       // Truyền thêm dữ liệu thời gian chi tiết xuống tầng Service xử lý nghiệp vụ
       const result = await this.checkinService.getUserManagedCheckinsAndTime(
-        user.id, 
-        String(startDate), 
-        String(endDate), 
+        user.id,
+        String(startDate),
+        String(endDate),
         finalStartTime,
         finalEndTime,
-        Number(page), 
+        Number(page),
         Number(limit)
       );
       res.status(200).json(result);
@@ -169,7 +169,7 @@ export class CheckinController {
       if (!user?.id) throw new HttpException(401, 'Unauthorized: Manager account not found');
 
       const subjectId = req.params.subjectId as string;
-      
+
       // BỔ SUNG: Đọc thêm startTime và endTime trực tiếp từ query
       const { startDate, endDate, startTime, endTime, page = 1, limit = 10 } = req.query;
 
@@ -186,14 +186,14 @@ export class CheckinController {
 
       // Truyền thêm dữ liệu thời gian chi tiết xuống tầng Service xử lý nghiệp vụ
       const result = await this.checkinService.getCheckinsBySubjectAndTime(
-        subjectId, 
-        String(startDate), 
-        String(endDate), 
+        subjectId,
+        String(startDate),
+        String(endDate),
         finalStartTime,
         finalEndTime,
-        Number(page), 
-        Number(limit), 
-        user.id, 
+        Number(page),
+        Number(limit),
+        user.id,
         role
       );
       res.status(200).json(result);
@@ -218,7 +218,7 @@ export class CheckinController {
       // Thiết lập Header báo hiệu cho trình duyệt tải file nhị phân
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename=Bao-Cao-Checkin-${Date.now()}.xlsx`);
-      
+
       res.status(200).send(buffer);
     } catch (error) {
       next(error);
