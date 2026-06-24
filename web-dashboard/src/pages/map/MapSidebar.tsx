@@ -13,11 +13,15 @@ interface MapSidebarProps {
   zones: Zone[];                        // Nhận thêm danh sách zone
   selectedZoneId: string | null;         // ID vùng đang được chọn focus
   onSelectZone: (id: string, coords: [number, number]) => void; // Hàm focus vùng
+  // --- THÊM CÁC PROP MỚI ---
+  locationHistory: any[];          // Dữ liệu lịch sử
+  onLoadMore: () => void;  // Hàm fetch trang tiếp theo
+  hasMore: boolean;        // Kiểm tra còn dữ liệu không
 }
 
 const MapSidebar: React.FC<MapSidebarProps> = ({
   sidebarCheckins, mapCheckins, selectedCheckin, onSelectCheckin,
-  zones, selectedZoneId, onSelectZone
+  zones, selectedZoneId, onSelectZone, locationHistory, onLoadMore, hasMore
 }) => {
   // Quản lý trạng thái tab hiện tại: 'checkins' hoặc 'zones'
   const [activeTab, setActiveTab] = useState<'checkins' | 'zones'>('checkins');
@@ -82,6 +86,21 @@ const MapSidebar: React.FC<MapSidebarProps> = ({
               );
             })
           )}
+          {/* --- DI CHUYỂN KHỐI TẢI THÊM VÀO ĐÂY --- */}
+          <div style={{ padding: '10px' }}>
+            {hasMore ? (
+              <button
+                onClick={onLoadMore}
+                style={{ width: '100%', padding: '8px', cursor: 'pointer', borderRadius: '4px', border: '1px solid #ddd' }}
+              >
+                Tải thêm lịch sử vị trí...
+              </button>
+            ) : (
+              locationHistory.length > 0 && (
+                <p style={{ textAlign: 'center', fontSize: '12px', color: '#888' }}>Đã tải hết dữ liệu</p>
+              )
+            )}
+          </div>
         </>
       )}
 

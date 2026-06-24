@@ -597,3 +597,19 @@ export const getDetailAlert = async (id: string): Promise<any> => {
   }
 };
 
+export const getLocationHistory = async (subjectId: string, params: { startDate?: string, endDate?: string, page: number }): Promise<any> => {
+  try {
+    // Sửa lại URL: dùng template string đúng và truyền query params
+    const response = await apiClient.get(`/locations/history/${subjectId}`, {
+      params: { 
+        from: params.startDate, 
+        to: params.endDate, 
+        page: params.page 
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi gọi API history:', error);
+    throw error;
+  }
+};

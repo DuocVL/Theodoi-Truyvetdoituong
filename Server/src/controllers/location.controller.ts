@@ -23,6 +23,7 @@ export class LocationController {
         try {
             const { subject_id } = req.params;
             const { from, to, page, limit } = req.query;
+            console.log(subject_id, from, to, page, limit)
 
             // Ép kiểu ngay tại đây để Service yên tâm xử lý logic
             const result = await this.service.getHistory({
@@ -30,7 +31,7 @@ export class LocationController {
                 from: from ? new Date(from as string) : undefined,
                 to: to ? new Date(to as string) : undefined,
                 page: page ? Number(page) : 1,
-                limit: limit ? Number(limit) : 100
+                limit: limit ? Number(limit) : 25
             });
 
             return res.json({ success: true, ...result });

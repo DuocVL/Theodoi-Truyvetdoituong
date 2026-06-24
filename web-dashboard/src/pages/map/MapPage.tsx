@@ -6,12 +6,12 @@ import MapView from './MapView';
 
 // Import các API đầu mối
 import type { Subject, CheckinData, Zone } from '../../services/api';
-import { getSubjects, getUserManagedCheckins, getCheckinsBySubject, getCheckinById, getZonesBySubject } from '../../services/api';
+import { getSubjects, getUserManagedCheckins, getCheckinsBySubject, getCheckinById, getZonesBySubject, getLocationHistory } from '../../services/api';
 
 const MapPage: React.FC = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>('');
-  
+
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   const [startTime, setStartTime] = useState<string>('');
@@ -20,35 +20,58 @@ const MapPage: React.FC = () => {
   const [sidebarCheckins, setSidebarCheckins] = useState<CheckinData[]>([]);
   const [mapCheckins, setMapCheckins] = useState<CheckinData[]>([]);
   const [zones, setZones] = useState<Zone[]>([]); // Quản lý danh sách các vùng bảo vệ
-  
+
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedCheckin, setSelectedCheckin] = useState<CheckinData | null>(null);
   const [mapCenter, setMapCenter] = useState<[number, number]>([20.974639, 105.8466543]);
 
+  const [locationHistory, setLocationHistory] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null);
 
   // Thêm hàm xử lý Focus Zone khi click từ danh sách:
-const handleSelectZone = (id: string, coords: [number, number]) => {
-  setSelectedZoneId(id);
-  setMapCenter(coords); // Kích hoạt MapController di chuyển bản đồ đến tâm Zone
-  setSelectedCheckin(null); // Tạm ẩn popup checkin nếu có để tập trung nhìn khu vực zone
-};
+  const handleSelectZone = (id: string, coords: [number, number]) => {
+    setSelectedZoneId(id);
+    setMapCenter(coords); // Kích hoạt MapController di chuyển bản đồ đến tâm Zone
+    setSelectedCheckin(null); // Tạm ẩn popup checkin nếu có để tập trung nhìn khu vực zone
+  };
 
-// Cập nhật lại hiệu ứng useEffect số 2 (Khi đổi User thì reset luôn selectedZoneId):
-useEffect(() => {
-  setSelectedZoneId(null); // Reset trạng thái chọn vùng cũ
-  if (!selectedSubjectId) {
-    setZones([]);
-    return;
-  }
+  const fetchLocationHistory = async (reset: boolean = false) => {
+    if (!selectedSubjectId) return;
+    const p = reset ? 1 : page;
 
-  getZonesBySubject(selectedSubjectId)
-    .then(data => setZones(data || []))
-    .catch(err => {
-      console.error("Không thể lấy danh sách vùng bảo vệ:", err);
+    try {
+      const res = await getLocationHistory(selectedSubjectId, { startDate, endDate, page: p });
+      console.log("Dữ liệu nhận được từ API:", res);
+
+      // Kiểm tra cấu trúc: res.data chính là mảng bạn cần
+      const newData = res.data || [];
+
+      setLocationHistory(prev => reset ? newData : [...prev, ...newData]);
+      setHasMore(!!res.pagination && (p < res.pagination.totalPages)); // Cập nhật dựa trên cấu trúc pagination
+      setPage(p + 1);
+    } catch (err) {
+      console.error("Lỗi fetch history:", err);
+    }
+  };
+
+  // Cập nhật lại hiệu ứng useEffect số 2 (Khi đổi User thì reset luôn selectedZoneId):
+  useEffect(() => {
+    setSelectedZoneId(null); // Reset trạng thái chọn vùng cũ
+    if (!selectedSubjectId) {
       setZones([]);
-    });
-}, [selectedSubjectId]);
+      return;
+    }
+
+    getZonesBySubject(selectedSubjectId)
+      .then(data => setZones(data || []))
+      .catch(err => {
+        console.error("Không thể lấy danh sách vùng bảo vệ:", err);
+        setZones([]);
+      });
+  }, [selectedSubjectId]);
 
   // 1. Tải danh sách người dùng ban đầu
   useEffect(() => {
@@ -108,6 +131,10 @@ useEffect(() => {
     loadCheckins();
   }, [selectedSubjectId, startDate, endDate, startTime, endTime]);
 
+  useEffect(() => {
+    fetchLocationHistory(true); // Reset khi đổi filter
+  }, [selectedSubjectId, startDate, endDate]);
+
   // 4. Xử lý xem chi tiết điểm check-in cụ thể
   const handleSelectCheckin = async (id: string, coords: [number, number]) => {
     setMapCenter(coords);
@@ -151,14 +178,18 @@ useEffect(() => {
       <MainContent>
         {/* Khối Dòng thời gian Check-in bên trái */}
         <MapSidebar
-            sidebarCheckins={sidebarCheckins}
-            mapCheckins={mapCheckins}
-            selectedCheckin={selectedCheckin}
-            onSelectCheckin={handleSelectCheckin}
-            zones={zones}                     // <-- TRUYỀN THÊM
-            selectedZoneId={selectedZoneId}   // <-- TRUYỀN THÊM
-            onSelectZone={handleSelectZone}   // <-- TRUYỀN THÊM
-            />
+          sidebarCheckins={sidebarCheckins}
+          mapCheckins={mapCheckins}
+          selectedCheckin={selectedCheckin}
+          onSelectCheckin={handleSelectCheckin}
+          zones={zones}                     // <-- TRUYỀN THÊM
+          selectedZoneId={selectedZoneId}   // <-- TRUYỀN THÊM
+          onSelectZone={handleSelectZone}   // <-- TRUYỀN THÊM
+          // <-- TRUYỀN CÁC THAM SỐ MỚI
+          locationHistory={locationHistory}
+          onLoadMore={() => fetchLocationHistory(false)} // false nghĩa là không reset, chỉ lấy trang tiếp
+          hasMore={hasMore}
+        />
 
         {/* Khối Bản đồ hiển thị cốt lõi */}
         <MapView
@@ -168,6 +199,7 @@ useEffect(() => {
           onSelectCheckin={handleSelectCheckin}
           movementPath={movementPath}
           zones={zones} // Chỉ vẽ khi mảng này có phần tử (khi chọn 1 user)
+          locationHistory={locationHistory}
         />
       </MainContent>
     </PageContainer>

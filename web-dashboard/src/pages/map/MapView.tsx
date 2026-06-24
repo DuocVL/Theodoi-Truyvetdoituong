@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, Circle, useMap, CircleMarker } from 'react-leaflet';
 import type { CheckinData, Zone } from '../../services/api';
 import { MapWrapper, PopupDetails } from './MapStyles';
 
@@ -8,8 +8,9 @@ interface MapViewProps {
   mapCheckins: CheckinData[];
   selectedCheckin: CheckinData | null;
   onSelectCheckin: (id: string, coords: [number, number]) => void;
-  movementPath: [number, number][];
   zones: Zone[]; // Nhận các zone đổ từ server về khi chọn 1 user cụ thể
+  locationHistory: any[];
+  movementPath: [number, number][]; // <--- THÊM DÒNG NÀY VÀO
 }
 
 // Hợp phần bổ trợ di chuyển góc nhìn bản đồ mượt mà
@@ -22,8 +23,10 @@ const MapController: React.FC<{ center: [number, number] }> = ({ center }) => {
 };
 
 const MapView: React.FC<MapViewProps> = ({
-  mapCenter, mapCheckins, selectedCheckin, onSelectCheckin, movementPath, zones
+  mapCenter, mapCheckins, selectedCheckin, onSelectCheckin, zones, locationHistory, movementPath
 }) => {
+  // Khai báo biến path dựa trên locationHistory
+  const path: [number, number][] = locationHistory.map(p => [p.latitude, p.longitude]);
   return (
     <MapWrapper>
       <MapContainer center={mapCenter} zoom={16} style={{ height: '100%', width: '100%' }}>
@@ -37,7 +40,7 @@ const MapView: React.FC<MapViewProps> = ({
         {/* --- YÊU CẦU 1: VẼ CÁC ZONE GIÁM SÁT --- */}
         {zones.map((zone) => {
           // Tránh lỗi bất đồng bộ trường ID từ Backend Prisma/Mongoose
-          const zoneId = zone.id || (zone as any)._id; 
+          const zoneId = zone.id || (zone as any)._id;
           return (
             <Circle
               key={zoneId}
@@ -100,11 +103,30 @@ const MapView: React.FC<MapViewProps> = ({
           </Marker>
         ))}
 
-        {/* --- VẼ ĐƯỜNG DI CHUYỂN POLYLINE --- */}
-        {movementPath.length > 1 && (
-          <Polyline
-            pathOptions={{ color: '#228be6', weight: 4, opacity: 0.8, dashArray: '1, 5' }}
-            positions={movementPath}
+        {/* Đường nối lịch sử */}
+        <Polyline positions={path} pathOptions={{ color: '#2563eb', weight: 3 }} />
+
+        {/* Điểm bắt đầu (cũ nhất) */}
+        {locationHistory.length > 0 && locationHistory[locationHistory.length - 1] && (
+          <CircleMarker
+            center={[
+              locationHistory[locationHistory.length - 1].latitude,
+              locationHistory[locationHistory.length - 1].longitude
+            ]}
+            pathOptions={{ color: 'green' }}
+            radius={6}
+          />
+        )}
+
+        {/* Điểm kết thúc (mới nhất) */}
+        {locationHistory.length > 0 && locationHistory[0] && (
+          <CircleMarker
+            center={[
+              locationHistory[0].latitude,
+              locationHistory[0].longitude
+            ]}
+            pathOptions={{ color: 'red' }}
+            radius={6}
           />
         )}
       </MapContainer>
