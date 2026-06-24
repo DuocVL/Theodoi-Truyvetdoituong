@@ -389,6 +389,7 @@ export const ModelName = {
   User: 'User',
   Subject: 'Subject',
   Zone: 'Zone',
+  LocationHistory: 'LocationHistory',
   Alert: 'Alert',
   Checkin: 'Checkin',
   RefreshToken: 'RefreshToken',
@@ -412,7 +413,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "activationToken" | "user" | "subject" | "zone" | "alert" | "checkin" | "refreshToken" | "passwordResetToken" | "faceData" | "systemLog" | "image" | "spatial_ref_sys"
+    modelProps: "account" | "activationToken" | "user" | "subject" | "zone" | "locationHistory" | "alert" | "checkin" | "refreshToken" | "passwordResetToken" | "faceData" | "systemLog" | "image" | "spatial_ref_sys"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -783,6 +784,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ZoneCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ZoneCountAggregateOutputType> | number
+        }
+      }
+    }
+    LocationHistory: {
+      payload: Prisma.$LocationHistoryPayload<ExtArgs>
+      fields: Prisma.LocationHistoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LocationHistoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LocationHistoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>
+        }
+        findFirst: {
+          args: Prisma.LocationHistoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LocationHistoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>
+        }
+        findMany: {
+          args: Prisma.LocationHistoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>[]
+        }
+        create: {
+          args: Prisma.LocationHistoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>
+        }
+        createMany: {
+          args: Prisma.LocationHistoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LocationHistoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>[]
+        }
+        delete: {
+          args: Prisma.LocationHistoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>
+        }
+        update: {
+          args: Prisma.LocationHistoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.LocationHistoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LocationHistoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LocationHistoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.LocationHistoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LocationHistoryPayload>
+        }
+        aggregate: {
+          args: Prisma.LocationHistoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLocationHistory>
+        }
+        groupBy: {
+          args: Prisma.LocationHistoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LocationHistoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LocationHistoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LocationHistoryCountAggregateOutputType> | number
         }
       }
     }
@@ -1492,6 +1567,21 @@ export const ZoneScalarFieldEnum = {
 export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
 
 
+export const LocationHistoryScalarFieldEnum = {
+  id: 'id',
+  subject_id: 'subject_id',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  accuracy: 'accuracy',
+  speed: 'speed',
+  altitude: 'altitude',
+  recorded_at: 'recorded_at',
+  created_at: 'created_at'
+} as const
+
+export type LocationHistoryScalarFieldEnum = (typeof LocationHistoryScalarFieldEnum)[keyof typeof LocationHistoryScalarFieldEnum]
+
+
 export const AlertScalarFieldEnum = {
   id: 'id',
   subject_id: 'subject_id',
@@ -1937,6 +2027,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   subject?: Prisma.SubjectOmit
   zone?: Prisma.ZoneOmit
+  locationHistory?: Prisma.LocationHistoryOmit
   alert?: Prisma.AlertOmit
   checkin?: Prisma.CheckinOmit
   refreshToken?: Prisma.RefreshTokenOmit

@@ -101,6 +101,7 @@ dependencies {
 
     // Coroutines để chạy ngầm tác vụ DB
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+    implementation("androidx.core:core-ktx:1.13.1")
 
     // Retrofit for networking
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

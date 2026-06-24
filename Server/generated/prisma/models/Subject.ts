@@ -384,6 +384,7 @@ export type SubjectWhereInput = {
   systemLog?: Prisma.SystemLogListRelationFilter
   faceData?: Prisma.FaceDataListRelationFilter
   zones?: Prisma.ZoneListRelationFilter
+  locations?: Prisma.LocationHistoryListRelationFilter
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   avatar?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -421,6 +422,7 @@ export type SubjectOrderByWithRelationInput = {
   systemLog?: Prisma.SystemLogOrderByRelationAggregateInput
   faceData?: Prisma.FaceDataOrderByRelationAggregateInput
   zones?: Prisma.ZoneOrderByRelationAggregateInput
+  locations?: Prisma.LocationHistoryOrderByRelationAggregateInput
   account?: Prisma.AccountOrderByWithRelationInput
   avatar?: Prisma.ImageOrderByWithRelationInput
   creator?: Prisma.UserOrderByWithRelationInput
@@ -461,6 +463,7 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   systemLog?: Prisma.SystemLogListRelationFilter
   faceData?: Prisma.FaceDataListRelationFilter
   zones?: Prisma.ZoneListRelationFilter
+  locations?: Prisma.LocationHistoryListRelationFilter
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   avatar?: Prisma.XOR<Prisma.ImageNullableScalarRelationFilter, Prisma.ImageWhereInput> | null
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -558,6 +561,7 @@ export type SubjectCreateInput = {
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
@@ -595,6 +599,7 @@ export type SubjectUncheckedCreateInput = {
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -624,6 +629,7 @@ export type SubjectUpdateInput = {
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
@@ -661,6 +667,7 @@ export type SubjectUncheckedUpdateInput = {
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -1004,6 +1011,20 @@ export type SubjectUncheckedUpdateManyWithoutCurrentZoneNestedInput = {
   deleteMany?: Prisma.SubjectScalarWhereInput | Prisma.SubjectScalarWhereInput[]
 }
 
+export type SubjectCreateNestedOneWithoutLocationsInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutLocationsInput, Prisma.SubjectUncheckedCreateWithoutLocationsInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutLocationsInput
+  connect?: Prisma.SubjectWhereUniqueInput
+}
+
+export type SubjectUpdateOneRequiredWithoutLocationsNestedInput = {
+  create?: Prisma.XOR<Prisma.SubjectCreateWithoutLocationsInput, Prisma.SubjectUncheckedCreateWithoutLocationsInput>
+  connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutLocationsInput
+  upsert?: Prisma.SubjectUpsertWithoutLocationsInput
+  connect?: Prisma.SubjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubjectUpdateToOneWithWhereWithoutLocationsInput, Prisma.SubjectUpdateWithoutLocationsInput>, Prisma.SubjectUncheckedUpdateWithoutLocationsInput>
+}
+
 export type SubjectCreateNestedOneWithoutAlertSubjectInput = {
   create?: Prisma.XOR<Prisma.SubjectCreateWithoutAlertSubjectInput, Prisma.SubjectUncheckedCreateWithoutAlertSubjectInput>
   connectOrCreate?: Prisma.SubjectCreateOrConnectWithoutAlertSubjectInput
@@ -1114,6 +1135,7 @@ export type SubjectCreateWithoutAccountInput = {
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   currentZone?: Prisma.ZoneCreateNestedOneWithoutSubjectsCurrentInput
@@ -1149,6 +1171,7 @@ export type SubjectUncheckedCreateWithoutAccountInput = {
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -1194,6 +1217,7 @@ export type SubjectUpdateWithoutAccountInput = {
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   currentZone?: Prisma.ZoneUpdateOneWithoutSubjectsCurrentNestedInput
@@ -1229,6 +1253,7 @@ export type SubjectUncheckedUpdateWithoutAccountInput = {
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -1258,6 +1283,7 @@ export type SubjectCreateWithoutCreatorInput = {
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   currentZone?: Prisma.ZoneCreateNestedOneWithoutSubjectsCurrentInput
@@ -1293,6 +1319,7 @@ export type SubjectUncheckedCreateWithoutCreatorInput = {
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -1378,6 +1405,7 @@ export type SubjectCreateWithoutZonesInput = {
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
@@ -1414,6 +1442,7 @@ export type SubjectUncheckedCreateWithoutZonesInput = {
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -1448,6 +1477,7 @@ export type SubjectCreateWithoutCurrentZoneInput = {
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
@@ -1483,6 +1513,7 @@ export type SubjectUncheckedCreateWithoutCurrentZoneInput = {
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -1532,6 +1563,7 @@ export type SubjectUpdateWithoutZonesInput = {
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
@@ -1568,6 +1600,7 @@ export type SubjectUncheckedUpdateWithoutZonesInput = {
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -1585,6 +1618,154 @@ export type SubjectUpdateWithWhereUniqueWithoutCurrentZoneInput = {
 export type SubjectUpdateManyWithWhereWithoutCurrentZoneInput = {
   where: Prisma.SubjectScalarWhereInput
   data: Prisma.XOR<Prisma.SubjectUpdateManyMutationInput, Prisma.SubjectUncheckedUpdateManyWithoutCurrentZoneInput>
+}
+
+export type SubjectCreateWithoutLocationsInput = {
+  id?: string
+  code?: string
+  full_name: string
+  dob?: Date | string | null
+  gender?: string | null
+  id_number?: string | null
+  address?: string | null
+  phone?: string | null
+  status?: $Enums.SubjectStatus
+  monitoring_start?: Date | string | null
+  monitoring_end?: Date | string | null
+  created_at?: Date | string
+  update_at?: Date | string
+  deleted_at?: Date | string | null
+  interval_minutes?: number
+  grace_minutes?: number
+  last_checkin_at?: Date | string | null
+  last_notified_at?: Date | string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
+  fcm_token?: string | null
+  checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
+  systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
+  faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
+  zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  account: Prisma.AccountCreateNestedOneWithoutSubjectInput
+  avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
+  creator: Prisma.UserCreateNestedOneWithoutSubjectInput
+  currentZone?: Prisma.ZoneCreateNestedOneWithoutSubjectsCurrentInput
+  alertSubject?: Prisma.AlertCreateNestedManyWithoutSubjectInput
+}
+
+export type SubjectUncheckedCreateWithoutLocationsInput = {
+  id?: string
+  account_id: string
+  code?: string
+  full_name: string
+  dob?: Date | string | null
+  gender?: string | null
+  id_number?: string | null
+  address?: string | null
+  phone?: string | null
+  status?: $Enums.SubjectStatus
+  monitoring_start?: Date | string | null
+  monitoring_end?: Date | string | null
+  avatar_id?: string | null
+  created_by: string
+  created_at?: Date | string
+  update_at?: Date | string
+  deleted_at?: Date | string | null
+  interval_minutes?: number
+  grace_minutes?: number
+  last_checkin_at?: Date | string | null
+  last_notified_at?: Date | string | null
+  current_zone_id?: string | null
+  active_start_time?: string | null
+  active_end_time?: string | null
+  fcm_token?: string | null
+  checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
+  systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
+  faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
+  zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
+}
+
+export type SubjectCreateOrConnectWithoutLocationsInput = {
+  where: Prisma.SubjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutLocationsInput, Prisma.SubjectUncheckedCreateWithoutLocationsInput>
+}
+
+export type SubjectUpsertWithoutLocationsInput = {
+  update: Prisma.XOR<Prisma.SubjectUpdateWithoutLocationsInput, Prisma.SubjectUncheckedUpdateWithoutLocationsInput>
+  create: Prisma.XOR<Prisma.SubjectCreateWithoutLocationsInput, Prisma.SubjectUncheckedCreateWithoutLocationsInput>
+  where?: Prisma.SubjectWhereInput
+}
+
+export type SubjectUpdateToOneWithWhereWithoutLocationsInput = {
+  where?: Prisma.SubjectWhereInput
+  data: Prisma.XOR<Prisma.SubjectUpdateWithoutLocationsInput, Prisma.SubjectUncheckedUpdateWithoutLocationsInput>
+}
+
+export type SubjectUpdateWithoutLocationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
+  dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
+  monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  interval_minutes?: Prisma.IntFieldUpdateOperationsInput | number
+  grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
+  last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
+  systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
+  faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
+  zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
+  avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
+  creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
+  currentZone?: Prisma.ZoneUpdateOneWithoutSubjectsCurrentNestedInput
+  alertSubject?: Prisma.AlertUpdateManyWithoutSubjectNestedInput
+}
+
+export type SubjectUncheckedUpdateWithoutLocationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  account_id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  full_name?: Prisma.StringFieldUpdateOperationsInput | string
+  dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumSubjectStatusFieldUpdateOperationsInput | $Enums.SubjectStatus
+  monitoring_start?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  monitoring_end?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_by?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  update_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deleted_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  interval_minutes?: Prisma.IntFieldUpdateOperationsInput | number
+  grace_minutes?: Prisma.IntFieldUpdateOperationsInput | number
+  last_checkin_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  last_notified_at?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  current_zone_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_start_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active_end_time?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fcm_token?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
+  systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
+  faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
+  zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateWithoutAlertSubjectInput = {
@@ -1613,6 +1794,7 @@ export type SubjectCreateWithoutAlertSubjectInput = {
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
@@ -1649,6 +1831,7 @@ export type SubjectUncheckedCreateWithoutAlertSubjectInput = {
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type SubjectCreateOrConnectWithoutAlertSubjectInput = {
@@ -1693,6 +1876,7 @@ export type SubjectUpdateWithoutAlertSubjectInput = {
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
@@ -1729,6 +1913,7 @@ export type SubjectUncheckedUpdateWithoutAlertSubjectInput = {
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type SubjectCreateWithoutCheckinsInput = {
@@ -1756,6 +1941,7 @@ export type SubjectCreateWithoutCheckinsInput = {
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
@@ -1792,6 +1978,7 @@ export type SubjectUncheckedCreateWithoutCheckinsInput = {
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -1836,6 +2023,7 @@ export type SubjectUpdateWithoutCheckinsInput = {
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
@@ -1872,6 +2060,7 @@ export type SubjectUncheckedUpdateWithoutCheckinsInput = {
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -1900,6 +2089,7 @@ export type SubjectCreateWithoutFaceDataInput = {
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
@@ -1936,6 +2126,7 @@ export type SubjectUncheckedCreateWithoutFaceDataInput = {
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -1980,6 +2171,7 @@ export type SubjectUpdateWithoutFaceDataInput = {
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
@@ -2016,6 +2208,7 @@ export type SubjectUncheckedUpdateWithoutFaceDataInput = {
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -2044,6 +2237,7 @@ export type SubjectCreateWithoutSystemLogInput = {
   checkins?: Prisma.CheckinCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   avatar?: Prisma.ImageCreateNestedOneWithoutSubjectAvatarInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
@@ -2080,6 +2274,7 @@ export type SubjectUncheckedCreateWithoutSystemLogInput = {
   checkins?: Prisma.CheckinUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -2124,6 +2319,7 @@ export type SubjectUpdateWithoutSystemLogInput = {
   checkins?: Prisma.CheckinUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
@@ -2160,6 +2356,7 @@ export type SubjectUncheckedUpdateWithoutSystemLogInput = {
   checkins?: Prisma.CheckinUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -2189,6 +2386,7 @@ export type SubjectCreateWithoutAvatarInput = {
   systemLog?: Prisma.SystemLogCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryCreateNestedManyWithoutSubjectInput
   account: Prisma.AccountCreateNestedOneWithoutSubjectInput
   creator: Prisma.UserCreateNestedOneWithoutSubjectInput
   currentZone?: Prisma.ZoneCreateNestedOneWithoutSubjectsCurrentInput
@@ -2224,6 +2422,7 @@ export type SubjectUncheckedCreateWithoutAvatarInput = {
   systemLog?: Prisma.SystemLogUncheckedCreateNestedManyWithoutSubjectInput
   faceData?: Prisma.FaceDataUncheckedCreateNestedManyWithoutSubjectInput
   zones?: Prisma.ZoneUncheckedCreateNestedManyWithoutSubjectInput
+  locations?: Prisma.LocationHistoryUncheckedCreateNestedManyWithoutSubjectInput
   alertSubject?: Prisma.AlertUncheckedCreateNestedManyWithoutSubjectInput
 }
 
@@ -2269,6 +2468,7 @@ export type SubjectUpdateWithoutAvatarInput = {
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
   currentZone?: Prisma.ZoneUpdateOneWithoutSubjectsCurrentNestedInput
@@ -2304,6 +2504,7 @@ export type SubjectUncheckedUpdateWithoutAvatarInput = {
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -2360,6 +2561,7 @@ export type SubjectUpdateWithoutCreatorInput = {
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   currentZone?: Prisma.ZoneUpdateOneWithoutSubjectsCurrentNestedInput
@@ -2395,6 +2597,7 @@ export type SubjectUncheckedUpdateWithoutCreatorInput = {
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -2478,6 +2681,7 @@ export type SubjectUpdateWithoutCurrentZoneInput = {
   systemLog?: Prisma.SystemLogUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUpdateManyWithoutSubjectNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutSubjectNestedInput
   avatar?: Prisma.ImageUpdateOneWithoutSubjectAvatarNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutSubjectNestedInput
@@ -2513,6 +2717,7 @@ export type SubjectUncheckedUpdateWithoutCurrentZoneInput = {
   systemLog?: Prisma.SystemLogUncheckedUpdateManyWithoutSubjectNestedInput
   faceData?: Prisma.FaceDataUncheckedUpdateManyWithoutSubjectNestedInput
   zones?: Prisma.ZoneUncheckedUpdateManyWithoutSubjectNestedInput
+  locations?: Prisma.LocationHistoryUncheckedUpdateManyWithoutSubjectNestedInput
   alertSubject?: Prisma.AlertUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
@@ -2553,6 +2758,7 @@ export type SubjectCountOutputType = {
   systemLog: number
   faceData: number
   zones: number
+  locations: number
   alertSubject: number
 }
 
@@ -2561,6 +2767,7 @@ export type SubjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   systemLog?: boolean | SubjectCountOutputTypeCountSystemLogArgs
   faceData?: boolean | SubjectCountOutputTypeCountFaceDataArgs
   zones?: boolean | SubjectCountOutputTypeCountZonesArgs
+  locations?: boolean | SubjectCountOutputTypeCountLocationsArgs
   alertSubject?: boolean | SubjectCountOutputTypeCountAlertSubjectArgs
 }
 
@@ -2605,6 +2812,13 @@ export type SubjectCountOutputTypeCountZonesArgs<ExtArgs extends runtime.Types.E
 /**
  * SubjectCountOutputType without action
  */
+export type SubjectCountOutputTypeCountLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LocationHistoryWhereInput
+}
+
+/**
+ * SubjectCountOutputType without action
+ */
 export type SubjectCountOutputTypeCountAlertSubjectArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AlertWhereInput
 }
@@ -2640,6 +2854,7 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   systemLog?: boolean | Prisma.Subject$systemLogArgs<ExtArgs>
   faceData?: boolean | Prisma.Subject$faceDataArgs<ExtArgs>
   zones?: boolean | Prisma.Subject$zonesArgs<ExtArgs>
+  locations?: boolean | Prisma.Subject$locationsArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2746,6 +2961,7 @@ export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   systemLog?: boolean | Prisma.Subject$systemLogArgs<ExtArgs>
   faceData?: boolean | Prisma.Subject$faceDataArgs<ExtArgs>
   zones?: boolean | Prisma.Subject$zonesArgs<ExtArgs>
+  locations?: boolean | Prisma.Subject$locationsArgs<ExtArgs>
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   avatar?: boolean | Prisma.Subject$avatarArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -2773,6 +2989,7 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     systemLog: Prisma.$SystemLogPayload<ExtArgs>[]
     faceData: Prisma.$FaceDataPayload<ExtArgs>[]
     zones: Prisma.$ZonePayload<ExtArgs>[]
+    locations: Prisma.$LocationHistoryPayload<ExtArgs>[]
     account: Prisma.$AccountPayload<ExtArgs>
     avatar: Prisma.$ImagePayload<ExtArgs> | null
     creator: Prisma.$UserPayload<ExtArgs>
@@ -3203,6 +3420,7 @@ export interface Prisma__SubjectClient<T, Null = never, ExtArgs extends runtime.
   systemLog<T extends Prisma.Subject$systemLogArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$systemLogArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SystemLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   faceData<T extends Prisma.Subject$faceDataArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$faceDataArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FaceDataPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   zones<T extends Prisma.Subject$zonesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$zonesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ZonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  locations<T extends Prisma.Subject$locationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$locationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   account<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   avatar<T extends Prisma.Subject$avatarArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Subject$avatarArgs<ExtArgs>>): Prisma.Prisma__ImageClient<runtime.Types.Result.GetResult<Prisma.$ImagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
@@ -3756,6 +3974,30 @@ export type Subject$zonesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ZoneScalarFieldEnum | Prisma.ZoneScalarFieldEnum[]
+}
+
+/**
+ * Subject.locations
+ */
+export type Subject$locationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LocationHistory
+   */
+  select?: Prisma.LocationHistorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LocationHistory
+   */
+  omit?: Prisma.LocationHistoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LocationHistoryInclude<ExtArgs> | null
+  where?: Prisma.LocationHistoryWhereInput
+  orderBy?: Prisma.LocationHistoryOrderByWithRelationInput | Prisma.LocationHistoryOrderByWithRelationInput[]
+  cursor?: Prisma.LocationHistoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LocationHistoryScalarFieldEnum | Prisma.LocationHistoryScalarFieldEnum[]
 }
 
 /**

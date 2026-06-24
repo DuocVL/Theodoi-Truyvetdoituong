@@ -19,13 +19,17 @@ import com.example.theodoi.security.CryptoManager
 import com.example.theodoi.ui.HistoryActivity
 import com.example.theodoi.ui.auth.LoginActivity
 import com.example.theodoi.utils.FaceMath
-import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import android.Manifest
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.PowerManager
+import android.provider.Settings
+import com.example.theodoi.realtime.PrefsManager
+import com.example.theodoi.realtime.LocationForegroundService
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,6 +45,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         ApiClient.init(applicationContext)
+
+        // Ví dụ: thiết lập interval = 30s do người dùng cấu hình
+        PrefsManager.setIntervalMs(this, 30_000L)
+        PrefsManager.setServerUrl(this, "http://192.168.44.101:3333/api/v1/locations/")
+
+        requestAllPermissions()
 
         sessionManager = SessionManager(this)
         database = AppDatabase.getDatabase(this)
@@ -100,6 +110,65 @@ class MainActivity : AppCompatActivity() {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+
+    private fun requestAllPermissions() {
+        val permissions = mutableListOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        requestPermissions.launch(permissions.toTypedArray())
+    }
+
+    private fun requestBackgroundLocationIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requestBackgroundLocation.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        } else {
+            startTrackingService()
+        }
+    }
+
+    /** Xin user loại app khỏi Doze/tối ưu pin — quan trọng cho trường hợp tắt màn hình lâu. */
+    private fun askIgnoreBatteryOptimization() {
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            try {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+                startActivity(intent)
+            } catch (e: Exception) {
+                // một số máy không hỗ trợ intent này -> dẫn user vào Settings thủ công
+            }
+        }
+    }
+
+    private fun startTrackingService() {
+        PrefsManager.setTrackingEnabled(this, true)
+        LocationForegroundService.start(this)
+    }
+
+    fun stopTrackingService() {
+        LocationForegroundService.stop(this)
+    }
+
+    private val requestPermissions = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        val fineGranted = results[Manifest.permission.ACCESS_FINE_LOCATION] == true
+        if (fineGranted) {
+            requestBackgroundLocationIfNeeded()
+        }
+    }
+
+    private val requestBackgroundLocation = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) askIgnoreBatteryOptimization()
+        startTrackingService()
     }
 
     private fun checkAndSyncFaceBiometric() {

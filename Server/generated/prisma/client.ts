@@ -67,6 +67,11 @@ export type Subject = Prisma.SubjectModel
  */
 export type Zone = Prisma.ZoneModel
 /**
+ * Model LocationHistory
+ * 
+ */
+export type LocationHistory = Prisma.LocationHistoryModel
+/**
  * Model Alert
  * 
  */

@@ -56,6 +56,7 @@ export const ModelName = {
   User: 'User',
   Subject: 'Subject',
   Zone: 'Zone',
+  LocationHistory: 'LocationHistory',
   Alert: 'Alert',
   Checkin: 'Checkin',
   RefreshToken: 'RefreshToken',
@@ -171,6 +172,21 @@ export const ZoneScalarFieldEnum = {
 } as const
 
 export type ZoneScalarFieldEnum = (typeof ZoneScalarFieldEnum)[keyof typeof ZoneScalarFieldEnum]
+
+
+export const LocationHistoryScalarFieldEnum = {
+  id: 'id',
+  subject_id: 'subject_id',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  accuracy: 'accuracy',
+  speed: 'speed',
+  altitude: 'altitude',
+  recorded_at: 'recorded_at',
+  created_at: 'created_at'
+} as const
+
+export type LocationHistoryScalarFieldEnum = (typeof LocationHistoryScalarFieldEnum)[keyof typeof LocationHistoryScalarFieldEnum]
 
 
 export const AlertScalarFieldEnum = {

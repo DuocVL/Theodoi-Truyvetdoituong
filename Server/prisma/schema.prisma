@@ -90,6 +90,8 @@ model Subject {
   systemLog   SystemLog[] @relation("SubjectToSystemLog")
   faceData    FaceData[]  @relation("SubjectToFaceData")
   zones       Zone[]      @relation("SubjectToZones")
+  locations LocationHistory[]
+
   account     Account     @relation(fields: [account_id], references: [id])
   avatar      Image?      @relation("SubjectToAvatar", fields: [avatar_id], references: [id])
   creator     User        @relation("UserToSubject", fields: [created_by], references: [id])
@@ -136,6 +138,31 @@ model Zone {
   checkins  Checkin[] @relation("ZoneToCheckin")
 
   @@map("zones")
+}
+
+model LocationHistory {
+  id          String   @id @default(uuid())
+
+  subject_id  String
+
+  latitude    Float
+  longitude   Float
+  accuracy    Float?
+  speed       Float?
+  altitude    Float?
+
+  recorded_at DateTime @default(now())
+  created_at  DateTime @default(now())
+
+
+  subject Subject @relation(fields: [subject_id], references: [id], onDelete: Cascade)
+
+   // query theo đối tượng + thời gian
+  @@index([subject_id, recorded_at(sort: Desc)])
+
+  // dọn dữ liệu / thống kê theo ngày
+  @@index([recorded_at])
+  @@map("location_histories")
 }
 
 enum AlertType {
@@ -252,6 +279,8 @@ model SystemLog {
   @@index([category, created_at(sort: Desc)])
   @@index([user_id, created_at(sort: Desc)])
   @@index([subject_id, created_at(sort: Desc)])
+
+  @@map("systemlog")
 }
 
 model Image {
