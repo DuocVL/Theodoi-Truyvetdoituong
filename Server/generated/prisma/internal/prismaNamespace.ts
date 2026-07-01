@@ -1517,7 +1517,6 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export const SubjectScalarFieldEnum = {
   id: 'id',
   account_id: 'account_id',
-  code: 'code',
   full_name: 'full_name',
   dob: 'dob',
   gender: 'gender',

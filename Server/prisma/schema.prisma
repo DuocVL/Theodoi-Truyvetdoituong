@@ -59,7 +59,6 @@ model User {
 model Subject {
   id         String        @id @default(uuid())
   account_id String        @unique
-  code       String        @unique @default(uuid())
   full_name  String
   dob        DateTime?
   gender     String?

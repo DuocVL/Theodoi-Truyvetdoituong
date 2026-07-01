@@ -3,7 +3,7 @@ import * as controller from '../../controllers/alerts.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 
 const router = Router();
-router.use(authMiddleware);
+router.use(authMiddleware);//midddlewaare xác thực , xác định quyền
 
 // Lấy danh sách alert cho Admin/User quản lý
 router.get('/', controller.getAlertsHandler);
@@ -11,10 +11,7 @@ router.get('/', controller.getAlertsHandler);
 //Lấy chi tiết thông tin 
 router.get('/:id', controller.getAlertDetailController);
 
-// Lấy danh sách alert cho chính Subject đó (nếu là role SUBJECT)
+// Lấy danh sách alert cho chính Subject đó
 router.get('/me', controller.getAlertsHandler); 
-
-// Tạo mới alert (thường do hệ thống tự sinh qua service khác)
-// router.post('/', authenticate, authorize(['ADMIN']), controller.create);
 
 export default router;

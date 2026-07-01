@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
 
-    private const val BASE_URL = "http://192.168.44.101:3333/"
+    private const val BASE_URL = "http://192.168.44.100:3333/"
     fun getAbsoluteImageUrl(relativeUrl: String): String = "$BASE_URL${relativeUrl.removePrefix("/")}"
 
     private lateinit var appContext: Context

@@ -39,7 +39,6 @@ export type SubjectSumAggregateOutputType = {
 export type SubjectMinAggregateOutputType = {
   id: string | null
   account_id: string | null
-  code: string | null
   full_name: string | null
   dob: Date | null
   gender: string | null
@@ -67,7 +66,6 @@ export type SubjectMinAggregateOutputType = {
 export type SubjectMaxAggregateOutputType = {
   id: string | null
   account_id: string | null
-  code: string | null
   full_name: string | null
   dob: Date | null
   gender: string | null
@@ -95,7 +93,6 @@ export type SubjectMaxAggregateOutputType = {
 export type SubjectCountAggregateOutputType = {
   id: number
   account_id: number
-  code: number
   full_name: number
   dob: number
   gender: number
@@ -135,7 +132,6 @@ export type SubjectSumAggregateInputType = {
 export type SubjectMinAggregateInputType = {
   id?: true
   account_id?: true
-  code?: true
   full_name?: true
   dob?: true
   gender?: true
@@ -163,7 +159,6 @@ export type SubjectMinAggregateInputType = {
 export type SubjectMaxAggregateInputType = {
   id?: true
   account_id?: true
-  code?: true
   full_name?: true
   dob?: true
   gender?: true
@@ -191,7 +186,6 @@ export type SubjectMaxAggregateInputType = {
 export type SubjectCountAggregateInputType = {
   id?: true
   account_id?: true
-  code?: true
   full_name?: true
   dob?: true
   gender?: true
@@ -306,7 +300,6 @@ export type SubjectGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type SubjectGroupByOutputType = {
   id: string
   account_id: string
-  code: string
   full_name: string
   dob: Date | null
   gender: string | null
@@ -357,7 +350,6 @@ export type SubjectWhereInput = {
   NOT?: Prisma.SubjectWhereInput | Prisma.SubjectWhereInput[]
   id?: Prisma.StringFilter<"Subject"> | string
   account_id?: Prisma.StringFilter<"Subject"> | string
-  code?: Prisma.StringFilter<"Subject"> | string
   full_name?: Prisma.StringFilter<"Subject"> | string
   dob?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   gender?: Prisma.StringNullableFilter<"Subject"> | string | null
@@ -395,7 +387,6 @@ export type SubjectWhereInput = {
 export type SubjectOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   account_id?: Prisma.SortOrder
-  code?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   dob?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -433,7 +424,6 @@ export type SubjectOrderByWithRelationInput = {
 export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   account_id?: string
-  code?: string
   avatar_id?: string
   AND?: Prisma.SubjectWhereInput | Prisma.SubjectWhereInput[]
   OR?: Prisma.SubjectWhereInput[]
@@ -469,12 +459,11 @@ export type SubjectWhereUniqueInput = Prisma.AtLeast<{
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   currentZone?: Prisma.XOR<Prisma.ZoneNullableScalarRelationFilter, Prisma.ZoneWhereInput> | null
   alertSubject?: Prisma.AlertListRelationFilter
-}, "id" | "account_id" | "code" | "avatar_id">
+}, "id" | "account_id" | "avatar_id">
 
 export type SubjectOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   account_id?: Prisma.SortOrder
-  code?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   dob?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -510,7 +499,6 @@ export type SubjectScalarWhereWithAggregatesInput = {
   NOT?: Prisma.SubjectScalarWhereWithAggregatesInput | Prisma.SubjectScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Subject"> | string
   account_id?: Prisma.StringWithAggregatesFilter<"Subject"> | string
-  code?: Prisma.StringWithAggregatesFilter<"Subject"> | string
   full_name?: Prisma.StringWithAggregatesFilter<"Subject"> | string
   dob?: Prisma.DateTimeNullableWithAggregatesFilter<"Subject"> | Date | string | null
   gender?: Prisma.StringNullableWithAggregatesFilter<"Subject"> | string | null
@@ -537,7 +525,6 @@ export type SubjectScalarWhereWithAggregatesInput = {
 
 export type SubjectCreateInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -572,7 +559,6 @@ export type SubjectCreateInput = {
 export type SubjectUncheckedCreateInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -605,7 +591,6 @@ export type SubjectUncheckedCreateInput = {
 
 export type SubjectUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -640,7 +625,6 @@ export type SubjectUpdateInput = {
 export type SubjectUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -674,7 +658,6 @@ export type SubjectUncheckedUpdateInput = {
 export type SubjectCreateManyInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -701,7 +684,6 @@ export type SubjectCreateManyInput = {
 
 export type SubjectUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -726,7 +708,6 @@ export type SubjectUpdateManyMutationInput = {
 export type SubjectUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -769,7 +750,6 @@ export type SubjectOrderByRelationAggregateInput = {
 export type SubjectCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   account_id?: Prisma.SortOrder
-  code?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   dob?: Prisma.SortOrder
   gender?: Prisma.SortOrder
@@ -802,7 +782,6 @@ export type SubjectAvgOrderByAggregateInput = {
 export type SubjectMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   account_id?: Prisma.SortOrder
-  code?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   dob?: Prisma.SortOrder
   gender?: Prisma.SortOrder
@@ -830,7 +809,6 @@ export type SubjectMaxOrderByAggregateInput = {
 export type SubjectMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   account_id?: Prisma.SortOrder
-  code?: Prisma.SortOrder
   full_name?: Prisma.SortOrder
   dob?: Prisma.SortOrder
   gender?: Prisma.SortOrder
@@ -1111,7 +1089,6 @@ export type SubjectUncheckedUpdateOneWithoutAvatarNestedInput = {
 
 export type SubjectCreateWithoutAccountInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1144,7 +1121,6 @@ export type SubjectCreateWithoutAccountInput = {
 
 export type SubjectUncheckedCreateWithoutAccountInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1193,7 +1169,6 @@ export type SubjectUpdateToOneWithWhereWithoutAccountInput = {
 
 export type SubjectUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1226,7 +1201,6 @@ export type SubjectUpdateWithoutAccountInput = {
 
 export type SubjectUncheckedUpdateWithoutAccountInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1259,7 +1233,6 @@ export type SubjectUncheckedUpdateWithoutAccountInput = {
 
 export type SubjectCreateWithoutCreatorInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1293,7 +1266,6 @@ export type SubjectCreateWithoutCreatorInput = {
 export type SubjectUncheckedCreateWithoutCreatorInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1355,7 +1327,6 @@ export type SubjectScalarWhereInput = {
   NOT?: Prisma.SubjectScalarWhereInput | Prisma.SubjectScalarWhereInput[]
   id?: Prisma.StringFilter<"Subject"> | string
   account_id?: Prisma.StringFilter<"Subject"> | string
-  code?: Prisma.StringFilter<"Subject"> | string
   full_name?: Prisma.StringFilter<"Subject"> | string
   dob?: Prisma.DateTimeNullableFilter<"Subject"> | Date | string | null
   gender?: Prisma.StringNullableFilter<"Subject"> | string | null
@@ -1382,7 +1353,6 @@ export type SubjectScalarWhereInput = {
 
 export type SubjectCreateWithoutZonesInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1416,7 +1386,6 @@ export type SubjectCreateWithoutZonesInput = {
 export type SubjectUncheckedCreateWithoutZonesInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1453,7 +1422,6 @@ export type SubjectCreateOrConnectWithoutZonesInput = {
 
 export type SubjectCreateWithoutCurrentZoneInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1487,7 +1455,6 @@ export type SubjectCreateWithoutCurrentZoneInput = {
 export type SubjectUncheckedCreateWithoutCurrentZoneInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1540,7 +1507,6 @@ export type SubjectUpdateToOneWithWhereWithoutZonesInput = {
 
 export type SubjectUpdateWithoutZonesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1574,7 +1540,6 @@ export type SubjectUpdateWithoutZonesInput = {
 export type SubjectUncheckedUpdateWithoutZonesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1622,7 +1587,6 @@ export type SubjectUpdateManyWithWhereWithoutCurrentZoneInput = {
 
 export type SubjectCreateWithoutLocationsInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1656,7 +1620,6 @@ export type SubjectCreateWithoutLocationsInput = {
 export type SubjectUncheckedCreateWithoutLocationsInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1704,7 +1667,6 @@ export type SubjectUpdateToOneWithWhereWithoutLocationsInput = {
 
 export type SubjectUpdateWithoutLocationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1738,7 +1700,6 @@ export type SubjectUpdateWithoutLocationsInput = {
 export type SubjectUncheckedUpdateWithoutLocationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1770,7 +1731,6 @@ export type SubjectUncheckedUpdateWithoutLocationsInput = {
 
 export type SubjectCreateWithoutAlertSubjectInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1804,7 +1764,6 @@ export type SubjectCreateWithoutAlertSubjectInput = {
 export type SubjectUncheckedCreateWithoutAlertSubjectInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1852,7 +1811,6 @@ export type SubjectUpdateToOneWithWhereWithoutAlertSubjectInput = {
 
 export type SubjectUpdateWithoutAlertSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1886,7 +1844,6 @@ export type SubjectUpdateWithoutAlertSubjectInput = {
 export type SubjectUncheckedUpdateWithoutAlertSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1918,7 +1875,6 @@ export type SubjectUncheckedUpdateWithoutAlertSubjectInput = {
 
 export type SubjectCreateWithoutCheckinsInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -1952,7 +1908,6 @@ export type SubjectCreateWithoutCheckinsInput = {
 export type SubjectUncheckedCreateWithoutCheckinsInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2000,7 +1955,6 @@ export type SubjectUpdateToOneWithWhereWithoutCheckinsInput = {
 
 export type SubjectUpdateWithoutCheckinsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2034,7 +1988,6 @@ export type SubjectUpdateWithoutCheckinsInput = {
 export type SubjectUncheckedUpdateWithoutCheckinsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2066,7 +2019,6 @@ export type SubjectUncheckedUpdateWithoutCheckinsInput = {
 
 export type SubjectCreateWithoutFaceDataInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2100,7 +2052,6 @@ export type SubjectCreateWithoutFaceDataInput = {
 export type SubjectUncheckedCreateWithoutFaceDataInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2148,7 +2099,6 @@ export type SubjectUpdateToOneWithWhereWithoutFaceDataInput = {
 
 export type SubjectUpdateWithoutFaceDataInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2182,7 +2132,6 @@ export type SubjectUpdateWithoutFaceDataInput = {
 export type SubjectUncheckedUpdateWithoutFaceDataInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2214,7 +2163,6 @@ export type SubjectUncheckedUpdateWithoutFaceDataInput = {
 
 export type SubjectCreateWithoutSystemLogInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2248,7 +2196,6 @@ export type SubjectCreateWithoutSystemLogInput = {
 export type SubjectUncheckedCreateWithoutSystemLogInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2296,7 +2243,6 @@ export type SubjectUpdateToOneWithWhereWithoutSystemLogInput = {
 
 export type SubjectUpdateWithoutSystemLogInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2330,7 +2276,6 @@ export type SubjectUpdateWithoutSystemLogInput = {
 export type SubjectUncheckedUpdateWithoutSystemLogInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2362,7 +2307,6 @@ export type SubjectUncheckedUpdateWithoutSystemLogInput = {
 
 export type SubjectCreateWithoutAvatarInput = {
   id?: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2396,7 +2340,6 @@ export type SubjectCreateWithoutAvatarInput = {
 export type SubjectUncheckedCreateWithoutAvatarInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2444,7 +2387,6 @@ export type SubjectUpdateToOneWithWhereWithoutAvatarInput = {
 
 export type SubjectUpdateWithoutAvatarInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2478,7 +2420,6 @@ export type SubjectUpdateWithoutAvatarInput = {
 export type SubjectUncheckedUpdateWithoutAvatarInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2511,7 +2452,6 @@ export type SubjectUncheckedUpdateWithoutAvatarInput = {
 export type SubjectCreateManyCreatorInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2537,7 +2477,6 @@ export type SubjectCreateManyCreatorInput = {
 
 export type SubjectUpdateWithoutCreatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2571,7 +2510,6 @@ export type SubjectUpdateWithoutCreatorInput = {
 export type SubjectUncheckedUpdateWithoutCreatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2604,7 +2542,6 @@ export type SubjectUncheckedUpdateWithoutCreatorInput = {
 export type SubjectUncheckedUpdateManyWithoutCreatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2631,7 +2568,6 @@ export type SubjectUncheckedUpdateManyWithoutCreatorInput = {
 export type SubjectCreateManyCurrentZoneInput = {
   id?: string
   account_id: string
-  code?: string
   full_name: string
   dob?: Date | string | null
   gender?: string | null
@@ -2657,7 +2593,6 @@ export type SubjectCreateManyCurrentZoneInput = {
 
 export type SubjectUpdateWithoutCurrentZoneInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2691,7 +2626,6 @@ export type SubjectUpdateWithoutCurrentZoneInput = {
 export type SubjectUncheckedUpdateWithoutCurrentZoneInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2724,7 +2658,6 @@ export type SubjectUncheckedUpdateWithoutCurrentZoneInput = {
 export type SubjectUncheckedUpdateManyWithoutCurrentZoneInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   account_id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
   full_name?: Prisma.StringFieldUpdateOperationsInput | string
   dob?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2827,7 +2760,6 @@ export type SubjectCountOutputTypeCountAlertSubjectArgs<ExtArgs extends runtime.
 export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   account_id?: boolean
-  code?: boolean
   full_name?: boolean
   dob?: boolean
   gender?: boolean
@@ -2866,7 +2798,6 @@ export type SubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type SubjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   account_id?: boolean
-  code?: boolean
   full_name?: boolean
   dob?: boolean
   gender?: boolean
@@ -2898,7 +2829,6 @@ export type SubjectSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type SubjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   account_id?: boolean
-  code?: boolean
   full_name?: boolean
   dob?: boolean
   gender?: boolean
@@ -2930,7 +2860,6 @@ export type SubjectSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
 export type SubjectSelectScalar = {
   id?: boolean
   account_id?: boolean
-  code?: boolean
   full_name?: boolean
   dob?: boolean
   gender?: boolean
@@ -2955,7 +2884,7 @@ export type SubjectSelectScalar = {
   fcm_token?: boolean
 }
 
-export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "code" | "full_name" | "dob" | "gender" | "id_number" | "address" | "phone" | "status" | "monitoring_start" | "monitoring_end" | "avatar_id" | "created_by" | "created_at" | "update_at" | "deleted_at" | "interval_minutes" | "grace_minutes" | "last_checkin_at" | "last_notified_at" | "current_zone_id" | "active_start_time" | "active_end_time" | "fcm_token", ExtArgs["result"]["subject"]>
+export type SubjectOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "account_id" | "full_name" | "dob" | "gender" | "id_number" | "address" | "phone" | "status" | "monitoring_start" | "monitoring_end" | "avatar_id" | "created_by" | "created_at" | "update_at" | "deleted_at" | "interval_minutes" | "grace_minutes" | "last_checkin_at" | "last_notified_at" | "current_zone_id" | "active_start_time" | "active_end_time" | "fcm_token", ExtArgs["result"]["subject"]>
 export type SubjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   checkins?: boolean | Prisma.Subject$checkinsArgs<ExtArgs>
   systemLog?: boolean | Prisma.Subject$systemLogArgs<ExtArgs>
@@ -2999,7 +2928,6 @@ export type $SubjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     account_id: string
-    code: string
     full_name: string
     dob: Date | null
     gender: string | null
@@ -3457,7 +3385,6 @@ export interface Prisma__SubjectClient<T, Null = never, ExtArgs extends runtime.
 export interface SubjectFieldRefs {
   readonly id: Prisma.FieldRef<"Subject", 'String'>
   readonly account_id: Prisma.FieldRef<"Subject", 'String'>
-  readonly code: Prisma.FieldRef<"Subject", 'String'>
   readonly full_name: Prisma.FieldRef<"Subject", 'String'>
   readonly dob: Prisma.FieldRef<"Subject", 'DateTime'>
   readonly gender: Prisma.FieldRef<"Subject", 'String'>

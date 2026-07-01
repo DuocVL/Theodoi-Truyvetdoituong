@@ -9,7 +9,6 @@ const envSchema = z.object({
     JWT_REFRESH_SECRET: z.string().min(32),
 
     DATABASE_URL: z.url(),
-    REDIS_URL: z.url(),
 
     EMAIL_HOST: z.string(),
     EMAIL_PORT: z.coerce.number(),
