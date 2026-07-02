@@ -3,7 +3,7 @@ import { HttpException } from '../exceptions/http-exception';
 import { createSubjectSchema, activateAccountSchema, updateSubjectSchema } from '../dtos/subjects.dto';
 import crypto from 'crypto';
 import { hashData } from '../utils/hash';
-import { emailService } from './email.service'; // Use the singleton instance
+import { sendActivationEmail } from './email.service'; // Use the singleton instance
 import Zod from 'zod';
 import { env } from '../configs/env';
 
@@ -72,7 +72,7 @@ class SubjectService {
       // Use the correct frontend URL from env config
       const activationLink = `${env.FRONTEND_URL}/activate-account/subjects?token=${token}`;
       // Call the singleton service directly
-      await emailService.sendActivationEmail(account.email, subject.full_name, activationLink);
+      await sendActivationEmail(account.email, activationLink);
 
       return { subject, account };
     });

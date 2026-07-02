@@ -1,62 +1,54 @@
 import crypto from 'crypto';
 import * as activationTokenRepository from '../repositories/activationToken.repository';
 import * as accountRepository from '../repositories/account.repository';
-import { sendActivationEmail } from '../utils/email';
+import { sendActivationEmail } from '../services/email.service';
 import { HttpException } from '../exceptions/http-exception';
 import { Account } from '../../generated/prisma/client';
+import {logger} from '../utils/log-helper'
 
+//thời gian hết hạn của mã kích hoạt (mặc định 24h)
 const ACTIVATION_TOKEN_EXPIRES_IN = 24 * 3600 * 1000; // 24 hours
 
-/**
- * Creates an activation token for a new account and sends the activation email.
- * This function should be called within a transaction after the account is created.
- * @param account - The newly created account object.
- */
+//tạo token kích hoạt và gửi email 
 export const createAndSendActivationToken = async (account: Account) => {
     if (!account.email) {
-        // Or handle this case as per business requirements
-        console.warn(`Account ${account.id} created without an email. Skipping activation.`);
+        //lỗi hệ thống khi chưa có email
+        logger.error(`Account ${account.id} created without an email. Skipping activation.`);
         return;
     }
 
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + ACTIVATION_TOKEN_EXPIRES_IN);
+    const token = crypto.randomBytes(32).toString('hex');//tạo mã kích hoạt ngẫu nhiêu 64hex
+    const expiresAt = new Date(Date.now() + ACTIVATION_TOKEN_EXPIRES_IN);//thời gian hết hạn
 
-    await activationTokenRepository.create(account.id, token, expiresAt);
+    await activationTokenRepository.create(account.id, token, expiresAt);//tạo token kích hoạt tài khoản
     await sendActivationEmail(account.email, token);
 };
 
-/**
- * Activates an account using the provided token.
- * @param token - The activation token from the user.
- * @returns The activated account.
- */
+//TODOXử lý việc kích hoạt tài khoản user (có thể phải bỏ)
 export const activateAccount = async (token: string) => {
-    const activationToken = await activationTokenRepository.findByToken(token);
 
+    const activationToken = await activationTokenRepository.findByToken(token);
     if (!activationToken) {
         throw new HttpException(400, "Invalid or expired activation token");
     }
 
+    //kiểm tra thời gian hết hạn
     if (activationToken.expires_at < new Date()) {
-        // Optionally, add logic to resend a new token
+        //hết hạn xóa token cũ yêu cầu lấy token lại
         await activationTokenRepository.deleteById(activationToken.id);
         throw new HttpException(400, "Activation token has expired");
     }
 
+    //kiểm tra trạng thái tài khoản và cập nhật nếu trạng thái chưa active
     const account = activationToken.account;
-
     if (account.status !== 'PENDING_ACTIVATION') {
-        // This could mean the account is already active or suspended.
-        // In any case, the token has served its purpose.
+        //tài khoản ko thuộc trạng thái cần active
         await activationTokenRepository.deleteById(activationToken.id);
         throw new HttpException(400, `Account is already ${account.status.toLowerCase()}.`);
     }
-
-    // Update account status to ACTIVE
     const updatedAccount = await accountRepository.updateStatus(account.id, 'ACTIVE');
 
-    // Clean up the used token
+    //xóa token active
     await activationTokenRepository.deleteById(activationToken.id);
 
     return updatedAccount;

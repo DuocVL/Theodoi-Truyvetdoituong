@@ -11,7 +11,6 @@ const app = express();
 
 //Định nghĩa danh sách các domain được truy cập vào API này 
 const allowedOrigins = [env.FRONTEND_URL];
-console.log(allowedOrigins)
 
 //Cấu hình CORS quản lý tài nguyên truy cập từ các domain khác
 app.use(cors({ 

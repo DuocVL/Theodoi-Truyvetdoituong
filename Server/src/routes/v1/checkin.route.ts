@@ -13,8 +13,6 @@ import upload from '../../middlewares/upload.middleware';
 const router = Router();
 const checkinController = new CheckinController();
 
-
-
 // Tất cả các route trong file này đều yêu cầu xác thực
 router.use(authMiddleware);
 

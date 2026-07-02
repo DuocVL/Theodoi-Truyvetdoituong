@@ -7,23 +7,26 @@ import { generateAccessToken, generateRefreshToken } from "../utils/token";
 import { compareData, hashData } from '../utils/hash';
 import { AccountPayload } from "../types/data";
 import { HttpException } from "../exceptions/http-exception";
-import { sendPasswordResetEmail } from '../utils/email';
-import { Prisma } from '../../generated/prisma/client';
+import { sendPasswordResetEmail } from './email.service';
+import { AccountStatus, Prisma } from '../../generated/prisma/client';
 import * as subjectRepository from '../repositories/subject.repository';
+import { logger } from '../utils/log-helper'
 import crypto from 'crypto';
 
+//Xử lý đăng nhập
 export const login = async (data: LoginDto) => {
+
     const account = await accountRepository.findByUsername(data.username);
 
     if (!account) {
         throw new HttpException(401, "Invalid username or password");
     }
 
-    if (account.status === 'PENDING_ACTIVATION') {
+    if (account.status === 'PENDING_ACTIVATION') {//kiểm tra trạng thái kích hoạt
         throw new HttpException(403, "Account is not activated. Please check your email.");
     }
 
-    if (account.status !== "ACTIVE") {
+    if (account.status !== "ACTIVE") {//trạng thái hoàn thành việc theo dõi
         throw new HttpException(403, `Account is ${account.status.toLowerCase()}`);
     }
 
@@ -31,53 +34,47 @@ export const login = async (data: LoginDto) => {
         throw new HttpException(401, "Account has no password set. Please activate first.");
     }
 
+    //Kiểm tra mật khẩu có hợp lệ không
     const isMatch = await compareData(data.password, account.password);
-
     if (!isMatch) {
         throw new HttpException(401, "Invalid username or password");
     }
 
-    if (account.type === "SUBJECT") {
+    if (account.type === "SUBJECT") {//Xử lý nếu là đối tượng
         try {
-            const subject = await subjectRepository.getSubjectByAccountId(account.id);
 
-            // 1. Kiểm tra null: Nếu không tìm thấy subject, không nên tiếp tục
+            const subject = await subjectRepository.getSubjectByAccountId(account.id);//Lấy bản ghi subject
+
+            //Nếu không tìm thấy subject tạo lỗi 
             if (!subject) {
                 throw new Error(`Subject không tồn tại cho account_id: ${account.id}`);
             }
 
-            // 2. Cập nhật fcm_token
-            // Sử dụng subject.id thay vì ép kiểu (as string) giúp code an toàn hơn
-            const updatedSubject = await subjectRepository.update(subject.id, {
-                fcm_token: data.fcm_token
-            });
-
-            // 3. Log lại hành động để dễ debug (rất quan trọng cho thực tế)
-            console.log(`Đã cập nhật FCM token thành công cho Subject: ${subject.id}`);
+            //Xử lý fcm_token
+            if(data.fcm_token) await subjectRepository.update(subject.id, {fcm_token: data.fcm_token});
+            else await subjectRepository.update(subject.id, {fcm_token: null});
 
         } catch (error) {
-            // 4. Xử lý lỗi cụ thể thay vì để trống
-            console.error("Lỗi cập nhật FCM token cho Subject:", error);
+            logger.error("Lỗi cập nhật FCM token cho Subject:", error);
 
-            // Bạn có thể ném lỗi ra ngoài nếu muốn Controller biết và phản hồi về client
-            // throw error; 
         }
     }
 
-    // FIX: Invalidate old refresh token for the same device.
-    // This ensures that a new login invalidates any previous session on the same device,
-    // preventing the accumulation of unused refresh tokens.
+    //xóa bỏ refreshtoken liên kết đến tài khaonr trên thiết bị này
     await refreshTokenRepository.deleteByAccountIdAndDeviceId(account.id, data.device_id);
 
+    //Tạo payload để sinh acesstoken
     const payload: AccountPayload = {
         id: account.id,
         type: account.type,
         device_id: data.device_id
     };
-
     const accessToken = generateAccessToken(payload);
+
+    //Tạo refreshtoken , và hash để lưu csdl
     const { plainToken: refreshToken, hashedToken } = generateRefreshToken();
 
+    //lưu refreshtoken với thời gian tồn tại 60 ngày
     const tokenData: Prisma.RefreshTokenCreateInput = {
         token_hash: hashedToken,
         device_id: data.device_id,
@@ -86,7 +83,6 @@ export const login = async (data: LoginDto) => {
             connect: { id: account.id }
         }
     };
-
     await refreshTokenRepository.create(tokenData);
 
     return {
@@ -95,7 +91,9 @@ export const login = async (data: LoginDto) => {
     };
 };
 
+//TODOđăng ký cho cán bộ (bỏ)
 export const register = async (data: RegisterDto) => {
+    //kiểm tra trùng username
     const existingUsername = await accountRepository.findByUsername(data.username);
     if (existingUsername) {
         throw new HttpException(409, "Username already exists");
@@ -105,40 +103,40 @@ export const register = async (data: RegisterDto) => {
         throw new HttpException(400, "Email is required");
     }
 
+    //kiểm tra trùng lặp email
     const existingEmail = await accountRepository.findByEmail(data.email);
     if (existingEmail) {
         throw new HttpException(409, "Email already exists");
     }
 
+    //mã hóa mật khẩu
     const hashedPassword = await hashData(data.password);
 
-    // SỬA LỖI: Tạo Account và User trong cùng một transaction
+    //tạo 2 bản ghi account và user lồng nhau để đồng bộ
     const newAccount = await accountRepository.create({
         username: data.username,
         password: hashedPassword,
         email: data.email,
         type: "USER",
-        user: { // Sử dụng nested write của Prisma
+        user: { 
             create: {
                 full_name: data.full_name,
-                // email và các trường khác có thể được thêm ở đây nếu cần
             },
         },
     });
 
     try {
+        //gửi email kích hoạt
         await activationService.createAndSendActivationToken(newAccount);
     } catch (error) {
-        console.error(`Failed to send activation email for ${newAccount.username}:`, error);
-        // We still return success to the user, but log the failure.
-        // The user can request a new activation link later.
+        logger.error(`Failed to send activation email for ${newAccount.username}:`, error);
     }
 
     return { message: "Registration successful. Please check your email to activate your account." };
 };
 
 
-// data được định nghĩa lại inline nếu DTO bị thiếu
+//xử lý kích hoạt tài khoản
 export const activateAccount = async (data: { token: string }) => {
     const { token } = data;
     const activatedAccount = await activationService.activateAccount(token);
@@ -149,41 +147,39 @@ export const activateAccount = async (data: { token: string }) => {
     };
 };
 
-
+//Cấp phát token mới
 export const refreshToken = async (data: RefreshTokenDto) => {
     const { refreshToken: oldRefreshToken } = data;
 
-    // 1. Hash the incoming plain-text token to match the one in the database
+    //băm token người dùng gửi lên để kiểm tra
     const hashedOldToken = crypto.createHash('sha256').update(oldRefreshToken).digest('hex');
 
-    // 2. Find the token in the database
+    //Tìm kiếm token trong csdl
     const tokenFromDb = await refreshTokenRepository.findByToken(hashedOldToken);
-
-    // If the token doesn't exist or has expired, it's invalid
+    //kiểm tra token có tồn tại , có còn hạn không
     if (!tokenFromDb || tokenFromDb.expires_at < new Date()) {
         throw new HttpException(401, "Invalid or expired refresh token");
     }
 
-    // 3. (Security) The token is valid. Now, immediately delete it to prevent reuse (part of token rotation)
+    //xóa refreshtoken cũ
     await refreshTokenRepository.deleteByToken(hashedOldToken);
 
-    // 4. Get the associated account to create the payload for the new access token
+    //kiểm tra tài khoản liên kết token có tồn tại không
     const account = await accountRepository.findById(tokenFromDb.account_id);
     if (!account) {
-        // This would be a data integrity issue. The account linked to the token is gone.
         throw new HttpException(401, "Invalid refresh token: Associated account not found.");
     }
 
-    // 5. Create a new pair of access and refresh tokens
+    //tạo cặp token mới
     const newPayload: AccountPayload = {
         id: account.id,
         type: account.type,
-        device_id: tokenFromDb.device_id // Carry over the device ID from the original token
+        device_id: tokenFromDb.device_id
     };
     const newAccessToken = generateAccessToken(newPayload);
     const { plainToken: newRefreshToken, hashedToken: newHashedRefreshToken } = generateRefreshToken();
 
-    // 6. Save the new refresh token to the database
+    //lưu trữ refreshtoken mới
     const newExpiresAt = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000); // 60 days from now
     const newTokenData: Prisma.RefreshTokenCreateInput = {
         token_hash: newHashedRefreshToken,
@@ -195,36 +191,50 @@ export const refreshToken = async (data: RefreshTokenDto) => {
     };
     await refreshTokenRepository.create(newTokenData);
 
-    // 7. Return the new tokens to the client
     return {
         accessToken: newAccessToken,
         refreshToken: newRefreshToken
     };
 };
 
+//đăng xuất
 export const logout = async (refreshToken: string) => {
+    //băm mã token được gửi từ client
     const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
     await refreshTokenRepository.deleteByToken(hashedToken);
 };
 
+//xử lý quên mật khẩu
 export const forgotPassword = async (data: ForgotPasswordDto) => {
+    //tìm kiếm tài khoản liên kết đến email này
     const account = await accountRepository.findByEmail(data.email);
-    console.log(account);
     if (!account) {
-        console.warn(`Password reset requested for non-existent email: ${data.email}`);
-        return;
+        logger.error(`Password reset requested for non-existent email: ${data.email}`);
+        throw new HttpException(403, `Password reset requested for non-existent email: ${data.email}`);
     }
 
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+    if (account.status !== "ACTIVE") {//trạng thái hoàn thành việc theo dõi
+        throw new HttpException(403, `Account is ${account.status.toLowerCase()}`);
+    }
 
-    await passwordResetTokenRepository.create(account.id, token, expiresAt);
-    await sendPasswordResetEmail(account.email!, token);
+
+    const token = crypto.randomBytes(32).toString('hex');//sinh token quên mật khẩu
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);//tồn tại 1 giừo
+    try {
+        await passwordResetTokenRepository.create(account.id, token, expiresAt);
+        await sendPasswordResetEmail(account.email!, token);
+    } catch (error) {
+        logger.error("Lỗi",error);
+        throw new HttpException(500, `Lỗi`);
+    }
+    
 };
 
+//dổi mật khẩu
 export const resetPassword = async (data: ResetPasswordDto) => {
     const { token, newPassword } = data;
 
+    //tìm token đổi mật khẩu
     const passwordResetToken = await passwordResetTokenRepository.findByToken(token);
 
     if (!passwordResetToken || passwordResetToken.expires_at < new Date()) {
@@ -237,35 +247,24 @@ export const resetPassword = async (data: ResetPasswordDto) => {
     await passwordResetTokenRepository.deleteByToken(token);
 };
 
+//lấy thông tin tài khoản
 export const getMe = async (accountId: string) => {
+
+    //truy vấn dữ liệu tài khoản
     const account = await accountRepository.findByIdWithUserProfile(accountId);
     if (!account) {
         throw new HttpException(404, "Account not found");
     }
 
+    console.log(account)
+
+    //xử lý nếu là subject
     if (account.type === 'SUBJECT') {
         if (!account.subject) {
-            console.error(`Data inconsistency: Account ${accountId} is SUBJECT but has no subject record.`);
-            // Sửa lỗi: Thay vì 500, trả về 404 để client có thể xử lý (vd: logout)
+            logger.error(`Data inconsistency: Account ${accountId} is SUBJECT but has no subject record.`);
             throw new HttpException(404, "Associated subject data not found for this account.");
         }
-        return {
-            id: account.subject.id,
-            full_name: account.subject.full_name,
-            dob: account.subject.dob,
-            gender: account.subject.gender,
-            id_number: account.subject.id_number,
-            address: account.subject.address,
-            phone: account.subject.phone,
-            monitoring_start: account.subject.monitoring_start,
-            monitoring_end: account.subject.monitoring_end,
-            account: {
-                username: account.username,
-                email: account.email,
-                status: account.status
-            },
-            check_ins: account.subject.checkin
-        };
+        return account.subject;
     } else if (account.type === 'USER') {
         if (!account.user) {
             console.error(`Data inconsistency: Account ${accountId} is USER but has no user record.`);
@@ -277,3 +276,26 @@ export const getMe = async (accountId: string) => {
 
     throw new HttpException(500, `Unknown or unhandled account type for account ${accountId}`);
 };
+
+//xử lý gửi lại email active
+export const resendEmailActive = async(email: string) => {
+    //Kiểm tra tài khoản với email
+    const account = await accountRepository.findByEmail(email);
+    if(!account){
+        throw new HttpException(404, "Account not found");
+    }
+
+    //kiểm tra tài khoản có thuộc trạng thái cần kích hoạt không
+    if(account.status !== AccountStatus.PENDING_ACTIVATION){
+        throw new HttpException(403, `Account is ${account.status.toLowerCase()}`);
+    }
+
+    try {
+        //gửi email kích hoạt
+        await activationService.createAndSendActivationToken(account);
+    } catch (error) {
+        logger.error(`Failed to send activation email for ${account.username}:`, error);
+    }
+
+    return { message: "Send email activation succeful" };
+}

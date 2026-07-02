@@ -1,42 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 
-/**
- * Middleware kiểm tra và chuẩn hóa dữ liệu từ request body, query, params
- * Sử dụng Zod schema để validate và transform dữ liệu đầu vào
- * 
- * Công dụng:
- * 1. Validate request data theo schema
- * 2. Transform và filter dữ liệu
- * 3. Return 400 Bad Request nếu validation fail
- * 4. Pass data qua cho next middleware/controller
- * 
- * Cách sử dụng:
- * const userSchema = z.object({
- *   body: z.object({ name: z.string(), email: z.string().email() }),
- *   query: z.object({ page: z.coerce.number().optional() }),
- *   params: z.object({ id: z.string().uuid() })
- * });
- * 
- * router.post('/:id', validate(userSchema), controller);
- */
+//Middleware kiểm tra và chuẩn hóa dữ liệu từ request body, query, params bằng ZodSchema
+
 export const validate = (schema: ZodSchema<any>) => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
-            /**
-             * Parse request data thông qua Zod schema
-             * Schema mong đợi object có structure: { body, query, params }
-             */
+
+            //Thu nhập các dữ liệu body,query,params từ requestvà kiểm tra xem nó khớp với schema không
+            //nếu không khớp -> zoderror
             const data = schema.parse({
                 body: req.body,
                 query: req.query,
                 params: req.params
             });
 
-            /**
-             * Kiểm tra xem parsed data có chứa các property cần thiết không
-             * Type guard: Đảm bảo data là object hợp lệ
-             */
+            //Kiểm tra tính hợp lệ của kết quả trả về sau khi parse thành công xem có rỗng , phải object không
             if (!data || typeof data !== 'object') {
                 return res.status(400).json({
                     success: false,
@@ -44,12 +23,10 @@ export const validate = (schema: ZodSchema<any>) => {
                 });
             }
 
-            /**
-             * Gán dữ liệu đã validate vào request
-             * Nếu schema không transform field nào, giữ nguyên original value
-             */
+            //Chuyển về kiểu dữ liệu key-value
             const validatedData = data as Record<string, any>;
             
+            //Ghi đè lại dữ liệu đã qua xử lý vào Request
             if (validatedData.body !== undefined) {
                 req.body = validatedData.body;
             }
@@ -62,10 +39,8 @@ export const validate = (schema: ZodSchema<any>) => {
 
             next();
         } catch (error) {
-            /**
-             * Bắt lỗi Zod validation
-             * Trả về 400 Bad Request với chi tiết lỗi từng field
-             */
+
+            //Xử lý trường hợp dữ liệu không hợp lệ
             if (error instanceof ZodError) {
                 return res.status(400).json({
                     success: false,
@@ -74,10 +49,7 @@ export const validate = (schema: ZodSchema<any>) => {
                 });
             }
             
-            /**
-             * Bắt các lỗi không phải ZodError
-             * Chuyển cho error handler middleware tổng thể
-             */
+            //Nếu lỗi khác tiếp tục xử lý với errormiddleware
             next(error);
         }
     };
