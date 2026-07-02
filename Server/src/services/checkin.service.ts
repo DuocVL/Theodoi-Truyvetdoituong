@@ -1,6 +1,3 @@
-/**
- * @file checkin.service.ts
- */
 import { CheckinRepository } from '../repositories/checkin.repository';
 import { ImageService } from '../services/image.service';
 import { HttpException } from '../exceptions/http-exception';

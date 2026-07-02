@@ -1,13 +1,11 @@
-/**
- * A custom error class for handling expected HTTP errors (e.g., 404 Not Found, 400 Bad Request).
- * This allows us to throw controlled, status-aware errors from anywhere in the application.
- */
+//Lớp xử lý lỗi tùy chỉnh
 export class HttpException extends Error {
-  public status: number;
-  public message: string;
+  public status: number;//mã reponse
+  public message: string;//thông điệp mô tả lỗi
 
+  //Hàm khởi tạo thiết lập 1 HttpException với status và message
   constructor(status: number, message: string) {
-    super(message);
+    super(message);//gọi hàm khởi tạo lớp cha Error
     this.status = status;
     this.message = message;
   }

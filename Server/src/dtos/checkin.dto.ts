@@ -1,17 +1,15 @@
-/**
- * @file checkin.dto.ts
- */
 import { z } from 'zod';
 
+//Schema tạo checkin
 export const createCheckinSchema = z.object({
   body: z.object({
-    latitude: z.preprocess((val) => Number(val), z.number().min(-90).max(90)),
-    longitude: z.preprocess((val) => Number(val), z.number().min(-180).max(180)),
+    latitude: z.preprocess((val) => Number(val), z.number().min(-90).max(90)),//vĩ độ
+    longitude: z.preprocess((val) => Number(val), z.number().min(-180).max(180)),//kinh độ
     face_verified: z.preprocess(
       (val) => (val === 'true' ? true : val === 'false' ? false : val),
       z.boolean()
     ),
-    notes: z.string().optional(),
+    notes: z.string().optional(),//ghi chú
   })
 });
 

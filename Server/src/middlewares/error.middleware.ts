@@ -1,49 +1,50 @@
 import { Request, Response, NextFunction } from "express";
-import { HttpException } from "../exceptions/http-exception"; // Correctly imported
+import { HttpException } from "../exceptions/http-exception";
 import { logger } from "../utils/log-helper";
 import { env } from "../configs/env";
 
-/**
- * The global error handling middleware. It should be the last middleware in the chain.
- * It catches all errors, logs them, and sends a standardized, safe response to the client.
- */
+//Midddlewaare xử lý lỗi, xử lý cuối cùng 
+
+//
 export const errorMiddleware = (
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction // next is required for Express to recognize this as an error handler
+  next: NextFunction //cần tham số next để Express biết đây là trình xử lý lỗi 
 ) => {
+
+  //Lấy lỗi nếu là lỗi tự tạo thì lấy nó không thì báo lỗi server
   const status = err instanceof HttpException ? err.status : 500;
   const message = err instanceof HttpException ? err.message : "An unexpected error occurred.";
 
-  // Log the error with all available context
+  //Ghi log lỗi kèm đầy đủ thông tin
   logger.error("HTTP Error", {
-    // Core Info
+    //thông tin lõi của lỗi
     error: {
-      message: err.message, // The original, detailed error message
-      stack: err.stack,     // The stack trace for debugging
+      message: err.message, //thông điệp lỗi
+      stack: err.stack,     //dòng code gây lỗi
     },
-    // Request Context
-    requestId: req.requestId, // Crucial for tracing the request that caused the error
+
+    //các thông tin của request gây lỗi
+    requestId: req.requestId,
     method: req.method,
     path: req.originalUrl,
     ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
-    // User Context (if available)
+    //thông tin client gửi request nếu đi qua authMiddleware
     accountId: req.account?.id,
     deviceId: req.account?.device_id,
   });
 
-  // In a development environment, you might want to send the full error back
+  //trả về tùy môi trường nếu là development trả về cả stack lỗi
   if (env.NODE_ENV === "development") {
     return res.status(status).json({
       status: "error",
       message,
-      stack: err.stack, // Be careful with this in production
+      stack: err.stack,//trả cả stack lỗi
     });
   }
 
-  // In production, send a generic, safe response.
-  // Do NOT leak implementation details like stack traces.
+  //Thực tế không trả về stack lỗi
   return res.status(status).json({
     status: "error",
     message: message,

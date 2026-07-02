@@ -2,23 +2,21 @@
 import { Router } from 'express';
 import { ImageController } from '../../controllers/image.controller';
 import upload from '../../middlewares/upload.middleware';
-import { authMiddleware } from '../..//middlewares/auth.middleware'; // Assuming you want to protect these routes
+import { authMiddleware } from '../..//middlewares/auth.middleware';
 
 const router = Router();
 const imageController = new ImageController();
 
-// Protect all image routes
+//Áp dụng middleware xác thực 
 router.use(authMiddleware);
 
-// Route to upload a single image. 
-// The field name in the form-data must be 'image'.
-// The body must contain 'uploadType' ('avatars', 'checkins', or 'subjects')
+//Tải lên 1 hình ảnh 
 router.post('/', upload.single('image'), imageController.uploadImage);
 
-// Route to get image details by ID
+//Lấy thông tin chi tiết 1 ảnh qua id
 router.get('/:id', imageController.getImageById);
 
-// Route to delete an image by ID
+//Xóa bỏ hình ảnh
 router.delete('/:id', imageController.deleteImageById);
 
 export default router;

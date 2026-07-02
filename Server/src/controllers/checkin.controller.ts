@@ -1,8 +1,3 @@
-/**
- * @file checkin.controller.ts
- * @description Controller xử lý các request HTTP cho module Checkin.
- */
-
 import { NextFunction, Response } from 'express';
 import { CheckinService } from '../services/checkin.service';
 import { RequestWithUser } from '../types/data';
