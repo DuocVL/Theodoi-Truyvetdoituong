@@ -50,8 +50,13 @@ export const refreshToken = async (req: Request, res: Response, next: NextFuncti
 //Xử lý việc đăng xuất
 export const logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        //lấy refreshtoken từ body
         const { refreshToken } = req.body;
-        await authService.logout(refreshToken);
+        const accountId = req.account?.id;
+
+        if(!accountId || !req.role) return res.status(401).json({ message: 'Unauthorized' });
+
+        await authService.logout(refreshToken, accountId, req.role);
         res.status(204).send();
     } catch (error) {
         next(error);

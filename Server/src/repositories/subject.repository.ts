@@ -17,8 +17,6 @@ export async function update(id: string, data: Prisma.SubjectUpdateInput): Promi
 export async function findById(id: string): Promise<Subject | null> {
     return prisma.subject.findUnique({
         where: { id },
-        // Mặc định không include account để tránh rò rỉ username/password.
-        // Nếu cần lấy thông tin liên quan, hãy sử dụng select cụ thể trong Service.
     });
 }
 

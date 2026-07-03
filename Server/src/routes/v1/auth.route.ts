@@ -19,7 +19,7 @@ router.post('/activate-account', validate(activateAccountSchema), authController
 router.post('/refresh-token', validate(refreshTokenSchema), authController.refreshToken);
 
 //Đăng xuất
-router.post('/logout', validate(logoutSchema), authController.logout);
+router.post('/logout', authMiddleware, validate(logoutSchema), authController.logout);
 
 //Quên mật khẩu
 router.post('/forgot-password', validate(forgotPasswordSchema), authController.forgotPassword);

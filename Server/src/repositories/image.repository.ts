@@ -3,6 +3,7 @@ import { Image, Prisma } from '../../generated/prisma/client';
 import { HttpException } from '../exceptions/http-exception';
 import { prisma } from '../configs/prisma';
 import { logger } from '../utils/log-helper'
+import { ImageUpdateInput } from '../../generated/prisma/models';
 //Quản lý các thao tác với bảng Image trong csdl
 export class ImageRepository {
 
@@ -21,15 +22,34 @@ export class ImageRepository {
   }
 
   //tìm kiếm image theo id 
-  public async findImageById(imageId: string): Promise<Image | null> {
+  public async findImageById(imageId: string): Promise<any> {
     try {
-      const image = await prisma.image.findUnique({
+      const image = await prisma.image.findFirst({
         where: { id: imageId },
+        include:{
+          checkinImage: { select: {id: true, subject_id: true} },
+          subjectAvatar: { select: { id: true } },
+          userAvatar: { select: { id: true } },
+        }
       });
       return image;
     } catch (error) {
       logger.error("Error finding image in DB:", error);
       throw new HttpException(500, 'Database error while finding image.');
+    }
+  }
+
+  //cập nhật
+  public async updateImage(imageId: string, data: ImageUpdateInput): Promise<Image> {
+    try {
+      const updateImage = await prisma.image.update({
+        where: { id: imageId },
+        data,
+      });
+      return updateImage;
+    } catch (error) {
+      logger.error("Error update image from DB:", error);
+      throw new HttpException(500, 'Could not update image from database.');
     }
   }
 

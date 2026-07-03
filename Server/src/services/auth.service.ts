@@ -198,10 +198,18 @@ export const refreshToken = async (data: RefreshTokenDto) => {
 };
 
 //đăng xuất
-export const logout = async (refreshToken: string) => {
+export const logout = async (refreshToken: string, accountId: string, role: string) => {
     //băm mã token được gửi từ client
     const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
     await refreshTokenRepository.deleteByToken(hashedToken);
+    //xóa fcm_token để không gửi cảnh báo về đây nữa nếu là subject
+    if(role === "SUBJECT"){
+        const subject = await subjectRepository.getSubjectByAccountId(accountId);
+        if(!subject) throw new Error(`Subject không tồn tại cho account_id: ${accountId}`);
+
+        await subjectRepository.update(subject.id, {fcm_token: null})//xóa fcm_token ko gửi nhầm thông báo
+    }
+
 };
 
 //xử lý quên mật khẩu
@@ -255,8 +263,6 @@ export const getMe = async (accountId: string) => {
     if (!account) {
         throw new HttpException(404, "Account not found");
     }
-
-    console.log(account)
 
     //xử lý nếu là subject
     if (account.type === 'SUBJECT') {

@@ -3,112 +3,97 @@ import fs from 'fs/promises';
 import path from 'path';
 import { ImageRepository } from '../repositories/image.repository';
 import { HttpException } from '../exceptions/http-exception';
-import { Image , Prisma } from '../../generated/prisma/client';
+import { Image } from '../../generated/prisma/client';
+import { logger } from '../utils/log-helper';
+import { ImageUpdateInput } from '../../generated/prisma/models';
 
-// Define the allowed upload types, matching middleware
-type UploadType = 'avatars' | 'checkins' | 'subjects';
 
+//danh sách các thư mục với các mục đích khác nhau 
+type UploadType = 'avatars' | 'checkins';
+
+//dịch vụ phục vụ xử lý các logic liên quan đến ảnh
 export class ImageService {
   private imageRepository = new ImageRepository();
 
-  /**
-   * Handles the upload of a file, creates a corresponding database record.
-   * If the database transaction fails, it automatically deletes the uploaded file.
-   * @param file - The Express.Multer.File object.
-   * @param type - The category of the upload (e.g., 'avatars', 'checkins').
-   * @returns The created Image record.
-   */
+  //xử lý lưu thông tin ảnh vào database sau khi file được Multer ghi vào ổ
+  //nếu ghi thất bại xóa luôn file vật lý
   public async uploadImage(file: Express.Multer.File, type: UploadType): Promise<Image> {
+    //kiểm tra có file không
     if (!file) {
       throw new HttpException(400, 'No file provided.');
     }
 
+    //tạo dữ liệu image lưu database
     const imageData = {
       file_name: file.originalname,
       stored_name: file.filename,
       mime_type: file.mimetype,
       size: file.size,
       url: `/uploads/${type}/${file.filename}`,
-      alt_text: file.originalname, // Default alt text
+      alt_text: file.originalname,//văn bản thay thế
     };
 
     try {
+      //lưu bản ghi image
       const newImage = await this.imageRepository.createImage(imageData);
       return newImage;
     } catch (dbError) {
-      // **Rollback logic**: Delete the file if DB operation fails.
-      console.error(`Database error during image creation. Deleting orphaned file: ${file.path}`);
+      //Xử lý khi lỗi ghi file
+      logger.error(`Database error during image creation. Deleting orphaned file: ${file.path}`);
+      //xóa file vật lý
       await fs.unlink(file.path).catch(unlinkError => {
-        // Log the unlink error, but the primary error is the DB error.
-        console.error(`Failed to delete orphaned file ${file.path}:`, unlinkError);
+        //xóa gặp lỗi
+        logger.error(`Failed to delete orphaned file ${file.path}:`, unlinkError);
       });
-      // Re-throw the original database error to the caller.
-      throw dbError;
+      //Tạo lỗi
+      throw new HttpException(500,"Write file error");
     }
   }
 
-  /**
-   * Deletes an image record from the database and the corresponding file from the filesystem.
-   * @param imageId - The ID of the image to delete.
-   */
+  //xóa image theo imageId
   public async deleteImage(imageId: string): Promise<void> {
+    //tìm xem image có tồn tại không
     const image = await this.imageRepository.findImageById(imageId);
     if (!image) {
-        // If image not in DB, no action needed. Or throw 404 if strictness is required.
-        console.warn(`Attempted to delete a non-existent image with ID: ${imageId}`);
+        logger.error(`Attempted to delete a non-existent image with ID: ${imageId}`);
         return;
     }
 
-    // Construct the full path to the file
-    // Note: image.url is `/uploads/type/filename.ext`
+    //xác định đường dẫn tuyệt đối đến tệp`vật lý
     const filePath = path.join(__dirname, '../../', image.url);
-
     try {
-        // 1. Delete the file from the filesystem
-        await fs.unlink(filePath);
         
-        // 2. Delete the record from the database
-        await this.imageRepository.deleteImage(imageId);
-
+        await fs.unlink(filePath);//xóa tệp vật lý
+        await this.imageRepository.deleteImage(imageId);//xóa bản ghi trong csdl
     } catch (error) {
-        // If the file doesn't exist, ENOENT error is thrown. We can ignore it and proceed to delete from DB.
-        if ( error instanceof Prisma.PrismaClientKnownRequestError && error.code !== 'ENOENT') {
-            console.error(`Error during image deletion for ID ${imageId}:`, error);
-            throw new HttpException(500, `Failed to delete image. File system or DB error.`);
-        }
-        // If file was already deleted, we still try to delete the DB record.
         await this.imageRepository.deleteImage(imageId);
+        throw new HttpException(500,`Failed to delete image. File system or DB error.`);
     }
   }
 
-  /**
-   * Replaces an old image with a new one.
-   * @param newFile - The new Express.Multer.File object.
-   * @param oldImageId - The ID of the image to be replaced. Can be null or undefined.
-   * @param type - The category of the upload.
-   * @returns The newly created Image record.
-   */
-  public async replaceImage(newFile: Express.Multer.File, oldImageId: string | null | undefined, type: UploadType): Promise<Image> {
-    // Step 1: Upload the new image. This will handle file saving and DB record creation.
-    const newImage = await this.uploadImage(newFile, type);
-
-    // Step 2: If an old image ID was provided, delete the old image.
-    if (oldImageId) {
-      try {
-        await this.deleteImage(oldImageId);
-      } catch (error) {
-        // Log the error but don't fail the whole operation, as the primary goal (uploading new image) succeeded.
-        console.warn(`Could not delete old image (ID: ${oldImageId}) during replacement. It may need manual cleanup.`, error);
-      }
+  //cập nhật image
+  public async updateImage(imageId: string, data: ImageUpdateInput): Promise<void> {
+    //tìm xem image có tồn tại không
+    const image = await this.imageRepository.findImageById(imageId);
+    if (!image) {
+        logger.error(`Attempted to delete a non-existent image with ID: ${imageId}`);
+        return;
     }
-
-    // Step 3: Return the new image record.
-    return newImage;
+    //cập nhật
+    try {
+      await this.imageRepository.updateImage(imageId, data);
+    } catch (error) {
+      throw new HttpException(500,`Failed to update image.`);
+    }
   }
   
-  public async getImage(id: string): Promise<Image> {
-    const image = await this.imageRepository.findImageById(id)
-    if(!image) throw new HttpException(404, "Image not found")
-    return image
+  //truy vấn thông tin tệp ảnh
+  public async getImage(id: string): Promise<any> {
+    //kiểm tra image có tồn tại không
+    const image = await this.imageRepository.findImageById(id);
+    
+    if(!image) throw new HttpException(404, "Image not found");
+
+    return image;
   }
 }
