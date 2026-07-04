@@ -47,11 +47,11 @@ model User {
   created_at DateTime        @default(now())
   update_at  DateTime        @updatedAt
 
-  subject   Subject[]   @relation("UserToSubject")
+  subject    Subject[]   @relation("UserToSubject")
   systemLogs SystemLog[] @relation("UserToSystemLog")
-  account   Account     @relation(fields: [account_id], references: [id])
-  avatar    Image?      @relation("UserToAvatar", fields: [avatar_id], references: [id])
-  zone      Zone[]      @relation("UserToZone")
+  account    Account     @relation(fields: [account_id], references: [id])
+  avatar     Image?      @relation("UserToAvatar", fields: [avatar_id], references: [id])
+  zone       Zone[]      @relation("UserToZone")
 
   @@map("users")
 }
@@ -75,26 +75,26 @@ model Subject {
   update_at        DateTime  @updatedAt
   deleted_at       DateTime?
 
-  interval_minutes Int       @default(30) // dùng khi KHÔNG thuộc zone nào
-  grace_minutes    Int       @default(5) // NEW - thời gian chờ thêm sau khi nhắc (case không zone)
-  last_checkin_at  DateTime? // NEW - lần checkin hợp lệ gần nhất (bất kể trong/ngoài zone)
-  last_notified_at DateTime? // NEW - lần nhắc gần nhất cho nghĩa vụ hiện tại
-  current_zone_id  String? // NEW - zone SAFE đang là "ngữ cảnh" tính hạn, null = đang dùng default
-  active_start_time String?  // "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
-  active_end_time   String?  // "22:00" - kết thúc khung giờ
-  
+  interval_minutes  Int       @default(30) // dùng khi KHÔNG thuộc zone nào
+  grace_minutes     Int       @default(5) // NEW - thời gian chờ thêm sau khi nhắc
+  last_checkin_at   DateTime? //lần checkin hợp lệ gần nhất (bất kể trong/ngoài zone)
+  last_notified_at  DateTime? //lần nhắc gần nhất cho nghĩa vụ hiện tại
+  current_zone_id   String? //zone SAFE đang là nơi tính hạn, null = đang dùng default
+  active_start_time String? // "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
+  active_end_time   String? // "22:00" - kết thúc khung giờ
+
   fcm_token String?
 
-  checkins    Checkin[]   @relation("SubjectToCheckin")
-  systemLog   SystemLog[] @relation("SubjectToSystemLog")
-  faceData    FaceData[]  @relation("SubjectToFaceData")
-  zones       Zone[]      @relation("SubjectToZones")
+  checkins  Checkin[]         @relation("SubjectToCheckin")
+  systemLog SystemLog[]       @relation("SubjectToSystemLog")
+  faceData  FaceData[]        @relation("SubjectToFaceData")
+  zones     Zone[]            @relation("SubjectToZones")
   locations LocationHistory[]
 
-  account     Account     @relation(fields: [account_id], references: [id])
-  avatar      Image?      @relation("SubjectToAvatar", fields: [avatar_id], references: [id])
-  creator     User        @relation("UserToSubject", fields: [created_by], references: [id])
-  currentZone Zone?       @relation("SubjectCurrentZone", fields: [current_zone_id], references: [id], onDelete: SetNull)
+  account     Account @relation(fields: [account_id], references: [id])
+  avatar      Image?  @relation("SubjectToAvatar", fields: [avatar_id], references: [id])
+  creator     User    @relation("UserToSubject", fields: [created_by], references: [id])
+  currentZone Zone?   @relation("SubjectCurrentZone", fields: [current_zone_id], references: [id], onDelete: SetNull)
 
   alertSubject Alert[] @relation("SubjectToAlert")
 
@@ -123,11 +123,11 @@ model Zone {
   created_by       String // ID của User (Cán bộ) tạo vùng này
   is_active        Boolean  @default(true)
 
-  active_start_time String?  // "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
-  active_end_time   String?  // "22:00" - kết thúc khung giờ
+  active_start_time String? // "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
+  active_end_time   String? // "22:00" - kết thúc khung giờ
 
-  created_at       DateTime @default(now())
-  update_at        DateTime @updatedAt
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
 
   subject         Subject   @relation("SubjectToZones", fields: [subject_id], references: [id], onDelete: Cascade)
   creator         User      @relation("UserToZone", fields: [created_by], references: [id])
@@ -140,25 +140,23 @@ model Zone {
 }
 
 model LocationHistory {
-  id          String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  subject_id  String
+  subject_id String
 
-  latitude    Float
-  longitude   Float
-  accuracy    Float?
-  speed       Float?
-  altitude    Float?
+  latitude  Float
+  longitude Float
+  accuracy  Float?
+  speed     Float?
+  altitude  Float?
 
   recorded_at DateTime @default(now())
   created_at  DateTime @default(now())
 
-
   subject Subject @relation(fields: [subject_id], references: [id], onDelete: Cascade)
 
-   // query theo đối tượng + thời gian
+  // query theo đối tượng + thời gian
   @@index([subject_id, recorded_at(sort: Desc)])
-
   // dọn dữ liệu / thống kê theo ngày
   @@index([recorded_at])
   @@map("location_histories")
@@ -187,8 +185,8 @@ model Alert {
 }
 
 enum CheckinStatus {
-  ON_TIME             // checkin trong hạn cho phép, không vi phạm zone cấm
-  LATE                // checkin trễ (sau dueAt) nhưng subject tự chủ động checkin trước khi bị tạo Alert
+  ON_TIME // checkin trong hạn cho phép, không vi phạm zone cấm
+  LATE // checkin trễ (sau dueAt) nhưng subject tự chủ động checkin trước khi bị tạo Alert
   RESTRICTED_VIOLATION // checkin rơi vào zone cấm
 }
 
@@ -201,10 +199,10 @@ model Checkin {
 
   latitude     Float
   longitude    Float
-  status CheckinStatus @default(ON_TIME)
-  checkin_time DateTime @default(now())
+  status       CheckinStatus @default(ON_TIME)
+  checkin_time DateTime      @default(now())
   zone_id      String?
-  zone         Zone?    @relation("ZoneToCheckin", fields: [zone_id], references: [id], onDelete: SetNull)
+  zone         Zone?         @relation("ZoneToCheckin", fields: [zone_id], references: [id], onDelete: SetNull)
 
   image        Image?  @relation("CheckinToImage", fields: [image_id], references: [id], onDelete: SetNull)
   subject      Subject @relation("SubjectToCheckin", fields: [subject_id], references: [id], onDelete: Cascade)
@@ -265,20 +263,19 @@ model SystemLog {
   old_data Json?
   new_data Json?
 
-  ip_address String?
-  user_agent String?
+  ip_address  String?
+  user_agent  String?
   duration_ms Int?
   status_code Int?
 
   created_at DateTime @default(now())
 
-  user    User?    @relation("UserToSystemLog", fields: [user_id], references: [id],onDelete: Cascade)
-  subject Subject? @relation("SubjectToSystemLog", fields: [subject_id], references: [id],onDelete: Cascade)
+  user    User?    @relation("UserToSystemLog", fields: [user_id], references: [id], onDelete: Cascade)
+  subject Subject? @relation("SubjectToSystemLog", fields: [subject_id], references: [id], onDelete: Cascade)
 
   @@index([category, created_at(sort: Desc)])
   @@index([user_id, created_at(sort: Desc)])
   @@index([subject_id, created_at(sort: Desc)])
-
   @@map("systemlog")
 }
 

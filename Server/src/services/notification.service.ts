@@ -2,10 +2,13 @@ import { messaging } from '../configs/firebase';
 import { logger } from '../utils/log-helper';
 import { prisma } from '../configs/prisma'
 
+//dịch vụ gửi thông báo sử dụng FCM 
 export class NotificationService {
+
+  //hàm gửi thông báo
   public async notifySubject(subjectId: string, message: string): Promise<void> {
     try {
-      // 1. Lấy FCM Token từ Database của Subject
+      //Lấy FCM Token từ Database của Subject
       const subject = await prisma.subject.findUnique({ 
         where: { id: subjectId },
         select: { fcm_token: true } // Yêu cầu bạn đã thêm field này vào model Subject
@@ -16,7 +19,7 @@ export class NotificationService {
         return;
       }
 
-      // 2. Gửi thông báo
+      //Gửi thông báo
       await messaging.send({
         token: subject.fcm_token,
         notification: {

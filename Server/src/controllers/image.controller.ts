@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ImageService } from '../services/image.service';
 import { HttpException } from '../exceptions/http-exception';
 import { findById, getSubjectByAccountId, update } from '../repositories/subject.repository';
-import { getUserByAccountId } from '../repositories/user.repository';
+import { getUserByAccountId, updateUser } from '../repositories/user.repository';
 import path from 'path';
 import { connect } from 'http2';
 
@@ -54,7 +54,7 @@ export class ImageController {
           if(user.avatar_id) await this.imageService.deleteImage(user.avatar_id);
 
           //Liên kết với ảnh mới
-          await update(user.id, {avatar: {connect: {id: newImage.id} }});
+          await updateUser(user.id, {avatar: {connect: {id: newImage.id} }});
         }
       }
 
@@ -97,7 +97,6 @@ export class ImageController {
         const user = await getUserByAccountId(accountId);
         if (!user) throw new HttpException(403, "Access denied. User profile missing.");
 
-        console.log(image)
         //kiểm tra là ảnh checkin nhưng ko có thẩm quyền
         if (image.checkinImage) {
           const subject = await findById(image.checkinImage.subject_id);

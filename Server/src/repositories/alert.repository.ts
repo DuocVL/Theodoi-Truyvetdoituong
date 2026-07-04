@@ -11,11 +11,7 @@ interface CreateAlertData {
 }
 
 //Lấy danh sách 
-export const getAlerts = async (
-  page: number,
-  limit: number,
-  whereClause: any
-) => {
+export const getAlerts = async ( page: number, limit: number, whereClause: any) => {
 
   const skip = (page - 1) * limit;//Tính số lượng bản ghi cần bỏ qua dựa trên số trang
   const [alerts, total] = await prisma.$transaction([//Sử dụng $transaction để chạy đồng thời 2 câu lệnh prisma

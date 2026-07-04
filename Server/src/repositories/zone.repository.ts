@@ -1,6 +1,9 @@
-// src/repositories/zone.repository.ts
+
 import { prisma } from '../configs/prisma';
 
+//reposity phục vụ việc xử lý zone trong csdl
+
+//Định nghĩa zonedata phục vụ việc tạo , cập nhật
 interface ZoneData {
   subject_id: string;
   zone_name: string;
@@ -8,13 +11,14 @@ interface ZoneData {
   latitude: number;
   longitude: number;
   radius: number;
-  interval_minutes?: number;
-  grace_minutes?: number; // Trường mới thêm từ Schema
+  interval_minutes?: number;//thời gian lặp lại checkin
+  grace_minutes?: number;//thời gian chờ trước khi tạo cảnh báo
   description?: string;
   is_active?: boolean;
   created_by: string;
 }
 
+//Tạo vùng giám sát 
 export const createZone = async (data: ZoneData) => {
   return await prisma.zone.create({
     data: {
@@ -25,15 +29,17 @@ export const createZone = async (data: ZoneData) => {
   });
 };
 
+//Lấy zone theo id
 export const getZoneById = async (id: string) => {
   return await prisma.zone.findUnique({
     where: { id },
     include: { 
-      subject: true // Lấy kèm thông tin đối tượng giám sát để phục vụ logic phân quyền
+      subject: true // Lấy kèm thông tin đối tượng giám sát
     },
   });
 };
 
+//lấy danh sách zone theo subjectId
 export const getZonesBySubjectId = async (subjectId: string) => {
   return await prisma.zone.findMany({
     where: { subject_id: subjectId },
@@ -41,6 +47,7 @@ export const getZonesBySubjectId = async (subjectId: string) => {
   });
 };
 
+//cập nhật zone
 export const updateZone = async (id: string, data: Partial<ZoneData>) => {
   return await prisma.zone.update({
     where: { id },
@@ -48,6 +55,7 @@ export const updateZone = async (id: string, data: Partial<ZoneData>) => {
   });
 };
 
+//xóa zone
 export const deleteZone = async (id: string) => {
   return await prisma.zone.delete({
     where: { id },

@@ -12,7 +12,7 @@ export const create = async (accountId: string, token: string, expiresAt: Date):
     });
 };
 
-//tìm kiếm token 
+//tìm kiếm tokenreset
 export const findByToken = async (token: string): Promise<PasswordResetToken | null> => {
     return await prisma.passwordResetToken.findUnique({ where: { token } });
 };

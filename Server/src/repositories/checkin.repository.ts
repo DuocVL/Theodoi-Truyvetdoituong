@@ -19,10 +19,10 @@ export class CheckinRepository {
   }
 
   //cập nhật checkin(không dùng)
-  public async update(id: string, data: UpdateCheckinDto): Promise<Checkin>{
+  public async update(id: string, notes: string): Promise<Checkin>{
     return prisma.checkin.update({
       where: { id },
-      data
+      data: {notes},
     });
   }
 
@@ -33,6 +33,7 @@ export class CheckinRepository {
 
   //lấy danh sách lịch sử checckin
   public async findBySubjectIdPaginated(subjectId: string, page: number, limit: number) {
+    //thiết lập bộ lọc , số bản ghi cần bỏ qua
     const skip = (page - 1) * limit;//số dòng cần bỏ qua
     const [data, total] = await Promise.all([
       prisma.checkin.findMany({
@@ -49,8 +50,11 @@ export class CheckinRepository {
 
   //Lấy danh sách checkin phân trang của 1 nhóm đối tượng
   public async findBySubjectIdsPaginated(subjectIds: string[], page: number, limit: number) {
+    //thiết lập bộ lọc , số bản ghi cần bỏ qua
     const skip = (page - 1) * limit;
     const whereClause = { subject_id: { in: subjectIds } };
+
+    //lấy danh sách checkins
     const [data, total] = await Promise.all([
       prisma.checkin.findMany({
         where: whereClause,
@@ -66,6 +70,7 @@ export class CheckinRepository {
 
   //Lọc điểm danh theo khoảng thời gian của 1 đối tượng
   public async findBySubjectIdAndTimeRange(subjectId: string, start: Date, end: Date, page: number, limit: number) {
+    //thiết lập bộ lọc , số bản ghi cần bỏ qua
     const skip = (page - 1) * limit;
     const whereClause = {
       subject_id: subjectId,
@@ -88,6 +93,7 @@ export class CheckinRepository {
 
   //Lọc điểm danh theo khoảng thời gian của 1 nhóm đối tượng
   public async findBySubjectIdsAndTimeRange(subjectIds: string[], start: Date, end: Date, page: number, limit: number) {
+    //thiết lập bộ lọc , số bản ghi cần bỏ qua
     const skip = (page - 1) * limit;
     const whereClause = {
       subject_id: { in: subjectIds },
@@ -104,6 +110,7 @@ export class CheckinRepository {
       }),
       prisma.checkin.count({ where: whereClause }),
     ]);
+    
     return { data, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
   }
 }

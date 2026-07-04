@@ -3,6 +3,8 @@ import * as alertRepository from '../repositories/alert.repository';
 import { NotificationService } from '../services/notification.service';
 import { logger } from '../utils/log-helper';
 
+//dịch vụ kiểm tra tuân thủ và leo thang cảnh báo
+
 export class ComplianceService {
   private notificationService = new NotificationService();
 
