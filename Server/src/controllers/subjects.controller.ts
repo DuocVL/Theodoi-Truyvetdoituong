@@ -5,24 +5,31 @@ import { activateAccountSchema, createSubjectSchema, updateSubjectSchema } from 
 import { getUserByAccountId } from '../repositories/user.repository';
 import { z } from 'zod';
 import { getSubjectByAccountId } from '../repositories/subject.repository';
+import { HttpException } from '../exceptions/http-exception';
+
+//xử lý các tác vụ liên quan đến subject
 
 class SubjectController {
   private subjectService = new SubjectService();
 
+  //tạo subject dành cho admin//user
   public create = async (req: RequestWithUser, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = req.role?.toUpperCase();
-      if (role !== 'ADMIN' && role !== 'USER') {
-        res.status(403).json({ message: 'Forbidden' });
-        return;
-      }
-      const subjectData = createSubjectSchema.parse(req.body);
+      //kiểm tra quyền
+      const role = req.role;
+      if (role !== 'ADMIN' && role !== 'USER') res.status(403).json({ message: 'Forbidden' });
+      
+      const subjectData = createSubjectSchema.parse(req.body);//lấy dữ liệu hồ sơ
+
+      //lấy thông tin cán bộ tạo hồ sơ
       const user = await getUserByAccountId(req.account?.id as string);
       const createdByUserId = user?.id;
+
       if (!createdByUserId) {
         res.status(401).json({ message: 'Unauthorized: Account ID not found' });
         return;
       }
+      //tạo hồ sơ
       const result = await this.subjectService.createSubjectAndInvite(subjectData, createdByUserId);
       res.status(201).json({ message: 'Hồ sơ đối tượng đã được tạo. Email mời kích hoạt đã được gửi.', data: result.subject });
     } catch (error) {
@@ -30,9 +37,12 @@ class SubjectController {
     }
   };
 
+  //active tài khoản đối tượng
   public activate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      //lấy thông tin active có token , username , password
       const activationData = activateAccountSchema.parse(req.body);
+      //thực hiện active tài khoản
       await this.subjectService.activateAccount(activationData);
       res.status(200).json({ message: 'Tài khoản đã được kích hoạt thành công. Bạn có thể đăng nhập ngay bây giờ.' });
     } catch (error) {
@@ -40,13 +50,17 @@ class SubjectController {
     }
   };
 
+  //lấy danh sách các đối tượng
   public getAll = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = req.role?.toUpperCase();
+      //kiểm tra quyền
+      const role = req.role;
       if (role !== 'ADMIN' && role !== 'USER') {
         res.status(403).json({ message: 'Forbidden' });
         return;
       }
+
+      //lấy thông tin user yêu cầu
       const user = await getUserByAccountId(req.account?.id as string)
       if(!user){
         res.status(401).json({ message: 'Unauthorized: Account ID not found' });
@@ -59,67 +73,77 @@ class SubjectController {
     }
   };
 
+  //lấy thông tin chi tiết 1 đối tượng
   public getById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const subjectId = z.string().parse(req.params.id);
-      const subject = await this.subjectService.findSubjectById(subjectId);
+      //lấy các thông tin tài khoản
+      const accountId = req.account?.id;
+      const role = req.account?.id
+      if(!accountId || !role) throw new HttpException(401,"Error author");
+
+      const subjectId = z.string().parse(req.params.id);//lấy id đối tượng
+      const subject = await this.subjectService.findSubjectById(subjectId, accountId, role);
       res.status(200).json({ data: subject, message: 'findOne' });
     } catch (error) {
       next(error);
     }
   };
 
+  //cập nhật thông tin của đối tượng
   public update = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = req.role?.toUpperCase();
-      if (role !== 'ADMIN' && role !== 'USER' ) {
-        res.status(403).json({ message: 'Forbidden' });
-        return;
-      }
+      const accountId = req.account?.id;
+      const role = req.role;
+      if(!accountId || !role) throw new HttpException(401,"Error author");
+
+      //lấy thông tin subject
       const subjectId = z.string().parse(req.params.id);
       const subjectData = updateSubjectSchema.parse(req.body);
-      const updatedSubject = await this.subjectService.updateSubject(subjectId, subjectData);
+
+      //cập nhật thông tin
+      const updatedSubject = await this.subjectService.updateSubject(subjectId, subjectData, accountId, role);
       res.status(200).json({ data: updatedSubject, message: 'update' });
     } catch (error) {
       next(error);
     }
   };
 
+  //xóa đối tượng
   public delete = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = req.role?.toUpperCase();
-      if (role !== 'ADMIN' && role !== 'USER') {
-        res.status(403).json({ message: 'Forbidden' });
-        return;
-      }
-      const subjectId = z.string().parse(req.params.id);
-      await this.subjectService.deleteSubject(subjectId);
+      const accountId = req.account?.id;
+      const role = req.role;
+      if(!accountId || !role) throw new HttpException(401,"Error author");
+
+      const subjectId = z.string().parse(req.params.id);//lấy subjectid
+      await this.subjectService.deleteSubject(subjectId, accountId, role);//xóa
       res.status(200).json({ message: 'deleted' });
     } catch (error) {
       next(error);
     }
   };
 
+  //cập nhật FCM token
   public updateFCMToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const role = req.role?.toUpperCase();
+      //kiểm tra quyền chỉ subject cập nhật
+      const accountId = req.account?.id;
+      const role = req.role;
+      if(!accountId || !role) throw new HttpException(401,"Error author");
       if (role !== 'SUBJECT') {
         res.status(403).json({ message: 'Forbidden' });
         return;
       }
+
+      //lấy fcm-token và kiểm tra
       const fcm_token = req.body.fcm_token
       if(!fcm_token){
         res.status(400).json({messager: "Dữ liệu không hợp lệ"})
         return;
       }
 
-      const subject = await getSubjectByAccountId(req.account?.id as string)
-      if(!subject){
-        res.status(401).json({ message: 'Unauthorized: Account ID not found' });
-        return;
-      }
-
-      await this.subjectService.updateToken(subject?.id, fcm_token);
+      //cập nhật token
+      await this.subjectService.updateToken(accountId, fcm_token);
       res.status(200).json({ message: 'updated' });
     } catch (error) {
       next(error);

@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import ZoneController from '../../controllers/zones.controller';
-import { authMiddleware } from '../../middlewares/auth.middleware';// Import the new RBAC middleware
-import { UserAccountRole } from '../../../generated/prisma/client'; // Import the Role enum
+import { authMiddleware } from '../../middlewares/auth.middleware';
+
+//xử lý các yêu cầu liên quan đến vùng
 
 class ZoneRoute {
   public path = '/zones';
@@ -13,29 +14,22 @@ class ZoneRoute {
   }
 
   private initializeRoutes() {
-    this.router.use(authMiddleware);
+    this.router.use(authMiddleware);//áp dụng middleware xác thực
 
-    // All zone management routes (GET, POST, PUT, DELETE) are accessible by ADMIN and USER roles.
-    this.router.get(
-      '/',
-      this.zoneController.getAll
-    );
-    this.router.get(
-      '/:id',
-      this.zoneController.getById
-    );
-    this.router.post(
-      '/',
-      this.zoneController.create
-    );
-    this.router.put(
-      '/:id',
-      this.zoneController.update
-    );
-    this.router.delete(
-      '/:id',
-      this.zoneController.delete
-    );
+    //lấy danh sách
+    this.router.get('/',this.zoneController.getAll);
+
+    //lấy thông tin chi tiết 1 zone theo id
+    this.router.get('/:id',this.zoneController.getById);
+
+    //tạo zone
+    this.router.post('/',this.zoneController.create);
+
+    //chỉnh sửa thông tin zone
+    this.router.put('/:id',this.zoneController.update);
+
+    //xóa zone
+    this.router.delete('/:id',this.zoneController.delete);
   }
 }
 

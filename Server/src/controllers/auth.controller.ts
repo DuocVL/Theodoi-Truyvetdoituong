@@ -53,7 +53,6 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
         //lấy refreshtoken từ body
         const { refreshToken } = req.body;
         const accountId = req.account?.id;
-
         if(!accountId || !req.role) return res.status(401).json({ message: 'Unauthorized' });
 
         await authService.logout(refreshToken, accountId, req.role);

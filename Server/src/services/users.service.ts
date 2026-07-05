@@ -1,7 +1,7 @@
 import { updateUserSchema } from '../dtos/users.dto';
-import { AccountStatus, User } from '../../generated/prisma/client';
+import { User } from '../../generated/prisma/client';
 import { deleteUser, getAllUsers, getUserById, updateUser } from '../repositories/user.repository'
-import Zod, { date } from 'zod';
+import Zod from 'zod';
 import { UserUpdateInput } from '../../generated/prisma/models';
 
 type UpdateUserData = Zod.infer<typeof updateUserSchema>;

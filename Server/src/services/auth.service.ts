@@ -201,7 +201,7 @@ export const refreshToken = async (data: RefreshTokenDto) => {
 export const logout = async (refreshToken: string, accountId: string, role: string) => {
     //băm mã token được gửi từ client
     const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    await refreshTokenRepository.deleteByToken(hashedToken);
+    await refreshTokenRepository.deleteByToken(hashedToken);//xóa refreshtoken
     //xóa fcm_token để không gửi cảnh báo về đây nữa nếu là subject
     if(role === "SUBJECT"){
         const subject = await subjectRepository.getSubjectByAccountId(accountId);

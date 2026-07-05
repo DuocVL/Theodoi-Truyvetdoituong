@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import SubjectController from '../../controllers/subjects.controller';
-import { authMiddleware } from '../../middlewares/auth.middleware'; // Import the new RBAC middleware// Import the Role enum
+import { authMiddleware } from '../../middlewares/auth.middleware';
+
+//xử lý các yêu cầu với subject
 
 class SubjectRoute {
   public path = '/subjects';
@@ -12,40 +14,29 @@ class SubjectRoute {
   }
 
   private initializeRoutes() {
-    // Route kích hoạt tài khoản là công khai (không cần token Bearer)
+    // Route kích hoạt tài khoản là công khai 
     this.router.post('/activate', this.subjectController.activate);
 
-    // All subject routes require authentication first.
+    //middleware xác thực
     this.router.use(authMiddleware);
 
-    // Routes for creating, updating, and deleting subjects.
-    // Accessible by both ADMIN and USER roles.
-    this.router.post(
-      '/',
-      this.subjectController.create
-    );
-    this.router.put(
-      '/fcm-token',
-      this.subjectController.updateFCMToken
-    );
-    this.router.put(
-      '/:id',
-      this.subjectController.update
-    );
+    //cacns bộ tạo đối tượng
+    this.router.post('/', this.subjectController.create);
 
-    this.router.delete(
-      '/:id',
-      this.subjectController.delete
-    );
+    //cập nhật fcm-token phục vụ gửi thông báo
+    this.router.put('/fcm-token',this.subjectController.updateFCMToken);
 
-    this.router.get(
-      '/',
-      this.subjectController.getAll
-    );
-    this.router.get(
-      '/:id',
-      this.subjectController.getById
-    );
+    //cập nhật thông tin hồ sơ
+    this.router.put('/:id',this.subjectController.update);
+
+    //xóa hồ sơ
+    this.router.delete('/:id',this.subjectController.delete);
+
+    //lấy danh sách đối tượng
+    this.router.get('/',this.subjectController.getAll);
+
+    //lấy thông tin chi tiết 1 đối tượng
+    this.router.get('/:id',this.subjectController.getById);
   }
 }
 

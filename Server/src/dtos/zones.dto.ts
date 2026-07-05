@@ -1,13 +1,14 @@
 // src/dtos/zones.dto.ts
 import { z } from 'zod';
 
+//schema tạo zone
 export const createZoneSchema = z.object({
-  subject_id: z.string().uuid({ message: 'Valid Subject ID is required' }),
-  zone_name: z.string().min(1, { message: 'Zone name is required' }),
-  type: z.enum(['SAFE', 'RESTRICTED'], { message: 'Invalid zone type (SAFE or RESTRICTED)' }),
-  latitude: z.number().min(-90).max(90, { message: 'Latitude must be between -90 and 90' }),
-  longitude: z.number().min(-180).max(180, { message: 'Longitude must be between -180 and 180' }),
-  radius: z.number().positive({ message: 'Radius must be a positive number' }), // Đơn vị: mét
+  subject_id: z.string().uuid(),
+  zone_name: z.string().min(1),
+  type: z.enum(['SAFE', 'RESTRICTED']),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  radius: z.number().positive(), // Đơn vị: mét
   interval_minutes: z.number().int().positive().optional().default(15),       // Chu kỳ nhắc nhở mặc định 15p
   grace_minutes: z.number().int().nonnegative().optional().default(5),       // Thời gian chờ gia hạn mặc định 5p
   active_start_time: z.string().optional(),
@@ -16,6 +17,7 @@ export const createZoneSchema = z.object({
   is_active: z.boolean().optional().default(true),
 });
 
+//schema cập nhật
 export const updateZoneSchema = z.object({
   zone_name: z.string().min(1).optional(),
   type: z.enum(['SAFE', 'RESTRICTED']).optional(),
