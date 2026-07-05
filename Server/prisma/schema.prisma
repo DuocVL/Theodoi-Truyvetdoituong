@@ -67,8 +67,8 @@ model Subject {
   phone      String?
   status     SubjectStatus @default(INACTIVE)
 
-  monitoring_start DateTime?
-  monitoring_end   DateTime?
+  monitoring_start DateTime? //thời gian bắt đầu cảnh báo
+  monitoring_end   DateTime? //thời gian kết thúc cản báo
   avatar_id        String?   @unique
   created_by       String
   created_at       DateTime  @default(now())
@@ -78,10 +78,11 @@ model Subject {
   interval_minutes  Int       @default(30) // dùng khi KHÔNG thuộc zone nào
   grace_minutes     Int       @default(5) // NEW - thời gian chờ thêm sau khi nhắc
   last_checkin_at   DateTime? //lần checkin hợp lệ gần nhất (bất kể trong/ngoài zone)
-  last_notified_at  DateTime? //lần nhắc gần nhất cho nghĩa vụ hiện tại
+  last_reminder_at  DateTime? //lần gửi nhắc 
+  last_alert_at     DateTime? //lần tạo Alert gần nhất
   current_zone_id   String? //zone SAFE đang là nơi tính hạn, null = đang dùng default
-  active_start_time String? // "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
-  active_end_time   String? // "22:00" - kết thúc khung giờ
+  active_start_time String  @default("07:00")// "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
+  active_end_time   String @default("17:00") // "22:00" - kết thúc khung giờ
 
   fcm_token String?
 
@@ -123,8 +124,8 @@ model Zone {
   created_by       String // ID của User (Cán bộ) tạo vùng này
   is_active        Boolean  @default(true)
 
-  active_start_time String? // "06:00" - bắt đầu khung giờ phải checkin, null = áp dụng 24/7
-  active_end_time   String? // "22:00" - kết thúc khung giờ
+  active_start_time String? // "06:00" - khung giwof trong zone này
+  active_end_time   String? // "22:00" - khung giwof két thúc
 
   created_at DateTime @default(now())
   update_at  DateTime @updatedAt
@@ -141,14 +142,15 @@ model Zone {
 
 model LocationHistory {
   id String @id @default(uuid())
-
   subject_id String
 
   latitude  Float
   longitude Float
-  accuracy  Float?
-  speed     Float?
-  altitude  Float?
+
+  //các thông số chưa được sử dụng 
+  accuracy  Float? //độ chính xác
+  speed     Float? //tốc độ
+  altitude  Float? //độ cao
 
   recorded_at DateTime @default(now())
   created_at  DateTime @default(now())
@@ -325,6 +327,7 @@ enum UserAccountRole {
 
 enum SubjectStatus {
   ACTIVE
+  NO_FACE
   INACTIVE
   COMPLETED
 }

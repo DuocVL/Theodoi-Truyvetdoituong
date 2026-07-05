@@ -1534,7 +1534,8 @@ export const SubjectScalarFieldEnum = {
   interval_minutes: 'interval_minutes',
   grace_minutes: 'grace_minutes',
   last_checkin_at: 'last_checkin_at',
-  last_notified_at: 'last_notified_at',
+  last_reminder_at: 'last_reminder_at',
+  last_alert_at: 'last_alert_at',
   current_zone_id: 'current_zone_id',
   active_start_time: 'active_start_time',
   active_end_time: 'active_end_time',
@@ -1672,8 +1673,7 @@ export const ImageScalarFieldEnum = {
   size: 'size',
   url: 'url',
   alt_text: 'alt_text',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
+  created_at: 'created_at'
 } as const
 
 export type ImageScalarFieldEnum = (typeof ImageScalarFieldEnum)[keyof typeof ImageScalarFieldEnum]

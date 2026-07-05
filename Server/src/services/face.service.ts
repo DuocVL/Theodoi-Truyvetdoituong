@@ -1,53 +1,45 @@
-
-/**
- * @file face.service.ts
- * @description
- * Lớp Service chứa logic nghiệp vụ cốt lõi cho module Face.
- * Nó được gọi bởi FaceController và tương tác với FaceRepository để thực hiện các thao tác 
- * liên quan đến dữ liệu khuôn mặt như lưu trữ và truy xuất.
- */
-
 import { FaceRepository } from '../repositories/face.repository';
 import { HttpException } from '../exceptions/http-exception';
 import { FaceData } from '../../generated/prisma/client';
+import { getSubjectByAccountId, update } from '../repositories/subject.repository';
+import { SubjectStatus } from '../../generated/prisma/enums';
+
+//lớp nghiệp vụ xử lý các nghiệp vụ liên quan đến khuôn mặt
 
 export class FaceService {
-  // Tiêm FaceRepository vào qua constructor
+
   private faceRepository = new FaceRepository()
 
-  /**
-   * @description Nghiệp vụ lưu một vector embedding mới cho một subject.
-   * @param {string} subjectId - ID của subject.
-   * @param {number[]} embedding - Vector embedding khuôn mặt.
-   * @returns {Promise<FaceData>} - Bản ghi face_data vừa được tạo.
-   */
-  public async registerFace(
-    subjectId: string,
-    embedding: number[],
-  ): Promise<FaceData> {
-    if (!embedding || !Array.isArray(embedding) || embedding.length === 0) {
+  public async registerFace(accountId: string, embedding: number[]): Promise<FaceData> {
+    //kiểm tra dữ liệu face_data
+    if (!embedding || !Array.isArray(embedding) || embedding.length === 0 || embedding.some(x => typeof x !== "number")) {
       throw new HttpException(400, 'Invalid or empty embedding vector provided.');
     }
 
-    const isAlreadyRegistered = await this.faceRepository.existsBySubjectId(subjectId);
-    
-    if (isAlreadyRegistered) {
-      throw new HttpException(400, 'Biometric data already exists. This subject has already registered a face.');
-    }
+    //xác định subject đăng ký
+    const subject = await getSubjectByAccountId(accountId);
+    if (!subject) throw new HttpException(403, 'Forbidden: User is not a subject');
+
+    //chỉ cho đăng ký nếu có trạng thái NO_FACE
+    if (subject.status !== SubjectStatus.NO_FACE) throw new HttpException(403, 'Subject không có quyền');
 
     // Gọi repository để lưu vào CSDL
-    const newFaceData = await this.faceRepository.create(subjectId, embedding);
+    const newFaceData = await this.faceRepository.create(subject.id, embedding);
+    await update(subject.id, { status: SubjectStatus.ACTIVE });//cập nhật trạng thái subject là đã thiết lập khuôn mặt
     return newFaceData;
   }
 
-  /**
-   * @description Nghiệp vụ lấy tất cả dữ liệu khuôn mặt của một subject.
-   * @param {string} subjectId - ID của subject.
-   * @returns {Promise<FaceData>} - Một mảng các bản ghi face_data.
-   */
-  public async getFaceDataForSubject(subjectId: string): Promise<FaceData> {
+  //lấy dữ liệu face của subject
+  public async getFaceDataForSubject(accountId: string): Promise<FaceData> {
+    //tìm subject yêu cầu
+    const subject = await getSubjectByAccountId(accountId);
+    if (!subject) throw new HttpException(403, 'Forbidden: User is not a subject');
+
+    //kiểm tra subject đã đăng ký khuôn mặt chưa
+    if (subject.status === SubjectStatus.NO_FACE) throw new HttpException(403, 'Subject chưa đăng ký khuôn mặt');
+
     // Gọi repository để truy xuất từ CSDL
-    const faceData = await this.faceRepository.findBySubjectId(subjectId);
+    const faceData = await this.faceRepository.findBySubjectId(subject.id);
     // Nếu chưa đăng ký khuôn mặt (kết quả là null) -> Báo lỗi ngay lập tức
     if (!faceData) {
       throw new HttpException(404, 'Biometric data not found. This subject has not registered a face yet.');

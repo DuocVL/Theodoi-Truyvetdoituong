@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { env } from '../configs/env';
 
-// 1. Khởi tạo và kiểm tra kết nối Transporter
+//Khởi tạo và kiểm tra kết nối Transporter
 const transporter = nodemailer.createTransport({
   host: env.EMAIL_HOST,
   port: Number(env.EMAIL_PORT),
@@ -13,7 +13,7 @@ transporter.verify()
   .then(() => console.log(`[EmailService] Connected to ${env.EMAIL_HOST}`))
   .catch((err) => console.error('[EmailService] Failed to connect:', err));
 
-// 2. Template HTML rút gọn (Sử dụng implicit return)
+//Template HTML rút gọn sử dụng tạo email
 const createHtmlTemplate = (title: string, greeting: string, body: string, link: string, btnText: string): string => `
   <div style="font-family: Arial, sans-serif; line-height:1.6; color:#333; max-width:600px; margin:20px auto; padding:20px; border:1px solid #ddd; border-radius:10px;">
     <h2 style="color:#0056b3;">${title}</h2>
@@ -29,7 +29,7 @@ const createHtmlTemplate = (title: string, greeting: string, body: string, link:
   </div>
 `;
 
-// 3. Hàm gửi mail core (Gom các logic lặp lại về đây)
+//Hàm gửi mail
 interface SendMailOptions {
   to: string;
   subject: string;

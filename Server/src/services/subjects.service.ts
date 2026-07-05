@@ -6,6 +6,7 @@ import { hashData } from '../utils/hash';
 import { sendActivationEmail } from './email.service'; // Use the singleton instance
 import Zod from 'zod';
 import { env } from '../configs/env';
+import { SubjectStatus } from '../../generated/prisma/enums';
 
 type CreateSubjectData = Zod.infer<typeof createSubjectSchema>;
 type UpdateSubjectData = Zod.infer<typeof updateSubjectSchema>;
@@ -121,11 +122,11 @@ class SubjectService {
         },
       });
 
-      // Cập nhật trạng thái của hồ sơ Subject tương ứng thành ACTIVE
+      // Cập nhật trạng thái của hồ sơ Subject tương ứng thành đã thiết lập nhưng NO_FACE
       await tx.subject.update({
         where: { account_id: activationToken.account_id },
         data: {
-          status: 'ACTIVE',
+          status: SubjectStatus.NO_FACE,
         },
       });
 

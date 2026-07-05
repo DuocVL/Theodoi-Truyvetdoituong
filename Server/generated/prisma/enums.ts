@@ -61,6 +61,7 @@ export type UserAccountRole = (typeof UserAccountRole)[keyof typeof UserAccountR
 
 export const SubjectStatus = {
   ACTIVE: 'ACTIVE',
+  NO_FACE: 'NO_FACE',
   INACTIVE: 'INACTIVE',
   COMPLETED: 'COMPLETED'
 } as const

@@ -58,7 +58,7 @@ export class CheckinService {
     //Tính xem checkin này có trễ hạn không, để gán LATE/ON_TIME đúng
     const safeHit = zones.find(z => z.type === 'SAFE' && isInsideZone(latitude, longitude, z));//kiểm tra đối tượng có đang checkin trong vùng an toàn không
     const interval = safeHit?.interval_minutes ?? subject.interval_minutes;//lấy chu kì điểm danh ưu tiên theo zone -> subject
-    const baseline = subject.last_checkin_at ?? subject.monitoring_start ?? subject.created_at;//xác định mốc thười gian gốc checkin cuối->mốc bắt đầu giám sát ->ngày tạo hồ sơ 
+    const baseline = subject.last_checkin_at ?? subject.monitoring_start ?? subject.created_at;//xác định mốc thời gian gốc checkin cuối->mốc bắt đầu giám sát ->ngày tạo hồ sơ 
     const dueAt = new Date(baseline.getTime() + interval * 60_000);//thời gian tối đa phải check-in = mốc gốc + chu kỳ ms
     const isLate = new Date() > dueAt;//nếu thời gian hiện tại quá hạn -> LATE
 
@@ -71,7 +71,7 @@ export class CheckinService {
     //reset lịch theo dõi checkin trễ vẫn được tính là đã hoàn thành, chỉ đánh dấu LATE để lưu vết
     await prisma.subject.update({
       where: { id: subject.id },
-      data: { last_checkin_at: new Date(), last_notified_at: null, current_zone_id: safeHit?.id ?? null },
+      data: { last_checkin_at: new Date(), last_alert_at: null, last_reminder_at: null, current_zone_id: safeHit?.id ?? null },
     });
 
     return checkin;
