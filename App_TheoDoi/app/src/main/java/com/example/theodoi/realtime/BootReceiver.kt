@@ -17,3 +17,54 @@ class BootReceiver : BroadcastReceiver() {
         }
     }
 }
+
+/*
+MainActivity
+      │
+      ▼
+LocationForegroundService
+      │
+      ├─────────────── Foreground Notification
+      │
+      ├─────────────── WakeLock
+      │
+      ▼
+Coroutine (while true)
+      │
+      ▼
+Đọc interval (PrefsManager)
+      │
+      ▼
+LocationRepository
+      │
+      ▼
+GpsManager
+      │
+      ├── Cache còn mới → dùng cache
+      │
+      └── Cache cũ/không có → FusedLocationProviderClient
+                               │
+                               ├── GPS
+                               ├── Wi-Fi
+                               └── Trạm phát sóng
+      │
+      ▼
+LocationPayload
+      │
+      ▼
+Retrofit + OkHttp
+      │
+      ▼
+REST API Server
+      │
+      ▼
+HTTP Response
+      │
+      ▼
+Cập nhật Notification
+      │
+      ▼
+delay(interval)
+      │
+      └─────────────── lặp lại
+ */

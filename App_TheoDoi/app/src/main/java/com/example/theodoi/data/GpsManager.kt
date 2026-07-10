@@ -16,60 +16,62 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 
+//Lớp chịu trách nhiệm lấy vị trí của thiết bị một cách nhanh , có giới hạn thời gian và có cơ chế dự phòng
+
+//Kết quả trả về
 data class GpsResult(
     val latitude: Double,
     val longitude: Double,
-    val accuracy: Float,
+    val accuracy: Float,//sai số
     val timestamp: Long,
-    val isMock: Boolean
+    val isMock: Boolean,//cho biết GPS có phải giả lập không
 )
+
 
 class GpsManager(private val context: Context) {
 
     companion object {
         private const val TAG = "GpsManager"
-        private const val CACHE_MAX_AGE = 300000L   // 5 phut
-        private const val ACCEPT_ACCURACY = 150f
-        private const val GPS_TIMEOUT = 3000L        // 3s - timeout THUC SU, khong phu thuoc Play Services tu huy
+        private const val CACHE_MAX_AGE = 300000L   //5 phút - cache cũ hơn 5 phút không được dùng
+        private const val ACCEPT_ACCURACY = 150f//sai số chấp nhận 150m
+        private const val GPS_TIMEOUT = 3000L        // 3s - timeouts nếu GPS chưa trả kết quả trong 3s - dừng chờ
     }
 
+    //API của Google Play Services kết hợp GPS + WIFI + Cell Tower + Bluetooth nhanh hơn và tiết kiệm pin
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
-    fun fetchFastLocation(
-        coroutineScope: CoroutineScope,
-        callback: (GpsResult?) -> Unit
-    ) {
-        if (!hasLocationPermission()) {
+    fun fetchFastLocation(coroutineScope: CoroutineScope, callback: (GpsResult?) -> Unit ) {
+        if (!hasLocationPermission()) {//kiểm tra quyền
             Log.e(TAG, "Missing location permission")
             callback(null)
             return
         }
 
-        // Canh bao neu nguoi dung tat het Location Services -> se cham/khong co ket qua
+        //Kiểm tra người dùng có bật GPS không
         if (!isLocationServiceEnabled()) {
             Log.w(TAG, "Location Services dang bi tat tren thiet bi - se rat cham hoac fail")
         }
 
         coroutineScope.launch {
-            val result = resolveLocation()
+            val result = resolveLocation()//lấy vị trí
             callback(result)
         }
     }
 
     @SuppressLint("MissingPermission")
     private suspend fun resolveLocation(): GpsResult? {
-        // 1. Thu cache truoc (khong ton thoi gian)
+        //Lấy vị trí cache của Google Play Services
         val cached = getCachedLocationOrNull()
         if (cached != null) {
-            val age = System.currentTimeMillis() - cached.time
+            val age = System.currentTimeMillis() - cached.time//tính age của cache
             Log.d(TAG, "Cached location: age=${age / 1000}s, accuracy=${cached.accuracy}m")
-            if (age < CACHE_MAX_AGE && cached.accuracy <= ACCEPT_ACCURACY) {
+            if (age < CACHE_MAX_AGE && cached.accuracy <= ACCEPT_ACCURACY) {//kiểm tra các thông tin về age và độ chính xác
                 Log.d(TAG, "Dung cache - tra ket qua ngay")
                 return convert(cached)
             }
         }
 
-        // 2. Quet vi tri moi, NHUNG voi timeout o tang coroutine - LUON tra ve dung han
+        //Lấy vị trí GPS mới với thời gian timeout là 3s
         Log.d(TAG, "Quet vi tri moi voi timeout cung ${GPS_TIMEOUT}ms")
         val fresh = withTimeoutOrNull(GPS_TIMEOUT) {
             requestCurrentLocationSuspend()
@@ -100,11 +102,11 @@ class GpsManager(private val context: Context) {
         }
 
     /**
-     * Quan trong: day la suspendCancellableCoroutine THUAN, khong dua vao
-     * CancellationTokenSource.cancel() de dam bao callback tra ve.
-     * Khi withTimeoutOrNull huy coroutine ngoai, invokeOnCancellation se
-     * goi token.cancel() chi de tiet kiem pin/mang, KHONG dung de cho doi
-     * ket qua tra ve nua (vi withTimeoutOrNull da tu tra null roi).
+     Quan trong: day la suspendCancellableCoroutine THUAN, khong dua vao
+     CancellationTokenSource.cancel() de dam bao callback tra ve.
+     Khi withTimeoutOrNull huy coroutine ngoai, invokeOnCancellation se
+     goi token.cancel() chi de tiet kiem pin/mang, KHONG dung de cho doi
+     ket qua tra ve nua (vi withTimeoutOrNull da tu tra null roi).
      */
     @SuppressLint("MissingPermission")
     private suspend fun requestCurrentLocationSuspend(): Location? =
@@ -126,6 +128,7 @@ class GpsManager(private val context: Context) {
             }
         }
 
+        //chuyển đổi dữ liệu
     private fun convert(location: Location): GpsResult = GpsResult(
         latitude = location.latitude,
         longitude = location.longitude,
@@ -134,11 +137,13 @@ class GpsManager(private val context: Context) {
         isMock = location.isFromMockProvider
     )
 
+    //kiểm tra quyền vị trí
     private fun hasLocationPermission(): Boolean =
         ContextCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
 
+    //kiểm tra GPS Provider hoặc Network Provider
     private fun isLocationServiceEnabled(): Boolean {
         val lm = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ||

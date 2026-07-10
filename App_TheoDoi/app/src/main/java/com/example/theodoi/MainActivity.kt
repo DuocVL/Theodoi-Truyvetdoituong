@@ -31,54 +31,65 @@ import android.provider.Settings
 import com.example.theodoi.realtime.PrefsManager
 import com.example.theodoi.realtime.LocationForegroundService
 
+//Màn hình chính sau khi người dùng đăng nhập
+
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var sessionManager: SessionManager
-    private lateinit var database: AppDatabase
-    private val faceRepository = FaceRepository()
-    private val cryptoManager = CryptoManager()
+    private lateinit var binding: ActivityMainBinding//liên kết giao diện XML
+    private lateinit var sessionManager: SessionManager//QUnr lý phiên(token)
+    private lateinit var database: AppDatabase//cơ sở dữ liệu room
 
+    private val faceRepository = FaceRepository()//api xử lý khuôn mặt
+    private val cryptoManager = CryptoManager()//mã hóa dữ liệu FaceID trước khi lưu
+
+    //Được gọi đầu tiên khi MainActivity được khởi tạo
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Khởi tạo binding liên kết đến giao diện
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ApiClient.init(applicationContext)
-
-        // Ví dụ: thiết lập interval = 30s do người dùng cấu hình
-        PrefsManager.setIntervalMs(this, 30_000L)
+        //Thiết lập chu kỳ quét GPS và cấu hình địa chỉ URL
+        PrefsManager.setIntervalMs(this, 60_000L)//1 phút 60000ms
         PrefsManager.setServerUrl(this, "http://192.168.44.101:3333/api/v1/locations/")
 
+        //Khởi động chuỗi rà soát và yêu cầu cấp quyền hệ thống vị trí , thông báo ảnh ,...
         requestAllPermissions()
 
+        //Khởi tạo SessionManager và database để lấy token , dữ liệu face_data
         sessionManager = SessionManager(this)
-        database = AppDatabase.getDatabase(this)
+        database = AppDatabase.getDatabase(this)//khởi tạo singleton của room database
 
+        //xin quyền notifiacation có thể phải gộp
         askNotificationPermission()
 
-        // Thực hiện kiểm tra đồng bộ khuôn mặt từ Server
+        // Thực hiện kiểm tra đồng bộ khuôn mặt từ Server nếu trong room chưa có
         checkAndSyncFaceBiometric()
 
+        //Thực hiện check-in
         binding.btnGoToVerify.setOnClickListener {
             startActivity(Intent(this, VerifyActivity::class.java))
         }
 
-        // Bên trong hàm onCreate() của MainActivity.kt thiết lập:
+        //Thwucj hiện logic khi Logout
         binding.btnLogout.setOnClickListener {
-            val refreshToken = sessionManager.getRefreshToken()
+            val refreshToken = sessionManager.getRefreshToken()//lấy refresh token
             if (!refreshToken.isNullOrEmpty()) {
                 lifecycleScope.launch(Dispatchers.IO) {
                     try {
                         // Gọi API báo hủy Token lên hệ thống Backend
                         AuthRepository().logout(refreshToken)
                     } catch (e: Exception) {
-                        // Có thể bỏ qua lỗi kết nối tại đây vì ta vẫn sẽ xóa cục bộ
+                        Log.e("THEODOI_LOGOUT",e.toString())
                     }
 
                     withContext(Dispatchers.Main) {
                         // Xóa SharedPreferences
                         sessionManager.clearTokens()
+
+                        //TODO xóa face_data đã lưu, kiểm tra có dữ liệu cần đồng bộ không
+                        database.userDao().deleteAllUsers()
 
                         // Điều hướng quay lại LoginActivity
                         val intent = Intent(this@MainActivity, LoginActivity::class.java)
@@ -90,11 +101,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        //đến activity lịch sử chekc-in
         binding.btnGoToHistory.setOnClickListener {
             startActivity(Intent(this, HistoryActivity::class.java))
         }
 
     }
+
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -103,6 +117,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //xin quyền thông báo từ ANDROID 13+ yêu cầu
     private fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -171,8 +186,9 @@ class MainActivity : AppCompatActivity() {
         startTrackingService()
     }
 
+    //đồng bộ dữu liệu khuôn mặt
     private fun checkAndSyncFaceBiometric() {
-        val token = sessionManager.getAccessToken()
+        val token = sessionManager.getAccessToken()//lấy accesstoken
         if (token == null) {
             Toast.makeText(this, "Phiên đăng nhập hết hạn!", Toast.LENGTH_SHORT).show()
             return
@@ -212,7 +228,7 @@ class MainActivity : AppCompatActivity() {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@MainActivity, "Đồng bộ FaceID thành công!", Toast.LENGTH_SHORT).show()
                         }
-                    } else if (response.code() == 404) {
+                    } else if (response.code() != 200) {
                         // Trường hợp mã lỗi 404: Bắt buộc chuyển hướng đến RegisterActivity
                         withContext(Dispatchers.Main) {
                             Toast.makeText(this@MainActivity, "Bạn chưa đăng ký dữ liệu khuôn mặt. Hãy thiết lập ngay!", Toast.LENGTH_LONG).show()

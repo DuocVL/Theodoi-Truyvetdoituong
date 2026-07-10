@@ -36,6 +36,91 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.random.Random
 
+/*
+                   VerifyActivity
+                         │
+ ┌───────────────────────┼────────────────────────┐
+ │                       │                        │
+ ▼                       ▼                        ▼
+CameraX             GpsManager            SessionManager
+ │                       │                        │
+ ▼                       ▼                        ▼
+FaceRecognition      Lấy GPS              Access Token
+Analyzer
+ │
+ ▼
+ML Kit + MobileFaceNet
+ │
+ ▼
+Liveness Detection
+ │
+ ▼
+Chụp ảnh bằng chứng
+ │
+ ▼
+CheckinRepository
+ │
+ ├──────────────► Online → Server
+ │
+ └──────────────► OfflineCheckinManager
+                     │
+                     ▼
+                SQLite + WorkManager
+ */
+
+ /*
+ Người dùng mở VerifyActivity
+            │
+            ▼
+Xin quyền Camera + GPS
+            │
+            ▼
+Mở CameraX
+            │
+            ▼
+FaceRecognitionAnalyzer
+            │
+            ▼
+ML Kit phát hiện khuôn mặt
+            │
+            ▼
+MobileFaceNet sinh Embedding
+            │
+            ▼
+Sinh thử thách Liveness
+            │
+            ▼
+Người dùng nháy mắt / mỉm cười
+            │
+            ▼
+Liveness thành công
+            │
+            ▼
+Chụp ảnh bằng chứng
+            │
+            ▼
+Lấy vị trí GPS
+            │
+            ▼
+Có Internet?
+      │                    │
+     Có                   Không
+      │                    │
+      ▼                    ▼
+Gửi API           Lưu SQLite Offline
+      │                    │
+      ▼                    ▼
+Server          WorkManager đồng bộ sau
+      │
+      ▼
+Check-in thành công
+  */
+
+/*VerifyActivity là màn hình xác thực (Face Verification) của hệ thống. 
+Đây là Activity trung tâm thực hiện toàn bộ quy trình check-in bằng khuôn mặt, từ mở camera, kiểm tra người thật (Liveness Detection), chụp ảnh bằng chứng,
+ lấy vị trí GPS đến gửi dữ liệu lên máy chủ hoặc lưu ngoại tuyến.
+ */
+
 class VerifyActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityVerifyBinding
@@ -74,6 +159,7 @@ class VerifyActivity : AppCompatActivity() {
             triggerChallenge()
         }
 
+        //kiểm tra quyền
         if (allPermissionsGranted()) {
             Log.d("VerifyActivity", "Quyen Camera va GPS da duoc cap truoc do")
             startCamera()
@@ -84,6 +170,7 @@ class VerifyActivity : AppCompatActivity() {
         }
     }
 
+    //tạo thử thách 1 là nhắm mắt , 2 là mỉm cười
     private fun triggerChallenge() {
         challengeTimer?.cancel()
         binding.btnRetry.visibility = View.GONE
@@ -107,6 +194,7 @@ class VerifyActivity : AppCompatActivity() {
         startTimeoutTimer()
     }
 
+    //thời gian thực hiện thủ thách
     private fun startTimeoutTimer() {
         challengeTimer = object : CountDownTimer(10000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -127,23 +215,28 @@ class VerifyActivity : AppCompatActivity() {
         }.start()
     }
 
+    //cấu hình camerax
     private fun startCamera() {
         Log.d("VerifyActivity", "Bat dau cau hinh va mo CameraX")
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            //hiển thị hình ảnh
             val preview = Preview.Builder().build().also {
                 it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
             }
 
+            //chụp ảnh
             imageCapture = ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                 .build()
 
+            //liên tục gửi frame sang FaceRecognitionAnalyzer phân tích
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
+                    //trả về các thông số đưa vào handleVerifyPipeline() để xử lý
                     it.setAnalyzer(cameraExecutor, FaceRecognitionAnalyzer(this) { vector, smile, leftEye, rightEye, faceCount, yaw, roll ->
                         handleVerifyPipeline(vector, smile, leftEye, rightEye, faceCount)
                     })
@@ -159,10 +252,11 @@ class VerifyActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    //nhận kết quả từ FaceRecognitionAnalyzer() 
     private fun handleVerifyPipeline(vector: FloatArray?, smile: Float, leftEye: Float, rightEye: Float, faceCount: Int) {
         if (!isActive) return
 
-        if (faceCount > 1) {
+        if (faceCount > 1) { // kiểm tra nhiều khuôn mặt
             challengeTimer?.cancel()
             isActive = false
             Log.w("VerifyActivity", "Canh bao: Phat hien nhieu khuon mat trong khung hinh ($faceCount)")
@@ -174,13 +268,14 @@ class VerifyActivity : AppCompatActivity() {
             }
             return
         }
-        if (faceCount == 0 || vector == null) return
+        if (faceCount == 0 || vector == null) return//không có mặt
 
         if (!isLivenessPassed) {
-            checkLiveness(smile, leftEye, rightEye, vector)
+            checkLiveness(smile, leftEye, rightEye, vector)//kiểm tra tuân thủ thủ thách
         }
     }
 
+    //kiểm tra tuân thủ thủ thách
     private fun checkLiveness(smile: Float, leftEye: Float, rightEye: Float, vector: FloatArray) {
         val pass = when (currentChallenge) {
             ChallengeType.BLINK_EYES -> leftEye < 0.25f && rightEye < 0.25f
@@ -200,12 +295,10 @@ class VerifyActivity : AppCompatActivity() {
         }
     }
 
+    //chụp ảnh bằng chứng gửi lên server
     private fun captureImageAndProceed(vector: FloatArray) {
         Log.d("VerifyActivity", "Chuan bi chup anh luu vao cacheDir")
-        // SUA: dung ten file co timestamp thay vi ten co dinh "checkin_proof.jpg".
-        // Ly do: neu submitCheckin loi mang va anh can duoc OfflineCheckinManager
-        // copy sang filesDir de dong bo sau, ten file co dinh de bi nham lan/de
-        // giua cac lan check-in lien tiep neu nguoi dung bam retry nhanh.
+
         val tempFile = File(cacheDir, "checkin_proof_${System.currentTimeMillis()}.jpg")
 
         if (imageCapture == null) {
@@ -240,6 +333,7 @@ class VerifyActivity : AppCompatActivity() {
         )
     }
 
+    //sau khi chụp ảnh lấy GPS
     private fun executeCheckInPipeline(vector: FloatArray, imageFile: File) {
         isActive = false
 
@@ -255,11 +349,6 @@ class VerifyActivity : AppCompatActivity() {
                 Log.d("VerifyActivity", "Lay duoc vi tri! Do sai so la: ${gpsResult.accuracy} met")
                 uploadCheckInData(vector, gpsResult.latitude, gpsResult.longitude, imageFile)
             } else {
-                // SUA: truoc day branch nay bi trong, khong lam gi ca -> nguoi dung
-                // bi "treo" man hinh khong hieu chuyen gi xay ra.
-                // Quyet dinh nghiep vu: check-in chấm cong KHONG nen duoc luu offline
-                // khi thieu toa do (rui ro gia mao vi tri / check-in "ao"). Yeu cau
-                // nguoi dung ra noi thoang hon roi thu lai, KHONG tu dong queue.
                 Log.w("VerifyActivity", "Khong lay duoc vi tri (het han GPS/khong co tin hieu)")
                 runOnUiThread {
                     binding.txtChallenge.text = "KHÔNG XÁC ĐỊNH ĐƯỢC VỊ TRÍ ⚠️"
@@ -271,6 +360,7 @@ class VerifyActivity : AppCompatActivity() {
         }
     }
 
+    //gủi dữ liệu lên server
     private fun uploadCheckInData(vector: FloatArray, lat: Double, lng: Double, imageFile: File) {
         val token = sessionManager.getAccessToken() ?: ""
         val notes = "Check-in tu thiet bi Android di dong"
@@ -336,7 +426,7 @@ class VerifyActivity : AppCompatActivity() {
         }
     }
 
-    // MOI
+    // kiểm tra mạng
     private fun isNetworkAvailable(): Boolean {
         val cm = getSystemService(ConnectivityManager::class.java)
         val network = cm.activeNetwork ?: return false

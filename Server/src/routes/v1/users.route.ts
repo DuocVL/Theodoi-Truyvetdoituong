@@ -2,6 +2,7 @@ import { Router } from 'express';
 import UserController from '../../controllers/users.controller';
 import { authMiddleware } from '../../middlewares/auth.middleware';
 
+//các yêu cầu liên quan đến cán bộ
 
 class UsersRoute {
   public path = '/users';
@@ -13,12 +14,19 @@ class UsersRoute {
   }
 
   private initializeRoutes() {
-    // All user management routes are protected and restricted to ADMINs.
+    //áp dụng middleware xác thực 
     this.router.use(authMiddleware);
 
+    //lấy danh sách user
     this.router.get(`/`, this.userController.getAll);
+
+    //lấy thông tin chi tiết 1 user
     this.router.get(`/:id`, this.userController.getById);
+
+    //cập nhật thông tin
     this.router.put(`/:id`, this.userController.update);
+
+    //xóa user
     this.router.delete(`/:id`, this.userController.delete);
   }
 }

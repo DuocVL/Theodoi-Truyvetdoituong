@@ -5,10 +5,25 @@ import androidx.work.*
 import java.util.concurrent.TimeUnit
 
 /**
- * Goi scheduleSync() sau moi lan luu check-in offline, hoac luc app khoi dong
- * (de phong truong hop app bi kill khi dang offline, chua kip enqueue lai).
- * An toan goi nhieu lan: enqueueUniqueWork + KEEP se khong tao job trung lap.
+ớp quản lý việc lên lịch (schedule) cho WorkManager. 
+Nó không thực hiện đồng bộ dữ liệu, mà chỉ có nhiệm vụ đăng ký để SyncCheckinWorker chạy khi đủ điều kiện
  */
+
+ /*
+ VerifyActivity
+       │
+       ▼
+CheckinSyncScheduler
+       │
+       ▼
+WorkManager
+       │
+       ▼
+SyncCheckinWorker
+       │
+       ▼
+Server
+  */
 object CheckinSyncScheduler {
 
     private const val UNIQUE_WORK_NAME = "offline_checkin_sync"

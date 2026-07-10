@@ -18,6 +18,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
+//thực hiện gửi yêu cầu cập nhật fcm_token khi có thay đổi
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 

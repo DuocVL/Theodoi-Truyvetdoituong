@@ -31,6 +31,184 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.random.Random
 
+/*
+                RegisterActivity
+                       │
+      ┌────────────────┼─────────────────┐
+      │                │                 │
+      ▼                ▼                 ▼
+ CameraX      FaceRecognitionAnalyzer  SessionManager
+      │                │                 │
+      ▼                ▼                 ▼
+ Preview      ML Kit + MobileFaceNet   Access Token
+      │
+      ▼
+ Liveness Detection
+      │
+      ▼
+ Face Embedding
+      │
+      ▼
+ FaceRepository
+      │
+      ▼
+      Server
+      │
+      ▼
+ CryptoManager
+      │
+      ▼
+ Room Database
+ */
+
+ /*
+ Mở RegisterActivity
+        │
+        ▼
+Xin quyền Camera
+        │
+        ▼
+Khởi động CameraX
+        │
+        ▼
+FaceRecognitionAnalyzer
+        │
+        ▼
+ML Kit phát hiện khuôn mặt
+        │
+        ▼
+Sinh thử thách ngẫu nhiên
+(Nháy mắt hoặc mỉm cười)
+        │
+        ▼
+Kiểm tra Liveness
+        │
+        ▼
+Kiểm tra góc khuôn mặt
+        │
+        ▼
+Sinh Face Embedding
+        │
+        ▼
+Gửi embedding lên Server
+        │
+        ▼
+Server lưu dữ liệu
+        │
+        ▼
+Mã hóa embedding bằng AES
+        │
+        ▼
+Lưu vào Room Database
+        │
+        ▼
+Chuyển sang MainActivity
+  */
+
+/*
+Người dùng
+    │
+    ▼
+Mở RegisterActivity
+    │
+    ▼
+Kiểm tra quyền Camera
+    │
+    ├── Chưa có → Xin quyền
+    │
+    └── Đã có
+            │
+            ▼
+Khởi động CameraX
+            │
+            ├── Preview (Hiển thị camera)
+            │
+            └── ImageAnalysis
+                    │
+                    ▼
+      FaceRecognitionAnalyzer
+                    │
+                    ▼
+          ML Kit Face Detection
+                    │
+                    ├── Không phát hiện khuôn mặt
+                    │         │
+                    │         └── Chờ frame tiếp theo
+                    │
+                    ├── > 1 khuôn mặt
+                    │         │
+                    │         └── Hủy đăng ký
+                    │
+                    └── 1 khuôn mặt
+                              │
+                              ▼
+                  Cắt khuôn mặt (Crop)
+                              │
+                              ▼
+                 Resize về 112 × 112
+                              │
+                              ▼
+               MobileFaceNet (TensorFlow Lite)
+                              │
+                              ▼
+               Sinh Face Embedding (192 chiều)
+                              │
+                              ▼
+                  Trả callback về Activity
+                              │
+                              ▼
+            Sinh thử thách ngẫu nhiên
+         (Nháy mắt hoặc Mỉm cười)
+                              │
+                              ▼
+             Người dùng thực hiện thử thách
+                              │
+                              ▼
+               Kiểm tra Liveness
+                              │
+                  ├── Không đạt
+                  │       │
+                  │       └── Timeout hoặc Retry
+                  │
+                  └── Đạt
+                          │
+                          ▼
+             Kiểm tra góc khuôn mặt
+            (Yaw ≤ 15°, Roll ≤ 15°)
+                          │
+                  ├── Không đạt
+                  │       │
+                  │       └── Yêu cầu nhìn thẳng
+                  │
+                  └── Đạt
+                          │
+                          ▼
+            FaceRepository.registerFaceToServer()
+                          │
+                          ▼
+                     Backend API
+                          │
+                 Lưu embedding vào DB
+                          │
+                 Trả subject_id
+                          │
+                          ▼
+          Chuyển FloatArray → ByteArray
+                          │
+                          ▼
+      CryptoManager.encrypt()
+      (AES/GCM với AndroidKeyStore)
+                          │
+                          ▼
+               Sinh CipherText + IV
+                          │
+                          ▼
+             Room Database (UserEntity)
+                          │
+                          ▼
+              Chuyển sang MainActivity
+* */
+
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
@@ -68,8 +246,8 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    //thủ thách
     private fun triggerChallenge() {
-        // CẬP NHẬT: Hủy bộ đếm cũ nếu có trước khi bắt đầu lượt mới để tránh chồng chéo bộ nhớ
         challengeTimer?.cancel()
 
         binding.btnRetry.visibility = View.GONE
@@ -92,6 +270,7 @@ class RegisterActivity : AppCompatActivity() {
         startTimeoutTimer()
     }
 
+    //thời gian thực hiện thủ thách
     private fun startTimeoutTimer() {
         challengeTimer = object : CountDownTimer(10000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -112,6 +291,7 @@ class RegisterActivity : AppCompatActivity() {
         }.start()
     }
 
+    //mở camera
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -139,6 +319,7 @@ class RegisterActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    //xử lý đăng ký
     private fun handleRegisterPipeline(vector: FloatArray?, smile: Float, leftEye: Float, rightEye: Float, faceCount: Int, yaw: Float, roll: Float) {
         if (!isActive) return
 
@@ -186,6 +367,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    //lưu dữ liệu
     private fun saveFaceToDatabase(vector: FloatArray) {
         isActive = false
         val token = sessionManager.getAccessToken()

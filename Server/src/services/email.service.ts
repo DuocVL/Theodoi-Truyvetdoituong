@@ -29,7 +29,7 @@ const createHtmlTemplate = (title: string, greeting: string, body: string, link:
   </div>
 `;
 
-//Hàm gửi mail
+//chuẩn hóa dữ liệu gửi
 interface SendMailOptions {
   to: string;
   subject: string;
@@ -40,6 +40,7 @@ interface SendMailOptions {
   btnText: string;
 }
 
+//gửi mail
 const sendMail = async ({ to, subject, title, greeting, body, link, btnText }: SendMailOptions) => {
   await transporter.sendMail({
     from: '"Giám Sát Đối Tượng" <noreply@theodoitruyvetdoituong.com>',

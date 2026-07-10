@@ -10,6 +10,86 @@ import com.example.theodoi.data.SessionManager
 import java.io.File
 import java.io.IOException
 
+/*
+VerifyActivity
+        │
+        ▼
+Kiểm tra Internet
+        │
+   ┌────┴────┐
+   │         │
+Có mạng   Không có mạng
+   │         │
+   ▼         ▼
+Gửi API   Lưu SQLite (OfflineCheckin)
+                 │
+                 ▼
+          WorkManager
+                 │
+                 ▼
+       SyncCheckinWorker
+                 │
+                 ▼
+        Gửi lại lên Server
+                 │
+        ┌────────┴─────────┐
+        ▼                  ▼
+    Thành công         Thất bại
+        │                  │
+        ▼                  ▼
+ Xóa dữ liệu local     Retry sau
+ */
+
+ /*
+ VerifyActivity
+      │
+      ▼
+Không có Internet
+      │
+      ▼
+OfflineCheckinManager
+      │
+      ▼
+Room Database
+(PENDING)
+      │
+      ▼
+CheckinSyncScheduler
+      │
+      ▼
+WorkManager
+      │
+      ▼
+SyncCheckinWorker
+      │
+      ▼
+Đọc Access Token
+      │
+      ▼
+Đọc danh sách PENDING
+      │
+      ▼
+Duyệt từng bản ghi
+      │
+      ├── Ảnh không tồn tại
+      │         │
+      │         ▼
+      │      Xóa bản ghi
+      │
+      └── Có ảnh
+                │
+                ▼
+        Gửi API Check-in
+                │
+     ┌──────────┼───────────┐
+     ▼          ▼           ▼
+ Thành công   HTTP 4xx   Lỗi mạng/HTTP 5xx
+     │          │           │
+     ▼          ▼           ▼
+Xóa bản ghi  Đánh dấu   Result.retry()
+và ảnh       FAILED      (WorkManager chạy lại)
+  */
+
 class SyncCheckinWorker(
     context: Context,
     workerParams: WorkerParameters
